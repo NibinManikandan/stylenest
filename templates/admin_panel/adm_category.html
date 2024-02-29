@@ -1,0 +1,63 @@
+{% extends "admin_panel/adm_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle d-flex justify-content-between">
+        <h1>Categories</h1>
+        <div class="addcatogorybutton text-end">
+            <a href="{% url 'add_category' %}" class="btn btn-dark">Add Categories</a>
+        </div>
+    </div>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">Admin</li>
+            <li class="breadcrumb-item active">Categories</li>
+        </ol>
+    </nav>
+        <!-- End Page Title -->
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+
+                <div class="card-body">
+                    <table class="table datatable table-borderless mt-3">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>List / Unlist</th>
+                                <th>Actions</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+            
+                         {% for cate in categories %}
+                            <tr>
+                                <td>{{cate.id}}</td>
+                                <td>{{cate.C_name}}</td>
+                                {% if cate.is_listed %}
+                                <td><a href='category_status/{{cate.id}}'><span class="badge bg-danger">Unlist</span></a></td>
+                                {% else %}
+                                <td><a href='category_status/{{cate.id}}'>&nbsp;&nbsp;&nbsp;<span class="badge bg-success">List</span></a></td>
+                                {% endif %}
+                                    <td style='font-size:20px; cursor: pointer;'>
+                                        <a href='edit_category/{{cate.id}}' class="btn btn-warning btn-sm edit-category" >
+                                            <i class="bi bi-pencil-square"></i>Edit
+                                        </a>                 
+                                </td>
+                            </tr>     
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- End Recent Sales -->
+    </main>
+
+{% endblock %}

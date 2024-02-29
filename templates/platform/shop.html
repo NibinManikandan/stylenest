@@ -1,0 +1,32 @@
+{% extends "platform/common.html" %}
+{% load static %}	
+{% block content %}
+
+
+<div class="intro-excerpt">
+    <h1 style='text-align: center;" aria-hidden="true"></i>'>Shop</h1>
+
+</div>
+
+<div class="untree_co-section product-section before-footer-section">
+<div class="container">
+      <div class="row">
+        {% for product in products %}
+        <div class="col-12 col-md-3 col-lg-3 mb-3">
+            <a class="product-item" href="../prod_details/{{product.id}}">
+                <img src="{{ product.images.all.0.Pro_image.url }}" class="img-fluid product-thumbnail" alt="{{ product.Pro_name }}">
+                <h3 class="product-title">{{ product.Pro_name }}</h3>
+                <strong class="product-price">{{ product.Pro_price }}</strong>
+        
+                <span class="icon-cross">
+                    <img src="{% static 'images/cross.svg' %}" class="img-fluid">
+                </span>
+            </a>
+        </div> 
+        {% endfor %}
+        
+      </div>
+</div>
+</div>
+
+{%endblock%}

@@ -1,0 +1,276 @@
+{% extends "platform/common.html" %}
+{% load static %}	
+{% block content %}
+		<!-- Start Hero Section -->
+			<div class="hero">
+				<div class="container">
+					<div class="row justify-content-between">
+						<div class="col-lg-5">
+							<div class="intro-excerpt">
+								<h1>Modern Interior <span clsas="d-block">Design Studio</span></h1>
+								<p class="mb-4">Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique.</p>
+								<p><a href="{% url 'shop' %}" class="btn btn-secondary me-2">Shop Now</a></p>
+							</div>
+						</div>
+						<div class="col-lg-7">
+							<div class="hero-img-wrap">
+								<img src="{% static '/images/couch.png' %}" class="img-fluid">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<!-- End Hero Section -->
+
+		<!-- Start Product Section -->
+		<div class="product-section">
+			<div class="container">
+				<div class="row">
+
+					<!-- Start Column 1 -->
+					<div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
+						<h2 class="mb-4 section-title">Crafted with excellent material.</h2>
+						<p class="mb-4">Redefining Home Decor with Metal Furniture. Explore Chic and Durable Designs. Elevate Your Living Space Today </p>
+						<p><a href="{% url 'shop' %}" class="btn">Explore</a></p>
+					</div> 
+					<!-- End Column 1 -->
+
+					<!-- Start Column 2 -->
+					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+						<a class="product-item" href="cart.html">
+							<img src="{% static "/images/chair-a-5-1.jpg" %}" class="img-fluid product-thumbnail">
+							<h3 class="product-title">Nordic Chair</h3>
+							<strong class="product-price">5550.00</strong>
+
+							<span class="icon-cross">
+								<img src="{% static '/images/cross.svg' %}" class="img-fluid">
+							</span>
+						</a>
+					</div> 
+					<!-- End Column 2 -->
+
+					<!-- Start Column 3 -->
+					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+						<a class="product-item" href="cart.html">
+							<img src="{% static '/images/Bench.jpg' %}" class="img-fluid product-thumbnail">
+							<h3 class="product-title">Kruzo Aero Chair</h3>
+							<strong class="product-price">2229.00</strong>
+
+							<span class="icon-cross">
+								<img src="{% static '/images/cross.svg' %}" class="img-fluid">
+							</span>
+						</a>
+					</div>
+					<!-- End Column 3 -->
+
+					<!-- Start Column 4 -->
+					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+						<a class="product-item" href="cart.html">
+							<img src="{% static '/images/officetable-b4.jpg' %}" class="img-fluid product-thumbnail">
+							<h3 class="product-title">Ergonomic Chair</h3>
+							<strong class="product-price">4143.00</strong>
+
+							<span class="icon-cross">
+								<img src="{% static '/images/cross.svg' %}" class="img-fluid">
+							</span>
+						</a>
+					</div>
+					<!-- End Column 4 -->
+
+				</div>
+			</div>
+		</div>
+		<!-- End Product Section -->
+
+		<!-- Start Why Choose Us Section -->
+		<div class="why-choose-section">
+			<div class="container">
+				<div class="row justify-content-between">
+					<div class="col-lg-6">
+						<h2 class="section-title">Why Choose Us</h2>
+						<p>At StyleNest, we understand that choosing the right furniture for your home is a big decision. That's why we strive to provide you with the best shopping experience possible. Here are a few reasons why you should choose us for all your furniture needs.</p>
+
+						<div class="row my-5">
+							<div class="col-6 col-md-6">
+								<div class="feature">
+									<div class="icon">
+										<img src="{% static 'images/truck.svg' %}" alt="Image" class="imf-fluid">
+									</div>
+									<h3>Fast &amp; Free Shipping</h3>
+									<p>Enjoy fast, free shipping on all orders at StyleNest! Shop now and get your furniture delivered straight to your door without any additional cost.</p>
+								</div>
+							</div>
+
+							<div class="col-6 col-md-6">
+								<div class="feature">
+									<div class="icon">
+										<img src="{% static 'images/bag.svg' %}" alt="Image" class="imf-fluid">
+									</div>
+									<h3>Easy to Shop</h3>
+									<p>Discover furniture made easy! Explore our collection and shop hassle-free. With simple navigation and seamless checkout, finding your perfect piece is a breeze.</p>
+								</div>
+							</div>
+
+							<div class="col-6 col-md-6">
+								<div class="feature">
+									<div class="icon">
+										<img src="{% static 'images/support.svg' %}" alt="Image" class="imf-fluid">
+									</div>
+									<h3>24/7 Support</h3>
+									<p>Need assistance? Our dedicated support team is available around the clock to help you with any questions or concerns. Contact us anytime for prompt and friendly assistance.</p>
+								</div>
+							</div>
+
+							<div class="col-6 col-md-6">
+								<div class="feature">
+									<div class="icon">
+										<img src="{% static 'images/return.svg' %}" alt="Image" class="imf-fluid">
+									</div>
+									<h3>Hassle Free Returns</h3>
+									<p>Enjoy stress-free returns with our hassle-free policy. If you're not completely satisfied with your purchase, simply return it within hours for a full refund or exchange. Shop confidently knowing we've got you covered!</p>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="col-lg-5">
+						<div class="img-wrap">
+							<img src="{% static '/images/choose_us.jpg' %}" alt="Image" class="img-fluid">
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<!-- End Why Choose Us Section -->
+
+		<!-- Start We Help Section -->
+		<div class="we-help-section">
+			<div class="container">
+				<div class="row justify-content-between">
+					<div class="col-lg-7 mb-5 mb-lg-0">
+						<div class="imgs-grid">
+							<div class="grid grid-1"><img src="{% static '/images/decor-1.jpg' %}" alt="Untree.co"></div>
+							<div class="grid grid-2"><img src="{% static '/images/decor-2.jpg' %}" alt="Untree.co"></div>
+							<div class="grid grid-3"><img src="{% static '/images/decor-3.jpg' %}" alt="Untree.co"></div>
+						</div>
+					</div>
+					<div class="col-lg-5 ps-lg-5">
+						<h2 class="section-title mb-4">We Help You Make Modern Interior With our Quality Products</h2>
+						<p>Unlock the potential of your living space with our expert tips and guidance. Our helpful resources are designed to inspire and empower you to create stunning interiors that reflect your unique style. From design inspiration to practical advice, we're here to help you bring your vision to life.</p>
+
+						<ul class="list-unstyled custom-list my-4">
+							<li>Delve into our curated collection, igniting your imagination and transforming your space with our Products</li>
+							<li>Access insider tips and tricks from our team of interior design professionals for a polished finish.</li>
+							<li>Learn practical techniques for optimizing space, choosing colors, and arranging furniture effectively.</li>
+							<li>Get personalized support and recommendations tailored to your unique style and preferences.</li>
+						</ul>
+						<p><a herf="{% url 'shop' %}" class="btn">Explore</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End We Help Section -->
+
+		<!-- Start Welcome Section -->
+		<div class="testimonial-section">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-7 mx-auto text-center">
+						<h2 class="section-title">Welcome to StyleNest</h2>
+					</div>
+				</div>
+
+				<div class="row justify-content-center">
+					<div class="col-lg-12">
+						<div class="testimonial-slider-wrap text-center">
+							<div class="testimonial-slider">
+								
+								<div class="item">
+									<div class="row justify-content-center">
+										<div class="col-lg-8 mx-auto">
+
+											<div class="testimonial-block text-center">
+												<blockquote class="mb-5">
+													<p>&ldquo;As the Co-founder of StyleNest, Nibin M Brings a passion for innovation and a keen eye for design to our team. Which a commitment to creating unique and stylish spaces, Nibin collabrates with our team to curate inspired collections that elevate every home. Join us on our Journey to redefine the art of living with StyleNest.&rdquo;</p>
+												</blockquote>
+
+												<div class="author-info">
+													<div class="author-pic">
+														<img src="{% static '/images/mine.jpeg' %}" alt="Maria Jones" class="img-fluid">
+													</div>
+													<h3 class="font-weight-bold">Nibin M</h3>
+													<span class="position d-block mb-3">CEO, Co-Founder, StyleNest Inc.</span>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								</div> 
+								<!-- END item -->
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Welcome section -->
+
+		<!-- Start Popular Section -->
+		<div class="blog-section">
+			<div class="container">
+				<div class="row mb-5">
+					<div class="col-md-6">
+						<h2 class="section-title">Popular</h2>
+					</div>
+					<div class="col-md-6 text-start text-md-end">
+						<a href="{% url 'shop' %}" class="more">View All</a>
+					</div>
+				</div>
+
+				<div class="row">
+
+					<div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
+						<div class="post-entry">
+							<a href="#" class="post-thumbnail"><img src="{% static 'images/kitchen.jpg' %}" alt="Image" class="img-fluid"></a>
+							<div class="post-content-entry">
+								<h3>Revamp Your Kitchen</h3>
+								<div class="meta">
+									<p>Transform your kitchen with our stylish and functional furniture pieces. Enhance efficiency and elegance in every corner</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
+						<div class="post-entry">
+							<a href="#" class="post-thumbnail"><img src="{% static 'images/tea.jpg' %}" alt="Image" class="img-fluid"></a>
+							<div class="post-content-entry">
+								<h3>Elevate Your Living Hall</h3>
+								<div class="meta">
+									<p>Upgrade your living hall with our elegant metal furniture. Transform your space into a stylish and functional sanctuary.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
+						<div class="post-entry">
+							<a href="#" class="post-thumbnail"><img src="{% static 'images/dining.jpg' %}" alt="Image" class="img-fluid"></a>
+							<div class="post-content-entry">
+								<h3>Dining Hall Delights</h3>
+								<div class="meta">
+									<p>Discover Elegant Dining Hall Furniture at Style Nest. Elevate Your Dining Experience with Timeless Designs.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<!-- End Blog Section -->	
+
+{%endblock%}

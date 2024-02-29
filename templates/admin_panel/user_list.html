@@ -1,0 +1,74 @@
+{% extends "admin_panel/adm_base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    th, td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    td a {
+        text-decoration: none;
+    }
+</style>
+<main id="main" class="main">
+
+        <div class="pagetitle">
+            <h1>Users</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Admin</li>
+                    <li class="breadcrumb-item active">Users</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+
+                <div class="card-body">
+                    <table class="table datatable table-borderless mt-3">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Firstname</th>
+                                <th>Lastname</th>
+                                <th>Email</th>
+                                <th>Date of join</th>
+                                <th>Phone Number</th>
+                                <th>Block / Unblock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            
+                        {% for user in Users %}
+                            <tr>
+                                <td>{{user.id}}</td>
+                                <td>{{user.first_name}}</td>
+                                <td>{{user.last_name}}</td>
+                                <td>{{user.email}}</td>
+                                <td>{{user.date_of_join}}</td>
+                                <td>{{user.phone}}</td>
+                                
+                                {% if user.is_active %}
+                                    <td><a href='user_status/{{user.id}}'><span class="badge bg-danger">Block</span></a></td>
+                                {% else %}
+                                    <td><a href='user_status/{{user.id}}'><span class="badge bg-success">Unblock</span></a></td>
+                                {% endif %}
+                            </tr>
+                        
+                        
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+        <!-- End Recent Sales -->
+
+    </main>
+
+{% endblock %}
