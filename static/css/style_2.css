@@ -15,17 +15,17 @@
 
 body {
   font-family: "Open Sans", sans-serif;
-  background: #f6f9ff;
+  background: #3b5d50;
   color: #444444;
 }
 
 a {
-  color: #4154f1;
+  color: #0f1015;
   text-decoration: none;
 }
 
 a:hover {
-  color: #717ff5;
+  color: #f9f9fb;
   text-decoration: none;
 }
 
@@ -64,7 +64,7 @@ h6 {
   font-size: 24px;
   margin-bottom: 0;
   font-weight: 600;
-  color: #012970;
+  color: #131414;
 }
 
 /*--------------------------------------------------------------
@@ -77,7 +77,7 @@ h6 {
   right: 15px;
   bottom: 15px;
   z-index: 99999;
-  background: #4154f1;
+  background: #66666b;
   width: 40px;
   height: 40px;
   border-radius: 4px;
@@ -91,7 +91,7 @@ h6 {
 }
 
 .back-to-top:hover {
-  background: #6776f4;
+  background: #e1e1e5;
   color: #fff;
 }
 
@@ -148,7 +148,7 @@ h6 {
 }
 
 .dropdown-menu .dropdown-item:hover {
-  background-color: #f6f9ff;
+  background-color: #3b5d50;
 }
 
 @media (min-width: 768px) {
@@ -325,7 +325,7 @@ h6 {
 }
 
 .breadcrumb .active {
-  color: #51678f;
+  color: #afb1b7;
   font-weight: 600;
 }
 
@@ -372,7 +372,7 @@ h6 {
 .logo span {
   font-size: 26px;
   font-weight: 700;
-  color: #012970;
+  color: #121213;
   font-family: "Nunito", sans-serif;
 }
 
@@ -610,7 +610,7 @@ h6 {
   scrollbar-width: thin;
   scrollbar-color: #aab7cf transparent;
   box-shadow: 0px 0px 20px rgba(1, 41, 112, 0.1);
-  background-color: #fff;
+  background-color: #63817a;
 }
 
 @media (max-width: 1199px) {
@@ -684,7 +684,7 @@ h6 {
   align-items: center;
   font-size: 15px;
   font-weight: 600;
-  color: #4154f1;
+  color: #01020a;
   transition: 0.3;
   background: #f6f9ff;
   padding: 10px 15px;
@@ -694,7 +694,7 @@ h6 {
 .sidebar-nav .nav-link i {
   font-size: 16px;
   margin-right: 10px;
-  color: #4154f1;
+  color: #0f0f10;
 }
 
 .sidebar-nav .nav-link.collapsed {
@@ -1222,12 +1222,12 @@ h6 {
 
 .footer .copyright {
   text-align: center;
-  color: #012970;
+  color: #e7eaef;
 }
 
 .footer .credits {
   padding-top: 5px;
   text-align: center;
   font-size: 13px;
-  color: #012970;
+  color: #eff1f6;
 }

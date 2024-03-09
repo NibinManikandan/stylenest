@@ -39,7 +39,6 @@
 			</button>
 		  </div>
 
-
 		  <div class="">
 			{% for img in images%}
 				<img src="{{img.Pro_image.url}}" height="100px", width="130px">
@@ -72,16 +71,16 @@
           </div>
           <p>{{ products.Pro_description }}</p>
 
-
-          <div class="product-count">
-            <label for="size">Quantity</label>
-            <form action="#" class="display-flex">
-              <div class="qtyminus">-</div>
-              <input type="text" name="quantity" value="1" class="qty" />
-              <div class="qtyplus">+</div>
-            </form>
-            <a href="#" class="round-black-btn">Add to Cart</a>
-          </div>
+            <div class="product-count">
+              <label for="size">Quantity</label>
+              <form action="#" class="display-flex">
+                {% csrf_token %}
+                <div class="qtyminus">-</div>
+                <input type="text" name="quantity" value="1" class="qty" />
+                <div class="qtyplus">+</div>
+              </form>
+              <div onclick="addToCart({{products.id}})" type="button" class="round-black-btn">Add to Cart</div>
+            </div>
         </div>
       </div>
     </div>
@@ -144,5 +143,61 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="	sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-  <script src="{% static 'js3/main.js' %}"></script>
+
+
+<script src="{% static 'js3/main.js' %}"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  // Function to get the CSRF token from the page
+  function getCSRFToken() {
+      // Find the CSRF token input field in the page
+      var csrfTokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+      // If the CSRF token input field is found, return its value
+      if (csrfTokenInput) {
+          return csrfTokenInput.value;
+      } else {
+          // If the CSRF token input field is not found, return an empty string
+          return '';
+      }
+  }
+
+  // Function to handle adding a product to the cart
+  function addToCart(id) {
+    console.log('dfdsfdfdfsdf')
+      var csrftoken = getCSRFToken();
+      
+      // AJAX request to add the product to the cart
+      $.ajax({
+          url: "/add_to_cart/",
+          method: "POST",
+          data: { id: id, csrfmiddlewaretoken: csrftoken },
+          dataType: "json", 
+          success: function(data) {
+              console.log(data);
+              if (data.success) {
+                  Swal.fire({
+                      title: data.status,
+                      icon: "success"
+                  }).then(function() {
+                      // Optional: Perform any action after successful response
+                  });
+              } else {
+                  Swal.fire({
+                      title: data.status,
+                      icon: "error"
+                  });
+              }
+          },
+          error: function() {
+              alert('An error occurred while processing your request.');
+          }
+      });
+  }
+</script>
+
+
+<script src="{% static "libs/elevatezoom/js/jquery  .elevatezoom.js" %}"></script>
+
 {% endblock %}

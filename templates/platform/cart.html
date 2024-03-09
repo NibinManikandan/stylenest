@@ -1,137 +1,259 @@
 {% extends "platform/common.html" %}
-{% load static %}	
-{% block content %}
+{% load static %}  
 
-		<div class="untree_co-section before-footer-section">
-            <div class="container">
-              <div class="row mb-5">
-                <form class="col-md-12" method="post">
-					{% csrf_token %}
-                  <div class="site-blocks-table">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th class="product-thumbnail">Image</th>
-                          <th class="product-name">Product</th>
-                          <th class="product-price">Price</th>
-                          <th class="product-quantity">Quantity</th>
-                          <th class="product-total">Total</th>
-                          <th class="product-remove">Remove</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td class="product-thumbnail">
-                            <img src="images/product-1.png" alt="Image" class="img-fluid">
-                          </td>
-                          <td class="product-name">
-                            <h2 class="h5 text-black">Product 1</h2>
-                          </td>
-                          <td>$49.00</td>
-                          <td>
-                            <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-                              <div class="input-group-prepend">
-                                <button class="btn btn-outline-black decrease" type="button">&minus;</button>
-                              </div>
-                              <input type="text" class="form-control text-center quantity-amount" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
-                              <div class="input-group-append">
-                                <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                              </div>
-                            </div>
-        
-                          </td>
-                          <td>$49.00</td>
-                          <td><a href="#" class="btn btn-black btn-sm">X</a></td>
-                        </tr>
-        
-                        <tr>
-                          <td class="product-thumbnail">
-                            <img src="images/product-2.png" alt="Image" class="img-fluid">
-                          </td>
-                          <td class="product-name">
-                            <h2 class="h5 text-black">Product 2</h2>
-                          </td>
-                          <td>$49.00</td>
-                          <td>
-                            <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-                              <div class="input-group-prepend">
-                                <button class="btn btn-outline-black decrease" type="button">&minus;</button>
-                              </div>
-                              <input type="text" class="form-control text-center quantity-amount" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
-                              <div class="input-group-append">
-                                <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                              </div>
-                            </div>
-        
-                          </td>
-                          <td>$49.00</td>
-                          <td><a href="#" class="btn btn-black btn-sm">X</a></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </form>
-              </div>
-        
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row mb-5">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                      <button class="btn btn-black btn-sm btn-block">Update Cart</button>
+{% block content %}
+{% if cart_items %}
+<div class="untree_co-section before-footer-section">
+  <div class="container">
+    <div class="row mb-5">
+      <form class="col-md-12" method="post">
+        {% csrf_token %}
+        <div class="site-blocks-table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="product-thumbnail">Image</th>
+                <th class="product-name">Product</th>
+                <th class="product-price">Price</th>
+                <th class="product-quantity">Quantity</th>
+                <th class="product-total">Total</th>
+                <th class="product-remove">Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart_items %}
+              <tr>
+                <td class="product-thumbnail">
+                  <img src="{{ item.product.images.first.Pro_image.url }}" alt="Image" class="img-fluid">
+                </td>
+                <td class="product-name">
+                  <h2 class="h5 text-black">{{ item.product.Pro_name }}</h2>
+                </td>
+                <td>${{ item.product.Pro_price }}</td>
+                <td>
+                  <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-black decrease" type="button" onclick="cartQuantity({{ item.id }}, -1, {{item.quantity}})">&minus;</button>
                     </div>
-                    <div class="col-md-6">
-                      <button class="btn btn-outline-black btn-sm btn-block">Continue Shopping</button>
+                    <span class="num-{{ item.id }}">{{ item.quantity }}</span>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-black increase" type="button" onclick="cartQuantity({{ item.id }}, 1, {{item.quantity}})">&plus;</button>
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-12">
-                      <label class="text-black h4" for="coupon">Coupon</label>
-                      <p>Enter your coupon code if you have one.</p>
-                    </div>
-                    <div class="col-md-8 mb-3 mb-md-0">
-                      <input type="text" class="form-control py-3" id="coupon" placeholder="Coupon Code">
-                    </div>
-                    <div class="col-md-4">
-                      <button class="btn btn-black">Apply Coupon</button>
-                    </div>
-                  </div>
                 </div>
-                <div class="col-md-6 pl-5">
-                  <div class="row justify-content-end">
-                    <div class="col-md-7">
-                      <div class="row">
-                        <div class="col-md-12 text-right border-bottom mb-5">
-                          <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
-                        </div>
-                      </div>
-                      <div class="row mb-3">
-                        <div class="col-md-6">
-                          <span class="text-black">Subtotal</span>
-                        </div>
-                        <div class="col-md-6 text-right">
-                          <strong class="text-black">$230.00</strong>
-                        </div>
-                      </div>
-                      <div class="row mb-5">
-                        <div class="col-md-6">
-                          <span class="text-black">Total</span>
-                        </div>
-                        <div class="col-md-6 text-right">
-                          <strong class="text-black">$230.00</strong>
-                        </div>
-                      </div>
-        
-                      <div class="row">
-                        <div class="col-md-12">
-                          <button class="btn btn-black btn-lg py-3 btn-block" onclick="window.location='checkout.html'">Proceed To Checkout</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
+                </td>
+                <td class="price-{{item.id}}">${{ item.cart_price }}</td>
+                <td>
+                  <a onclick="confirmDelete({{item.id}})"><i class="bi bi-x-circle-fill"></i></a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row mb-5">
+          <div class="col-md-6 mb-3 mb-md-0">
+            <a href="#" class="btn btn-black btn-sm btn-block">Update Cart</a>
+          </div>
+          <div class="col-md-6">
+            <a href="{% url 'shop' %}" class="btn btn-outline-black btn-sm btn-block">Continue Shopping</a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label class="text-black h4" for="coupon">Coupon</label>
+            <p>Enter your coupon code if you have one.</p>
+          </div>
+          <div class="col-md-8 mb-3 mb-md-0">
+            <input type="text" class="form-control py-3" id="coupon" placeholder="Coupon Code">
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-black">Apply</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 pl-5">
+        <div class="row justify-content-end">
+          <div class="col-md-7">
+            <div class="row">
+              <div class="col-md-12 text-right border-bottom mb-5">
+                <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
               </div>
             </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <span class="text-black">Subtotal</span>
+              </div>
+              <div class="col-md-6 text-right">
+                <strong class="cart-total text-black ">${{ subPrice }}</strong>
+              </div>
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-6">
+                <span class="text-black">Total</span>
+              </div>
+              <div class="col-md-6 text-right">
+                <strong class="cart-total text-black">${{ subPrice }}</strong>
+              </div> 
+            </div>
           </div>
-		
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="text-center">
+  <img src="{% static 'images/empty.png' %}" alt="Empty Cart" style="height: 18rem; margin-top: 20px;">
+  <p class="mb-5" style="color: black;">Your cart is empty. </p>
+  <a href="{% url 'shop' %}" class="btn btn-dark mb-5" style="margin-top: 10px;">Back to Shop</a>
+</div>
+{% endif %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<script>
+  $(".js-select2").each(function(){
+    $(this).select2({
+      minimumResultsForSearch: 20,
+      dropdownParent: $(this).next('.dropDownSelect2')
+    });
+  })
+</script>
+<script>
+  $('.js-pscroll').each(function(){
+    $(this).css('position','relative');
+    $(this).css('overflow','hidden');
+    var ps = new PerfectScrollbar(this, {
+      wheelSpeed: 1,
+      scrollingThreshold: 1000,
+      wheelPropagation: false,
+    });
+
+    $(window).on('resize', function(){
+      ps.update();
+    })
+  });
+</script>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
+
+
+   <script>
+
+  function confirmDelete(id) {
+    const itemId = id;
+    
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+      // User confirmed the deletion, proceed with the AJAX request to remove the item
+      $.ajax({
+        type: 'POST',
+        url: '/remove_item_cart/',
+        data: {
+        item_id: itemId,
+        csrfmiddlewaretoken: getCookie('csrftoken')
+        },
+        success: function(data) {
+        console.log(data.message);
+        $('#cart-' + itemId).remove();
+        const remainingItems = $('.table_row').length;
+        if (remainingItems === 0) {
+                      location.reload();
+                  }
+        $('#js-show-cart').attr('data-notify', data.cartCount);
+
+        $('.col-sm-10.col-lg-7.col-xl-4.m-lr-auto.m-b-50').load(location.href + ' .col-sm-10.col-lg-7.col-xl-4.m-lr-auto.m-b-50>*', function () {
+          // Callback function after the content is reloaded (if needed)
+        });		
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+        console.error('Error removing item:', errorThrown);
+        }
+      });
+      }
+    });
+    }
+  
+  // Function to get the CSRF token from cookies
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  
+   </script>
+
+
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  // Function to get the CSRF token from cookies
+  function getCSRFToken() {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; csrftoken=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  
+    function cartQuantity(id, change, quantity) {     
+      console.log("Change: " + change);
+      console.log("id: " + id);
+      console.log('button clicked' + quantity)
+
+      $.ajax({
+        url: '/update_cart/',
+        type: 'POST',
+        data: {
+          change: change,
+          id: id,
+          quantity: quantity
+        },
+        headers: {
+          'X-CSRFToken': getCSRFToken() // Include the CSRF token in the request header
+        },
+        
+        success: function(data) {
+          // Handle the response from the server
+          console.log(data);
+
+          // Check if the request was successful
+          if (data.success) {
+            console.log(data)
+            // Update the displayed quantity based on the server response
+            var newQuantity = data.datas.updateQuantity;
+            console.log(newQuantity)
+            $(`.num-${id}`).text(newQuantity);
+            $(`.price-${id}`).text('$'+data.datas.total)
+            $(`.cart-total`).text('$'+data.datas.subTotal)
+            
+          } else {
+            // Display error message if the request was not successful
+            console.error('Error:', data.message);
+          }
+        },
+        error: function(error) {
+          console.error('Error:', error);
+        }
+      });
+    }
+ 
+</script>
+
 
 {% endblock %}

@@ -56,9 +56,6 @@ def user_Login(request):
 def send_otp_email(request):
     email=request.session.get('email')
     otp = random.randint(100000, 999999)
-    print(otp)
-
-
 
 
 # sending otp

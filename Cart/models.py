@@ -6,7 +6,12 @@ from userAuth.models import CustomUser
 
 
 class Cart(models.Model):
-    customuser = models.ForeignKey(CustomUser, null = True, on_delete = models.CASCADE)
+    user = models.ForeignKey(CustomUser, null = True, on_delete = models.CASCADE)
     product = models.ForeignKey(Product, null = True, on_delete = models.CASCADE)
     quantity = models.PositiveIntegerField(null = True, blank = False, default = 1)
     cart_price = models.PositiveIntegerField(default = 1)
+    created_at = models.DateTimeField(auto_now_add = True, null = True)
+
+
+    def __str__(self):
+        return f"{self.user.first_name}'s {self.product.Pro_name} in Cart"

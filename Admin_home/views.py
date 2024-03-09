@@ -161,7 +161,9 @@ def add_products(request):
         Pro_description = request.POST.get('description')
         category_id = request.POST.get('category')
         Pro_price = request.POST.get('price')
-
+        stock = request.POST.get('stock')
+        print(stock)
+        print('--------------------------')
         # checkthe product already exist with the same name
         try:
             existing_product = Product.objects.get(Pro_name__iexact=Pro_name)
@@ -176,7 +178,8 @@ def add_products(request):
             Pro_name = Pro_name,
             Pro_description = Pro_description,
             category = category,
-            Pro_price = Pro_price
+            Pro_price = Pro_price,
+            stock = stock
         )
         
         product.save()
@@ -209,6 +212,7 @@ def Edit_product(request, id):
         images  = request.FILES.getlist('images')   
         prod.Pro_price = request.POST.get('price')
         prod.category_id = request.POST.get('category')
+        prod.stock = request.POST.get('stock')
         prod.save()
 
         if images:
@@ -223,7 +227,6 @@ def Edit_product(request, id):
     
     return render(request, 'admin_panel/edit_product.html', context)
             
-
 
 # admin_logout
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
