@@ -1,0 +1,348 @@
+{% extends "platform/common.html" %}
+{% load static %}  
+
+{% block content %}
+	
+<div class="untree_co-section">
+	<div class="intro-excerpt">
+		<h1 style='text-align: center;" aria-hidden="true"></i>'>Checkout</h1>
+	</div>
+	<div class="container">
+		{% if user.is_authenticated %}
+		<div class="row mb-5">
+			<div class="col-md-12">
+			</div>
+		</div>
+		{% else %}
+		<div class="row mb-5">
+		<div class="col-md-12">
+		<div class="border p-4 rounded" role="alert">
+			Returning customer? <a href="{% url 'Userlogin' %}">Click here</a> to login
+		</div>
+		</div>
+	</div>
+		{% endif %}
+		<div class="row">
+		<div class="col-md-6 mb-5 mb-md-0">
+			<h2 class="h3 mb-3 text-black">Billing Details</h2>
+			<div class="p-3 p-lg-5 border bg-white">
+
+				{% comment %} current address section {% endcomment %}
+
+				<div class="form-group row">
+					<div class="col-md-6">
+						<label for="c_diff_fname" class="text-black">First Name <span class="text-danger"></label>
+						<input type="text" class="form-control" id="c_diff_fname" name="c_diff_fname" placeholder="First Name" value="{{addresses.first_name}}" disabled/>
+					</div>
+					<div class="col-md-6">
+						<label for="c_diff_lname" class="text-black">Last Name <span class="text-danger"></label>
+						<input type="text" class="form-control" id="c_diff_lname" name="c_diff_lname" placeholder="Last Name" value="{{addresses.last_name}}" disabled/>
+					</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-md-12">
+						<label for="c_address" class="text-black">Address <span class="text-danger"></label>
+							<input type="text" class="form-control" id="c_address" name="address" placeholder="Sreet Address" value="{{addresses.street_address}}" disabled/>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<div class="col-md-12">
+						<label for="c_companyname" class="text-black">Landmark <span class="text-danger"></label>
+						<input type="text" class="form-control" id="c_companyname" name="landmark" placeholder="Landmark" value="{{addresses.landmark}}" disabled/>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-md-6">
+							<label for="c_diff_country" class="text-black">Country <span class="text-danger"></label>
+							<input type="text" class="form-control" id="c_diff_country" name="c_country" placeholder="Country" value="{{addresses.country}}" disabled/>
+						</div>
+
+					<div class="form-group row">
+					<div class="col-md-6">
+						<label for="c_diff_state_country" class="text-black">State <span class="text-danger"></label>
+						<input type="text" class="form-control" id="c_diff_state" name="c_state" placeholder="State" value="{{addresses.state}}" disabled/>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-md-12">
+						<label for="c_companyname" class="text-black">City <span class="text-danger"></label>
+						<input type="text" class="form-control" id="c_city" name="city" placeholder="City" value="{{addresses.city}}" disabled/>
+					</div>
+					</div>
+
+					<div class="col-md-6">
+						<label for="c_diff_postal_zip" class="text-black">Posta / Zip <span class="text-danger"></label>
+						<input type="text" class="form-control" id="c_diff_postal_zip" name="c_postal" placeholder="Posta / Zip" value="{{addresses.pin_code}}" disabled/>
+					</div>
+					</div>
+
+					<div class="col-md-6">
+						<label for="c_diff_phone" class="text-black">Phone <span class="text-danger"></label>
+						<input type="text" class="form-control" id="c_diff_phone" name="c_diff_phone" placeholder="Phone Number" value="{{addresses.phone}}" disabled/>
+					</div>
+					</div>
+
+					{% comment %} end section {% endcomment %}
+
+
+			{% comment %} another address section {% endcomment %}
+
+			<div class="form-group" style="margin-top: 20px;">
+				<label for="c_ship_different_address" class="text-black" data-bs-toggle="collapse" href="#ship_different_address" role="button" aria-expanded="false" aria-controls="ship_different_address"><input type="checkbox" value="1" id="c_ship_different_address"> Ship To A Different Address?</label>
+				<div class="collapse" id="ship_different_address">
+				<div class="py-2">
+
+
+				<form method='POST' action=''>
+					{% csrf_token %}
+				<div class="form-group row">
+					<div class="col-md-6">
+						<label for="c_diff_fname" class="text-black">First Name <span class="text-danger">*</span></label>
+						<input type="text" class="form-control" id="c_diff_fname" name="c_diff_fname">
+					</div>
+					<div class="col-md-6">
+						<label for="c_diff_lname" class="text-black">Last Name <span class="text-danger">*</span></label>
+						<input type="text" class="form-control" id="c_diff_lname" name="c_diff_lname">
+					</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-md-12">
+						<label for="c_address" class="text-black">Address <span class="text-danger">*</span></label>
+						<textarea class="form-control" type="text" name="c_address" id="exampleFormControlTextarea1" rows="2" placeholder="Street address"></textarea>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<div class="col-md-12">
+						<label for="c_companyname" class="text-black">Landmark <span class="text-danger">*</span></label>
+						<input type="text" class="form-control" id="c_companyname" name="landmark" placeholder="Landmark">
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-md-6">
+							<label for="c_diff_country" class="text-black">country <span class="text-danger">*</span></label>
+							<input type="text" class="form-control" id="c_diff_country" name="c_country">
+						</div>
+
+					<div class="form-group row">
+					<div class="col-md-6">
+						<label for="c_diff_state_country" class="text-black">State <span class="text-danger">*</span></label>
+						<input type="text" class="form-control" id="c_diff_state" name="c_state">
+					</div>
+
+					<div class="col-md-6">
+						<label for="c_diff_postal_zip" class="text-black">Posta / Zip <span class="text-danger">*</span></label>
+						<input type="text" class="form-control" id="c_diff_postal_zip" name="c_postal">
+					</div>
+					</div>
+
+					<div class="col-md-6">
+						<label for="c_diff_phone" class="text-black">Phone <span class="text-danger">*</span></label>
+						<input type="text" class="form-control" id="c_diff_phone" name="c_diff_phone" placeholder="Phone Number">
+					</div>
+					</div>
+				</form>
+					<div class="card-footer text-body-secondary">
+						<div class="d-flex justify-content-end">
+						  <button type="button" class="btn btn-primary">Add New</button>
+						</div>
+					</div>
+				</div>
+			    </div>
+			</div>
+			</div>
+		</div>
+
+		{% comment %} end section {% endcomment %}
+
+		{% comment %} coupon section {% endcomment %}
+
+		<div class="col-md-6">
+			<div class="row mb-5">
+			<div class="col-md-12">
+				<h2 class="h3 mb-3 text-black">Coupon Code</h2>
+				<div class="p-3 p-lg-5 border bg-white">
+
+				<label for="c_code" class="text-black mb-3">Enter your coupon code if you have one</label>
+				<div class="input-group w-75 couponcode-wrap">
+					<input type="text" class="form-control me-2" id="c_code" placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
+					<div class="input-group-append">
+					<button class="btn btn-black btn-sm" type="button" id="button-addon2">Apply</button>
+					</div>
+				</div>
+
+				</div>
+			</div>
+			</div>
+
+			{% comment %} end section {% endcomment %}
+
+			<div class="row mb-5">
+			<div class="col-md-12">
+				<h2 class="h3 mb-3 text-black">Your Order</h2>
+				<div class="p-3 p-lg-5 border bg-white">
+				<table class="table site-block-order-table mb-5">
+					<thead>
+					<th>Product</th>
+					<th>Total</th>
+					</thead>
+					<tbody>
+						{% for items in obj  %}
+					<tr>
+						<td>{{items.product.Pro_name}} <strong class="mx-2"></td>
+						<td>${{items.cart_price}}</td>
+					</tr> 
+					<tr>
+						<td class="text-black font-weight-bold"><strong>Cart Subtotal</td>
+						<td class="text-black">${{total}}</td>
+					</tr>
+					<tr>
+						<td class="text-black font-weight-bold"><strong>Order Total</strong></td>
+						<td class="text-black font-weight-bold"><strong>${{total}}</strong></td>
+					</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+
+				  <div class="form-check">
+					<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+					<label class="form-check-label" for="flexRadioDefault1">
+					  Cash On Delivery
+					</label>
+				  </div>
+				  
+				  <div class="form-check">
+					<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+					<label class="form-check-label" for="flexRadioDefault1">
+					  Paypal
+					</label>
+				  </div>
+				  
+				  <div class="form-check">
+					<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+					<label class="form-check-label" for="flexRadioDefault2">
+					  Wallet
+					</label>
+				  </div>
+
+				<div>
+					<div class="form-group">
+						<a href="{% url 'confirm' %}" class="btn btn-outline-black btn-sm btn-block">Place Order</a>
+					</div>
+				</div>
+
+				</div>
+			</div>
+			</div>
+
+		</div>
+		</div>
+		<!-- </form> -->
+	</div>
+</div>
+
+
+<script>
+	$(document).ready(function () {
+		var rzp1; // Define rzp1 outside the click event handler
+	
+		$("#placeOrderButton").off("click").on("click", function (event) {
+		  event.preventDefault(); // Prevent default form submission
+	
+		  console.log("Button Clicked!");
+	
+		  // Your existing code...
+		  console.log("clicked");
+		  var address = $("input[name=address_select]:checked").val();
+		  var total = $("#coupon-total").text();
+		  var payment = $("input[name=payment_mode]:checked").val();
+		  var csrf_token = $("[name=csrfmiddlewaretoken]").val();
+		  console.log('button clicked');
+		  console.log(address, "address");
+	
+		  console.log('Before AJAX request');
+		  console.log(total);
+	
+	
+		  // Check if the cart is empty before proceeding
+		  checkCart(function (isCartEmpty) {
+			if (isCartEmpty) {
+			  // Show a SweetAlert message indicating that the cart is empty
+			  Swal.fire({
+				icon: 'warning',
+				title: 'Cart is Empty',
+				text: 'Please add items to your cart before placing an order.',
+				confirmButtonColor: '#d33',
+				confirmButtonText: 'OK'
+			  });
+			} else {
+			  // Cart is not empty, proceed with payment method check
+			  handlePaymentMethod(payment, address, total, csrf_token);
+			}
+		  });
+		});
+	
+		function handlePaymentMethod(payment, address, total, csrf_token) {
+		  
+		  if (payment === 'cod') {
+			// Cash on delivery script...
+			$.ajax({
+			  type: 'POST',
+			  url: "../place_order/",
+			  data: {
+				addreselect: address,
+				total: total,
+				payment_mode: payment,
+				csrfmiddlewaretoken: csrf_token,
+			  },
+			  success: function (response) {
+				console.log("entered");
+				if (response && response.success === true) {
+				  console.log("order_success");
+				  // Use SweetAlert for success...
+				  Swal.fire({
+					icon: 'success',
+					title: 'Success',
+					text: 'Your order has been placed successfully',
+					confirmButtonColor: '#3085d6',
+					confirmButtonText: 'OK'
+				  }).then((result) => {
+					if (result.isConfirmed) {
+					  window.location.href = '/order_success/';
+					}
+				  });
+				} else {
+				  // Use SweetAlert for error...
+				  Swal.fire({
+					icon: 'error',
+					title: 'Error',
+					text: response.message || 'Please Select Address',
+					confirmButtonColor: '#d33',
+					confirmButtonText: 'OK'
+				  });
+				}
+			  },
+			  error: function (error) {
+				console.error("AJAX request failed: ", error);
+				// Use SweetAlert for general error...
+				Swal.fire({
+				  icon: 'error',
+				  title: 'Error',
+				  text: 'An error occurred while processing your order',
+				  confirmButtonColor: '#d33',
+				  confirmButtonText: 'OK'
+				});
+			  }
+			});
+			}
+		}
+	})
+</script>
+
+
+{% endblock %}		

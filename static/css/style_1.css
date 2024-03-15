@@ -235,8 +235,8 @@ a {
 
 .btn {
   font-weight: 600;
-  padding: 12px 30px;
-  border-radius: 30px;
+  padding: 7px 30px;
+  border-radius: 10px;
   color: #ffffff;
   background: #2f2f2f;
   border-color: #2f2f2f; 
@@ -726,7 +726,7 @@ a {
       color: #3b5d50; 
     }
     .footer-section .subscription-form .form-control {
-      height: 50px;
+      height: 40px;
       border-radius: 10px;
       font-family: "Inter", sans-serif; 
     }
@@ -809,7 +809,7 @@ a {
 }
 
 .form-control {
-  height: 50px;
+  height: 38px;
   border-radius: 10px;
   font-family: "Inter", sans-serif; 
 }
@@ -915,5 +915,3 @@ textarea {
     border-radius: 50%;
     background: rgba(59, 93, 80, 0.2); 
 }
-
-

@@ -27,6 +27,7 @@
       type="text/css"
     />
     <title>StyleNest</title>
+    
   </head>
 
   <body>
@@ -73,24 +74,25 @@
           <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5  me-5">
             <li>
                 {% if user.is_authenticated %}
-                <div class="dropdown">
-                  <a class="nav-link dropdown-toggle" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                      <img src="{% static '/images/user.svg' %}"/>
-                  </a>
-                  <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="{% url 'cart_page' %}">Cart</a></li>
-                    <li><a class="dropdown-item" href="#">Wishlist</a></li>
-                    <li><a class="dropdown-item" href="#">My Order</a></li>
-                    <li><a class="dropdown-item" href="#">Wallet</a></li>
-                    <li><a class="dropdown-item" href="#">My Profile</a></li>
-                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                  </ul>
-              </div>
+                <div class="btn-group dropstart">
+                  <button type="button" class="btn btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{user.first_name}}
+                  </button>
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                      <li><a class="dropdown-item" href="{% url 'cart_page' %}">Cart</a></li>
+                      <li><a class="dropdown-item" href="#">Wishlist</a></li>
+                      <li><a class="dropdown-item" href="#">My Order</a></li>
+                      <li><a class="dropdown-item" href="#">Wallet</a></li>
+                      <li><a class="dropdown-item" href="{% url 'my_details' %}">My Profile</a></li>
+                      <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </div>
+                
                 {% else %}
-                <div class="dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{% static '/images/user.svg' %}"/>
-                    </a>
+                <div class="btn-group dropstart">
+                  <a class="nav-link dropdown-toggle" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{% static '/images/user.svg' %}"/>
+                  </a>
                     <ul class="dropdown-menu" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="{% url 'cart_page' %}">Cart</a></li>
                         <li><a class="dropdown-item" href="#">Wishlist</a></li>
@@ -101,11 +103,6 @@
                     </ul>
                 </div>
                 {% endif %}
-            </li>
-            <li>
-                <a class="nav-link" href="{% url 'cart_page' %}">
-                    <img src="{% static '/images/cart.svg' %}"/>
-                </a>
             </li>
         </ul>
         

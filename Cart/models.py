@@ -14,4 +14,4 @@ class Cart(models.Model):
 
 
     def __str__(self):
-        return f"{self.user.first_name}'s {self.product.Pro_name} in Cart"
+        return f"{self.user}'s {self.product} in Cart"

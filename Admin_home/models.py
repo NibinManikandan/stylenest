@@ -25,11 +25,11 @@ class Product(models.Model):
 
 
     def discounted_price(self):
-        discount_percentage = self.product_offer
+        discount_percentage = self.Pro_offer
         if discount_percentage > 0:
-            return self.price - ((self.price * discount_percentage) / 100)
+            return self.Pro_price - ((self.Pro_price * discount_percentage) / 100)
         else:
-            return self.price
+            return self.Pro_price
 
 
     def __str__(self):

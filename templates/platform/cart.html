@@ -3,7 +3,11 @@
 
 {% block content %}
 {% if cart_items %}
+
 <div class="untree_co-section before-footer-section">
+  <div class="intro-excerpt">
+    <h1 style='text-align: center;" aria-hidden="true"></i>'>Cart</h1>
+  </div>
   <div class="container">
     <div class="row mb-5">
       <form class="col-md-12" method="post">
@@ -58,22 +62,10 @@
       <div class="col-md-6">
         <div class="row mb-5">
           <div class="col-md-6 mb-3 mb-md-0">
-            <a href="#" class="btn btn-black btn-sm btn-block">Update Cart</a>
+            <button type="submit" class="btn btn-black btn-sm btn-block">Update Cart</button>
           </div>
           <div class="col-md-6">
             <a href="{% url 'shop' %}" class="btn btn-outline-black btn-sm btn-block">Continue Shopping</a>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <label class="text-black h4" for="coupon">Coupon</label>
-            <p>Enter your coupon code if you have one.</p>
-          </div>
-          <div class="col-md-8 mb-3 mb-md-0">
-            <input type="text" class="form-control py-3" id="coupon" placeholder="Coupon Code">
-          </div>
-          <div class="col-md-4">
-            <button class="btn btn-black">Apply</button>
           </div>
         </div>
       </div>
@@ -100,6 +92,11 @@
               <div class="col-md-6 text-right">
                 <strong class="cart-total text-black">${{ subPrice }}</strong>
               </div> 
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <a href="{% url 'checkout' %}" class="btn btn-outline-black btn-sm btn-block">Proceed to Chechkout</a>
+              </div>
             </div>
           </div>
         </div>

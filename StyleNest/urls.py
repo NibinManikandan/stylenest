@@ -12,6 +12,7 @@ urlpatterns = [
     path('', include('Admin_home.urls')),
     path('',include('Cart.urls')),
     path('', include('Userprofile.urls')),
+    path('', include('order_manage.urls')),
     
 ]
 
