@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{% static 'css/style3.css' %}" />
   </head>
 
-  <div class="container">
+  <div class="container" style="margin-top: 30px;">
     <div class="heading-section">
       <h2>Product Details</h2>
     </div>
@@ -72,14 +72,12 @@
           <p>{{ products.Pro_description }}</p>
 
             <div class="product-count">
-              <label for="size">Quantity</label>
+              <h4>Here You Can</h4>
               <form action="#" class="display-flex">
                 {% csrf_token %}
-                <div class="qtyminus">-</div>
-                <input type="text" name="quantity" value="1" class="qty" />
-                <div class="qtyplus">+</div>
               </form>
               <div onclick="addToCart({{products.id}})" type="button" class="round-black-btn">Add to Cart</div>
+              <div onclick="({{products.id}})" type="button" class="round-black-btn" style="background-color:darkorange;">Buy Now</div>
             </div>
         </div>
       </div>

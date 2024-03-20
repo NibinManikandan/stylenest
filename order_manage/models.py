@@ -1,5 +1,7 @@
+from unicodedata import category
 from django.db import models
 from Admin_home.models import *
+from Cart.models import Cart
 from userAuth.models import *
 from Userprofile.models import *
 from Admin_home.models import *
@@ -10,7 +12,7 @@ import uuid
 class Order(models.Model):
     order_id = models.CharField(max_length=10, primary_key=True, unique=True, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    order_address = models.ForeignKey(Address, on_delete=models.CASCADE)
     pyment_mode = models.CharField(max_length=100, null=False)
     order_date = models.DateTimeField(auto_now_add=True)
     quantity = models.PositiveIntegerField(default = 1)
@@ -37,8 +39,9 @@ class Order_item(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     ord_quantity = models.PositiveBigIntegerField(default=1)
     modified_time = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=100, default='Pending')
+    status = models.CharField(max_length=20, default='Order confirmed')
     ord_product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    category_name = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
 
     def total_price(self):
         return self.ord_quantity * self.price

@@ -10,6 +10,7 @@ from django.contrib import messages
 # Create your views here.
 
 # admin login
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
 
 def Dashboard(request):
@@ -226,7 +227,8 @@ def Edit_product(request, id):
         return redirect('adm_products')
     
     return render(request, 'admin_panel/edit_product.html', context)
-            
+
+
 
 # admin_logout
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)

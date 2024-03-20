@@ -1,8 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from Admin_home.models import *
 from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from django.views.decorators.cache import cache_control
+from django.contrib.auth.hashers import check_password
+from userAuth.models import *
+from Userprofile.models import *
 
 # Create your views here.
 
@@ -60,7 +64,6 @@ def filtter(request):
 
     categories = Category.objects.all()
 
-
     context = {
         'products':products,
         'categories':categories,
@@ -69,5 +72,6 @@ def filtter(request):
     }
 
     return render(request, 'platform/shop.html', context)
+
 
 

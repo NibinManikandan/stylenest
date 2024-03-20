@@ -19,6 +19,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
       rel="stylesheet"
     />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-sb3+xhO19oOMGt/yTlq7PBj1hIQP6hlK+D3Hx6/rGqUOQ1Pz4HjXtmN6umEhLyGvWdB12gwx0d51/z8rq2BGjA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     
     <link href="{% static 'css/tiny-slider.css' %}" rel="stylesheet" />
     <link
@@ -31,11 +34,19 @@
   </head>
 
   <body>
+
+    <style>
+      .btn-group.dropstart > .dropdown-toggle::after {
+        display: none;
+    }
+    </style>
+
     <!-- Start Header/Navigation -->
     <nav
       class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
       arial-label="Furni navigation bar"
     >
+
       
       <div class="ms-3" style="width: 40%;">
       <div class="d-flex align-items-center">
@@ -74,32 +85,34 @@
           <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5  me-5">
             <li>
                 {% if user.is_authenticated %}
-                <div class="btn-group dropstart">
+                <div class="btn-group">
                   <button type="button" class="btn btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user"></i>
                     {{user.first_name}}
                   </button>
-                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                      <li><a class="dropdown-item" href="{% url 'cart_page' %}">Cart</a></li>
-                      <li><a class="dropdown-item" href="#">Wishlist</a></li>
-                      <li><a class="dropdown-item" href="#">My Order</a></li>
-                      <li><a class="dropdown-item" href="#">Wallet</a></li>
-                      <li><a class="dropdown-item" href="{% url 'my_details' %}">My Profile</a></li>
-                      <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">                      
+                      <li><a class="dropdown-item" href="{% url 'cart_page' %}"><i class="fas fa-cart-shopping"></i> Cart</a></li>
+                      <li><a class="dropdown-item" href="#"><i class="fas fa-heart"></i> Wishlist</a></li>
+                      <li><a class="dropdown-item" href="{% url 'my_orders' %}"><i class="fas fa-box-open"></i> My Order</a></li>
+                      <li><a class="dropdown-item" href="#"><i class="fas fa-wallet"></i> Wallet</a></li>
+                      <li><a class="dropdown-item" href="{% url 'my_details' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                      <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                     </ul>
                 </div>
                 
                 {% else %}
-                <div class="btn-group dropstart">
+                <div class="btn-group">
                   <a class="nav-link dropdown-toggle" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="{% static '/images/user.svg' %}"/>
                   </a>
                     <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="{% url 'cart_page' %}">Cart</a></li>
-                        <li><a class="dropdown-item" href="#">Wishlist</a></li>
-                        <li><a class="dropdown-item" href="#">My Order</a></li>
-                        <li><a class="dropdown-item" href="#">Wallet</a></li>
-                        <li><a class="dropdown-item" href="#">My Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}">Login</a></li>
+                        <li><a class="dropdown-item" href="{% url 'cart_page' %}"><i class="fas fa-cart-shopping"></i> Cart</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-heart"></i> Wishlist</a></li>
+                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-box-open"></i> My Order</a></li>
+                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-wallet"></i> Wallet</a></li>
+                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-right-to-bracket"></i> Login</a></li>
                     </ul>
                 </div>
                 {% endif %}
@@ -118,7 +131,7 @@
     <!-- Start Footer Section -->
     <footer class="footer-section">
       <div class="container relative">
-        <div class="sofa-img">
+        <div class="sofa-img" style="margin-top: 30px;">
           <img
             src="{% static '/images/sofa.png' %}"
             alt="Image"

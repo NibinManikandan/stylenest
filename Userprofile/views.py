@@ -7,9 +7,8 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
-from django_countries import countries as django_countries
-
 # Create your views here.
+
 
 
 # function to user profile in profile
@@ -19,6 +18,13 @@ def my_details(request):
         data = CustomUser.objects.filter(email = request.user).first()
 
     return render(request, 'platform/my_profile.html', {'data':data})
+
+
+
+# order details
+def my_orders(request):
+    return render(request, 'platform/order_details.html')
+
 
 
 # function for edit user peofile
@@ -52,7 +58,6 @@ def change_password(request):
             old_pass = request.POST.get('old_pass')
             new_pass = request.POST.get('new_pass')
             cnf_new_pass = request.POST.get('cnf_new_pass')
-            
 
             if check_password(old_pass, user.password):
                 if new_pass == cnf_new_pass:
@@ -93,16 +98,20 @@ def manage_address(request):
         if not l_name.isalpha() or len(l_name) < 3:
             return redirect('manage_address')
         
-        if not c_address.isalpha() or len(c_address) < 6:
+        c_address_stripped = c_address.strip()
+        if not c_address_stripped or len(c_address) < 6:
             return redirect('manage_address')
         
-        if not city.isalpha() or len(city) < 3:
+        city_stripped = city.strip()
+        if not city_stripped or len(city) < 3:
             return redirect('manage_address')
         
-        if not landMark.isalpha() or len(landMark) < 3:
+        landMark_stripped = landMark.strip()
+        if not landMark_stripped or len(landMark) < 3:
             return redirect('manage_address')
         
-        if not state.isalpha() or len(state) < 3:
+        state_stripped = state.strip()
+        if not state_stripped or len(state) < 3:
             return redirect('manage_address')
         
         if not postal.isdigit() or len(postal) != 6:
@@ -111,8 +120,8 @@ def manage_address(request):
         if not c_phone.isdigit() or len(c_phone) != 10:
             return redirect('manage_address')
         
-
-        address_1 = Address.objects.create(
+        addressess = Address.objects.create(
+            user = user,
             country = country,
             first_name = f_name,
             last_name = l_name,
@@ -122,7 +131,6 @@ def manage_address(request):
             state = state,
             pin_code = postal,
             phone = c_phone,
-            user = user
 
         )
         
@@ -130,5 +138,3 @@ def manage_address(request):
     
     else:
         return render(request, 'platform/my_profile.html')
-
-

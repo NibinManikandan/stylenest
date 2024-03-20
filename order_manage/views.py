@@ -1,3 +1,5 @@
+import email
+from itertools import product
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
 import requests
@@ -17,118 +19,59 @@ from django_countries import countries as django_countries
 
 
 # Create your views here.
+
+# function for list orders
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def order_success(request):
-    if request.user.is_authenticated:
-        order_id = request.user.email
-        
-        if order_id:
-            order=get_object_or_404(Order, order_id=order_id)
-            order_item = Order_item.objects.filter(order=order)
+def orders(request):
+    if 'email' in request.session:
+        email = request.session['email']
+        user = CustomUser.objects.get(email=email)
+        orders = Order.objects.filter(user=user)
+        order_items = Order_item.objects.filter(order__in = orders).order_by('-id')
+    return render(request, 'platform/order_details.html',{"order_items":order_items})
 
-            context = {
-                'order':order,
-                'order_item':order_item
-            }
 
-            return render(request, 'platform/conform.htmls', context)
-        
-        else:
-            messages.error(request, 'Invalid or missing order ID in session.')
-            return redirect('home')
-        
 
-# fucntion for place order
+# function for order confirmed page
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def place_order(request):
-    if request.user.is_authenticated:
-        email = request.user.email
-        user = get_object_or_404(CustomUser, email=email)
-        cart_items = Cart.objects.filter(user=user)
-        out_of_stock = [item for item in cart_items if item.quantity > item.product.stock]
-        if out_of_stock:
-            return JsonResponse({'empty':True ,'message':'Item out of Stock'})
-        
-        if request.method == 'POST':
-            address_id = request.POST.get('address_select')
-            payment_mode = request.POST.get('pyment_mode')
-            cart_items = Cart.objects.filter(user=user)
-            delivery_address = get_object_or_404(Address, user=user, id=address_id)
-            coupon_code = request.POST.get('coupon_code')
-
-
-            if payment_mode == 'cod':
-                if cart_items.exists():
-                    try:
-                        with transaction.atomic():
-                            total_price = 0
-                            if 'final_amount' in request.session:
-                                final_amount = int(request.session['final_amount'])
-                            else:
-                                total_price = sum(cart_items.values_list('cart_price', flat=True))
-
-                            order = Order.objects.create(
-                                user = user,
-                                address = delivery_address,
-                                payment_mode = payment_mode,
-                                ord_quantity = 0,
-                                total_price = final_amount if 'final_amount' in request.session else total_price
-                            )
-
-                            for cart_item in cart_items:
-                                order_item = Order_item.objects.create(
-                                    order = order,
-                                    price = cart_item.cart_price,
-                                    ord_quantity = cart_item.quantity,
-                                    status = "Order Confirmed"
-                                )
-
-                                products = cart_item.product
-                                products.stock -= cart_item.quantity 
-                                products.save()
-
-
-                                order.quantity += order_item.ord_quantity
-                                cart_item.delete()
-
-                            order.expected_date = (order.order_date + timedelta(days=7))
-                            order.save()
-                            request.session['order_id'] = str(order.order_id)
-
-                            response_data = {
-                                'success':True,
-                                'message':'Your order hasbeen placed Successfully',
-                                'order_id':order.order_id
-                            }
-
-                            return JsonResponse(response_data)
-                    except Exception as e:
-                        response_data={
-                            'success':False,
-                            'message':'An error occured while placing your order'
-                        }
-
-                        return JsonResponse(response_data)
-                    
-                else:
-                    response_data = {
-                        'success':False,
-                        'message':'Your Cart is empty'
-                    }
-
-                    return JsonResponse(response_data)
-                
-        else:
-            response_data = {
-                'success':False,
-                'message':'Please login to Place an order!'
-            }
-
-            return JsonResponse(response_data)
-        
+def view_order(request):
+    order_id = request.session['order_id']
+    current_order = Order.objects.get(order_id=order_id)
+    context = {"current_order":current_order}
+    return render(request, 'platform/conform.html', context)
 
 
 
+# function for cancel the order
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def cancel_order(request, id):
+    email = request.session['email']
+    user = CustomUser.objects.get(email = email)
+    order = Order_item.objects.get(id=id)
+    order_status = "Cancelled"
 
-def confirm(request):
-    return render(request, 'platform/conform.html')
+    if order.order.payment_method == 'COD':
+        order.ord_product.stock += order.ord_quantity
+        order.save()
+        order.ord_product.save()
+
+    return redirect('orders')
+
+
+# function for return product
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def return_order(request, id):
+    email = request.session['email']
+    user = CustomUser.objects.get(email=email)
+
+    order = Order_item.objects.get(id=id)
+    order_status = "Returned"
+    order.ord_product.stock += order.ord_quantity
+    
+    amount = order.price * order.ord_quantity
+
+    balance = 0
+
+    order.save()
+    order.ord_product.save()
+    return redirect('orders')

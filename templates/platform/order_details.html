@@ -3,174 +3,295 @@
 
 {% block content %}
 
-  <style>
-    body {
-      background: #eee;
-    }
-    .card {
-      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
-    }
-    .card {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      word-wrap: break-word;
-      background-color: #fff;
-      background-clip: border-box;
-      border: 0 solid rgba(0, 0, 0, 0.125);
-      border-radius: 1rem;
-    }
-    .text-reset {
-      --bs-text-opacity: 1;
-      color: inherit !important;
-    }
-    a {
-      color: #5465ff;
-      text-decoration: none;
-    }
-  </style>
+<style>
 
-  <div class="container-fluid">
-    <div class="container">
-      <!-- Title -->
-      <div class="d-flex justify-content-between align-items-center py-3">
-        <h2 class="h5 mb-0"><a href="#" class="text-muted"></a> Order #16123222</h2>
-      </div>
+select.form-control:not([size]):not([multiple]) {
+    height: 44px;
+}
+select.form-control {
+    padding-right: 38px;
+    background-position: center right 17px;
+    background-image: url(data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNv…9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K);
+    background-repeat: no-repeat;
+    background-size: 9px 9px;
+}
+.form-control:not(textarea) {
+    height: 44px;
+}
+.form-control {
+    padding: 0 18px 3px;
+    border: 1px solid #dbe2e8;
+    border-radius: 22px;
+    background-color: #fff;
+    color: #606975;
+    font-family: "Maven Pro",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
-      <!-- Main content -->
-      <div class="row">
-        <div class="col-lg-8">
-          <!-- Details -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="mb-3 d-flex justify-content-between">
-                <div>
-                  <span class="me-3">22-11-2021</span>
-                  <span class="me-3">#16123222</span>
-                  <span class="me-3">Visa -1234</span>
-                  <span class="badge rounded-pill bg-info">SHIPPING</span>
-                </div>
-                <div class="d-flex">
-                  <button class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text"><i class="bi bi-download"></i> <span class="text">Invoice</span></button>
-                  <div class="dropdown">
-                    <button class="btn btn-link p-0 text-muted" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                      <li>
-                        <a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Edit</a>
-                      </li>
-                      <li>
-                        <a class="dropdown-item" href="#"><i class="bi bi-printer"></i> Print</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <table class="table table-borderless">
-                <tbody>
-                  <tr>
+.shopping-cart .table,
+.wishlist-table .table,
+.order-table .table {
+    margin-bottom: 0
+}
+
+.shopping-cart .btn,
+.wishlist-table .btn,
+.order-table .btn {
+    margin: 0
+}
+
+.shopping-cart>table>thead>tr>th,
+.shopping-cart>table>thead>tr>td,
+.shopping-cart>table>tbody>tr>th,
+.shopping-cart>table>tbody>tr>td,
+.wishlist-table>table>thead>tr>th,
+.wishlist-table>table>thead>tr>td,
+.wishlist-table>table>tbody>tr>th,
+.wishlist-table>table>tbody>tr>td,
+.order-table>table>thead>tr>th,
+.order-table>table>thead>tr>td,
+.order-table>table>tbody>tr>th,
+.order-table>table>tbody>tr>td {
+    vertical-align: middle !important
+}
+
+.shopping-cart>table thead th,
+.wishlist-table>table thead th,
+.order-table>table thead th {
+    padding-top: 17px;
+    padding-bottom: 17px;
+    border-width: 1px
+}
+
+.shopping-cart .remove-from-cart,
+.wishlist-table .remove-from-cart,
+.order-table .remove-from-cart {
+    display: inline-block;
+    color: #ff5252;
+    font-size: 18px;
+    line-height: 1;
+    text-decoration: none
+}
+
+.shopping-cart .count-input,
+.wishlist-table .count-input,
+.order-table .count-input {
+    display: inline-block;
+    width: 100%;
+    width: 86px
+}
+
+.shopping-cart .product-item,
+.wishlist-table .product-item,
+.order-table .product-item {
+    display: table;
+    width: 100%;
+    min-width: 150px;
+    margin-top: 5px;
+    margin-bottom: 3px
+}
+
+.shopping-cart .product-item .product-thumb,
+.shopping-cart .product-item .product-info,
+.wishlist-table .product-item .product-thumb,
+.wishlist-table .product-item .product-info,
+.order-table .product-item .product-thumb,
+.order-table .product-item .product-info {
+    display: table-cell;
+    vertical-align: top
+}
+
+.shopping-cart .product-item .product-thumb,
+.wishlist-table .product-item .product-thumb,
+.order-table .product-item .product-thumb {
+    width: 130px;
+    padding-right: 20px
+}
+
+.shopping-cart .product-item .product-thumb>img,
+.wishlist-table .product-item .product-thumb>img,
+.order-table .product-item .product-thumb>img {
+    display: block;
+    width: 100%
+}
+
+@media screen and (max-width: 860px) {
+    .shopping-cart .product-item .product-thumb,
+    .wishlist-table .product-item .product-thumb,
+    .order-table .product-item .product-thumb {
+        display: none
+    }
+}
+
+.shopping-cart .product-item .product-info span,
+.wishlist-table .product-item .product-info span,
+.order-table .product-item .product-info span {
+    display: block;
+    font-size: 13px
+}
+
+.shopping-cart .product-item .product-info span>em,
+.wishlist-table .product-item .product-info span>em,
+.order-table .product-item .product-info span>em {
+    font-weight: 500;
+    font-style: normal
+}
+
+.shopping-cart .product-item .product-title,
+.wishlist-table .product-item .product-title,
+.order-table .product-item .product-title {
+    margin-bottom: 6px;
+    padding-top: 5px;
+    font-size: 16px;
+    font-weight: 500
+}
+
+.shopping-cart .product-item .product-title>a,
+.wishlist-table .product-item .product-title>a,
+.order-table .product-item .product-title>a {
+    transition: color .3s;
+    color: #374250;
+    line-height: 1.5;
+    text-decoration: none
+}
+
+.shopping-cart .product-item .product-title>a:hover,
+.wishlist-table .product-item .product-title>a:hover,
+.order-table .product-item .product-title>a:hover {
+    color: #0da9ef
+}
+
+.shopping-cart .product-item .product-title small,
+.wishlist-table .product-item .product-title small,
+.order-table .product-item .product-title small {
+    display: inline;
+    margin-left: 6px;
+    font-weight: 500
+}
+
+.wishlist-table .product-item .product-thumb {
+    display: table-cell !important
+}
+
+@media screen and (max-width: 576px) {
+    .wishlist-table .product-item .product-thumb {
+        display: none !important
+    }
+}
+
+.shopping-cart-footer {
+    display: table;
+    width: 100%;
+    padding: 10px 0;
+    border-top: 1px solid #e1e7ec
+}
+
+.shopping-cart-footer>.column {
+    display: table-cell;
+    padding: 5px 0;
+    vertical-align: middle
+}
+
+.shopping-cart-footer>.column:last-child {
+    text-align: right
+}
+
+.shopping-cart-footer>.column:last-child .btn {
+    margin-right: 0;
+    margin-left: 15px
+}
+
+@media (max-width: 768px) {
+    .shopping-cart-footer>.column {
+        display: block;
+        width: 100%
+    }
+    .shopping-cart-footer>.column:last-child {
+        text-align: center
+    }
+    .shopping-cart-footer>.column .btn {
+        width: 100%;
+        margin: 12px 0 !important
+    }
+}
+
+.coupon-form .form-control {
+    display: inline-block;
+    width: 100%;
+    max-width: 235px;
+    margin-right: 12px;
+}
+
+.form-control-sm:not(textarea) {
+    height: 36px;
+}
+
+
+
+</style>
+
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container padding-bottom-3x mb-1">
+
+    <!-- Shopping Cart-->
+    <div class="table-responsive shopping-cart" style="margin-top: 30px; margin-bottom: 30px; background-color: white;">
+        {% if not order_items %}
+        <div class="empty-cart-message" style="margin-bottom: 20px;">
+          <center>
+            <i class="fa-solid fa-bag-shopping my-3 opacity-75" style="color: #000000; font-size:90px"></i>
+            <h2 class="cart-heading" >You have no Orders Yet</h2>
+            <p class="cart-subheading text-secondary">There are no items in your Orders. <br> Order items from StyleNest</p>
+            <a href="{% url "shop" %}"><button type="button" class="btn btn-primary">Shop now</button></a>
+          </center>
+        </div>
+      {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th class="text-center">Count</th>
+                    <th class="text-center">Subtotal</th>
+                    <th class="text-center">Discount</th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in order_items %}
+                <tr>
                     <td>
-                      <div class="d-flex mb-2">
-                        <div class="flex-shrink-0">
-                          <img src="https://www.bootdey.com/image/280x280/87CEFA/000000" alt="" width="35" class="img-fluid" />
+                        <div class="product-item">
+                            <a class="product-thumb" href="#"><img src="{{order.Product_Image_set.last.image.url}}" alt="Product"></a>
+                            <div class="product-info">
+                                <h4 class="product-title"><a href="#">{{order.ord_product.Pro_name}}</a></h4><span><em>Category:</em> {{order.ord_product.C_name}}</span>
+                            </div>
                         </div>
-                        <div class="flex-lg-grow-1 ms-3">
-                          <h6 class="small mb-0"><a href="#" class="text-reset">Wireless Headphones with Noise Cancellation Tru Bass Bluetooth HiFi</a></h6>
-                          <span class="small">Color: Black</span>
-                        </div>
-                      </div>
                     </td>
-                    <td>1</td>
-                    <td class="text-end">$79.99</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="d-flex mb-2">
-                        <div class="flex-shrink-0">
-                          <img src="https://www.bootdey.com/image/280x280/FF69B4/000000" alt="" width="35" class="img-fluid" />
-                        </div>
-                        <div class="flex-lg-grow-1 ms-3">
-                          <h6 class="small mb-0"><a href="#" class="text-reset">Smartwatch IP68 Waterproof GPS and Bluetooth Support</a></h6>
-                          <span class="small">Color: White</span>
-                        </div>
-                      </div>
+                    <td class="text-center">
+                        <h6>1</h6>
                     </td>
-                    <td>1</td>
-                    <td class="text-end">$79.99</td>
-                  </tr>
+                    <td class="text-center text-lg text-medium">${{order.price}}</td>
+                    <td class="text-center text-lg text-medium">${{order.total_price}}</td>
+                    <td class="text-center text-lg text-medium"><span class="badge {% if order.status == "Cancelled" %}text-danger {% elif order.status == "Delivered" %} text-success {% elif order.status == "Order confirmed" %} text-warning {% else %}text-primary{% endif %}">{{order.status}}<span></td>
+                    {% if order.status == "Cancelled" or order.status == "Returned" %}
+                    <td><a href="../product_details/{{order.variant.id}}" class="btn btn-sm btn-outline-primary">View Product<a></td>
+                    
+                    {% elif order.status == "Delivered" %}
+                    <td><a href="#Return-{{forloop.counter}}" class="btn btn-sm btn-outline-secondary" data-toggle="modal">Return Order<a></td>
+            
+                    {% else %}
+                    <td><a href="#deleteAddress-{{forloop.counter}}" class="delete btn btn-sm btn-outline-danger" data-toggle="modal">Cancel Order<a></td>
+                    {% endif %}
+                    </tr>
+                </tr>
+                {% endfor %}
                 </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="2">Subtotal</td>
-                    <td class="text-end">$159,98</td>
-                  </tr>
-                  <tr>
-                    <td colspan="2">Shipping</td>
-                    <td class="text-end">$20.00</td>
-                  </tr>
-                  <tr>
-                    <td colspan="2">Discount (Code: NEWYEAR)</td>
-                    <td class="text-danger text-end">-$10.00</td>
-                  </tr>
-                  <tr class="fw-bold">
-                    <td colspan="2">TOTAL</td>
-                    <td class="text-end">$169,98</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          </div>
-          <!-- Payment -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-lg-6">
-                  <h3 class="h6">Payment Method</h3>
-                  <p>
-                    Visa -1234 <br />
-                    Total: $169,98 <span class="badge bg-success rounded-pill">PAID</span>
-                  </p>
-                </div>
-                <div class="col-lg-6">
-                  <h3 class="h6">Billing address</h3>
-                  <address>
-                    <strong>John Doe</strong><br />
-                    1355 Market St, Suite 900<br />
-                    San Francisco, CA 94103<br />
-                    <abbr title="Phone">P:</abbr> (123) 456-7890
-                  </address>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4">
-          <!-- Customer Notes -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <h3 class="h6">Customer Notes</h3>
-              <p>Sed enim, faucibus litora velit vestibulum habitasse. Cras lobortis cum sem aliquet mauris rutrum. Sollicitudin. Morbi, sem tellus vestibulum porttitor.</p>
-            </div>
-          </div>
-          <div class="card mb-4">
-            <!-- Shipping information -->
-            <div class="card-body">
-              <h3 class="h6">Shipping Information</h3>
-              <strong>FedEx</strong>
-              <span><a href="#" class="text-decoration-underline" target="_blank">FF1234567890</a> <i class="bi bi-box-arrow-up-right"></i></span>
-              <hr />
-              <h3 class="h6">Address</h3>
-              <address>
-                <strong>John Doe</strong><br />
-                1355 Market St, Suite 900<br />
-                San Francisco, CA 94103<br />
-                <abbr title="Phone">P:</abbr> (123) 456-7890
-              </address>
-            </div>
-          </div>
-        </div>
-      </div>
+        </table>
+        {% endif %}
     </div>
-  </div>
+</div>
 
 {% endblock %}

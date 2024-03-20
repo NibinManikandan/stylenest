@@ -41,11 +41,7 @@
             <a class="product-item" href="../prod_details/{{product.id}}">
                 <img src="{{ product.images.all.0.Pro_image.url }}" class="img-fluid product-thumbnail" alt="{{ product.Pro_name }}">
                 <h3 class="product-title">{{ product.Pro_name }}</h3>
-                <strong class="product-price">{{ product.Pro_price }}</strong>
-        
-                <span class="icon-cross">
-                    <img src="{% static 'images/cross.svg' %}" class="img-fluid">
-                </span>
+                <strong class="product-price">${{ product.Pro_price }}</strong>
             </a>
         </div> 
         {% endfor %}
