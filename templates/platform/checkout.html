@@ -40,20 +40,21 @@
 					  {% else %}
 
 					<!--current addresses section-->
-					{% for address in addresses %}
+						{% csrf_token %}
+						{% for address in addresses %}
 						<div class="card w-85 mb-3" style="border-radius: 5px;">
 							<div class="card-body">
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="select_address" id="cardRadio1" value="option1">
-								<label class="form-check-label" for="cardRadio1">Address {{forloop.counter}}</label>
-							</div>
-							<p class="card-text">{{address.first_name}} {{address.last_name}}, {{address.street_address}}, {{address.landmark}} {{address.city}}, {{address.state}}, {{address.pin_code}}, {{address.country}}</p>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio"  name="select_address" id="address{{ address.id }}" value="{{ address.id }}">
+									<label class="form-check-label"  for="address{{ address.id }}" >Address {{ forloop.counter }}</label>
+								</div>
+								<p  class="card-text">{{ address.first_name }} {{ address.last_name }}, {{ address.street_address }}, {{ address.landmark }} {{ address.city }}, {{ address.state }}, {{ address.pin_code }}, {{ address.country }}</p>
 							</div>
 						</div>
-					{% endfor %}
+						{% endfor %}
+					
 					{% endif %}
 					<!--address section end-->
-
 
 			<!--another address section-->
 			
@@ -67,7 +68,6 @@
 				<div class="collapse" id="ship_different_address">
 					<div class="py-2">
 
-					<form method="POST" action="{% url 'add_address' %}">
 						{% csrf_token %}
 						<div class="form-group row">
 						<div class="col-md-6">
@@ -128,7 +128,7 @@
 						<hr />
 						<button type="submit" class="btn btn-primary">Add New</button>
 					  </div>
-					</form>
+					{% comment %} </form> {% endcomment %}
 				</div>
 			    </div>
 			</div>
@@ -138,18 +138,50 @@
 
 		<!--coupon section-->
 		<div class="col-md-6">
+			{% csrf_token %}
 			<div class="row mb-5">
 			<div class="col-md-12">
 				<h2 class="h3 mb-3 text-black">Coupon Code</h2>
 				<div class="p-3 p-lg-5 border bg-white">
 
-				<label for="c_code" class="text-black mb-3">Enter your coupon code if you have one</label>
-				<div class="input-group w-75 couponcode-wrap">
-					<input type="text" class="form-control me-2" id="c_code" placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
+				<label for="c_code" class="text-black mb-3">Enter your coupon code if you have one. </label> 
+				<div class="input-group w-90 couponcode-wrap">
+					<input type="text" class="form-control me-2" id="couponCode" placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
 					<div class="input-group-append">
-					<button class="btn btn-black btn-sm" type="button" id="button-addon2">Apply</button>
+					<button class="btn btn-black btn-sm" type="button" onclick="applyCoupon()" id="button-addon2" style="border-radius: 10px; margin-left: 10px; background-color: green;">Apply </button>
+					</div>
+
+					<div class="input-group-append">
+						<button class="btn btn-black btn-sm" type="button" onclick="removeCoupon" id="button-addon2" style="border-radius: 10px; margin-left: 10px; background-color: darkred;">Cancel </button>
+					</div>
+
+				</div>
+				<div class="input-group-append" style="margin-top: 20px;">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+						Available Coupons
+					</button>
+				</div>
+				
+
+				<!--coupons modal-->
+				<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+					  <div class="modal-content">
+						<div class="modal-header">
+						  <h5 class="modal-title" id="exampleModalLabel">Availabe Coupons</h5>
+						  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<ul>
+								{% for coupon in coupons %}
+								<li>{{coupon.name}} - {{coupon.code}}</li>
+								{% endfor %}
+							</ul>
+						</div>
 					</div>
 				</div>
+			  </div>
+			  <!--end modal-->
 
 				</div>
 			</div>
@@ -209,15 +241,13 @@
 
 					<div>
 						<div class="form-group" style="margin-top: 20px;">
-							<a href="#" id="placeOrderButton" class="btn btn-outline-black btn-sm btn-block">Place Order</a>
+							<button type="button" onclick="place_order()" id="placeOrderButton" class="btn btn-outline-black btn-sm btn-block" style="background-color: green;">Place Order</button>
 						</div>
 					</div>
-
 				</div>
 			  </div>
 			</div>
 			<!--order section end-->
-
 		  </div>
 		</div>
 	</div>
@@ -225,100 +255,136 @@
 
 
 <script>
-	$(document).ready(function () {
-		var rzp1; 
+	function showCouponModal() {
+	  $('#couponModal').modal('show'); // Show the modal
+	}
+</script>
+
+<script>
+    function getCSRFToken() {
+        // Implement the logic to retrieve the CSRF token
+        // This might involve selecting an input element or using a different method
+        return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+      }
+    function applyCoupon() {
+        var couponCode = $('#couponCode').val();
+
+        $.ajax({
+            url: 'apply_coupons',
+            type: 'POST',
+            data: {
+                couponCode: couponCode,
+                csrfmiddlewaretoken: getCSRFToken()
+            },
+            success: function (data) {
+                // Handle the response from the server, e.g., update total prices
+                console.log(data);
+
+                if ('error' in data) {
+                    // Display the error message below the input field
+                    $('#couponError').text(data.error);
+                } else {
+                    $('.coupon-discount').text(data.discount_amount);
+                    $('.final-total').text(data.total);
+                    
+                    // Clear the error message on success
+                    $('#couponError').text('');
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Coupon Applied Successfully",
+                        confirmButtonText: 'OK',
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Error:', errorThrown);
+
+                // Display a generic error message below the input field
+                $('#couponError').text('Error applying coupon. Please try again.');
+            }
+        });
+    }
+    function removeCoupon() {
+        var couponCode = $('#couponCode').val();
+        console.log("clicked")
+    
+        $.ajax({
+            url: 'remove_coupon',
+            type: 'POST',
+            data: {
+                couponCode: couponCode,
+                csrfmiddlewaretoken: getCSRFToken()
+            },
+            success: function (data) {
+                // Handle the response from the server, e.g., update total prices
+                console.log(data);
+    
+                if ('error' in data) {
+                    // Display the error message below the input field
+                    $('#couponError').text(data.error);
+                } else {
+                    $('.coupon-discount').text(''); // Clear the coupon discount display
+                    $('.final-total').text(data.total);
+    
+                    // Clear the error message on success
+                    $('#couponError').text('');
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Coupon Removed Successfully",
+                        confirmButtonText: 'OK',
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Error:', errorThrown);
+    
+                // Display a generic error message below the input field
+                $('#couponError').text('Error removing coupon. Please try again.');
+            }
+        });
+    }
 	
-		$("#placeOrderButton").off("click").on("click", function (event) {
-		  event.preventDefault(); // Prevent default form submission
+
+    
+</script>
+
+<script>
+    function place_order() {
+		console.log('hello');
+		var selectedAddress = $("input[name='select_address']:checked").val();
+		var selectedPayment = $("input[name='payment']:checked").val();
+		var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+		console.log(selectedAddress);
+		console.log(selectedPayment);
+		if (selectedAddress && selectedPayment) {
+			var data = {
+				selected_address: selectedAddress,
+				payment: selectedPayment,
+				csrfmiddlewaretoken: csrfToken,
+			};
 	
-		  console.log("Button Clicked!");
-	
-		  // Your existing code...
-		  console.log("clicked");
-		  var address = $("input[name=address_select]:checked").val();
-		  var total = $("#coupon-total").text();
-		  var payment = $("input[name=payment_method]:checked").val();
-		  var csrf_token = $("[name=csrfmiddlewaretoken]").val();
-		  console.log('button clicked');
-		  console.log(addresses, "addresses");
-	
-		  console.log('Before AJAX request');
-		  console.log(total);
-	
-	
-		  // Check if the cart is empty before proceeding
-		  checkCart(function (isCartEmpty) {
-			if (isCartEmpty) {
-			  // Show a SweetAlert message indicating that the cart is empty
-			  Swal.fire({
-				icon: 'warning',
-				title: 'Cart is Empty',
-				text: 'Please add items to your cart before placing an order.',
-				confirmButtonColor: '#d33',
-				confirmButtonText: 'OK'
-			  });
-			} else {
-			  // Cart is not empty, proceed with payment method check
-			  handlePaymentMethod(payment, address, total, csrf_token);
-			}
-		  });
-		});
-	
-		function handlePaymentMethod(payment, address, total, csrf_token) {
-		  
-		  if (payment === 'cod') {
-			// Cash on delivery script...
-			$.ajax({
-			  type: 'POST',
-			  url: "../place_order/",
-			  data: {
-				addreselect: address,
-				total: total,
-				payment_mode: payment,
-				csrfmiddlewaretoken: csrf_token,
-			  },
-			  success: function (response) {
-				console.log("entered");
-				if (response && response.success === true) {
-				  console.log("order_success");
-				  // Use SweetAlert for success...
-				  Swal.fire({
-					icon: 'success',
-					title: 'Success',
-					text: 'Your order has been placed successfully',
-					confirmButtonColor: '#3085d6',
-					confirmButtonText: 'OK'
-				  }).then((result) => {
-					if (result.isConfirmed) {
-					  window.location.href = '/order_success/';
+			if (selectedPayment === 'COD') {
+				$.ajax({
+					url: '../place_order/',
+					type: 'post',
+					data: data,
+					success: function(response) {
+						if (response.success) {
+							window.location.href='../view_order/'
+						} else {
+							Swal.fire({
+								icon: 'error',
+								title: 'Error',
+								text: response.message,
+								confirmButtonText: 'Ok'
+							});
+						}
 					}
-				  });
-				} else {
-				  // Use SweetAlert for error...
-				  Swal.fire({
-					icon: 'error',
-					title: 'Error',
-					text: response.message || 'Please Select Address',
-					confirmButtonColor: '#d33',
-					confirmButtonText: 'OK'
-				  });
-				}
-			  },
-			  error: function (error) {
-				console.error("AJAX request failed: ", error);
-				// Use SweetAlert for general error...
-				Swal.fire({
-				  icon: 'error',
-				  title: 'Error',
-				  text: 'An error occurred while processing your order',
-				  confirmButtonColor: '#d33',
-				  confirmButtonText: 'OK'
 				});
-			  }
-			});
 			}
 		}
-	})
+	}
+	
 </script>
 
 

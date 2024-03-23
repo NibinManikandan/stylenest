@@ -1,3 +1,4 @@
+from datetime import timedelta
 from urllib import response
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
@@ -96,16 +97,16 @@ def update_cart(request):
                 cart = get_object_or_404(Cart, id=cart_id, user=user)
                 prod_obj = cart.product
                 if change == str(1):
-                    if prod_obj.stock > cart.quantity:
-                        cart.quantity += 1
-                        cart.cart_price=cart.product.Pro_price*cart.quantity
+                    if prod_obj.stock > cart.cart_quantity:
+                        cart.cart_quantity += 1
+                        cart.cart_price=cart.product.Pro_price*cart.cart_quantity
                 else:
-                    if cart.quantity > 1:
-                        cart.quantity -= 1
-                        cart.cart_price=cart.product.Pro_price*cart.quantity
+                    if cart.cart_quantity > 1:
+                        cart.cart_quantity -= 1 
+                        cart.cart_price=cart.product.Pro_price*cart.cart_quantity
                     else:
-                        cart.quantity = 1
-                        cart.cart_price=cart.product.Pro_price*cart.quantity
+                        cart.cart_quantity = 1
+                        cart.cart_price=cart.product.Pro_price*cart.cart_quantity
 
 
                 cart.save()
@@ -114,7 +115,7 @@ def update_cart(request):
                 user_cart = Cart.objects.filter(user=user)
                 sub_total = sum(user_cart.values_list('cart_price', flat=True))
 
-                response_data = {'updateQuantity': cart.quantity, 'total': cart.cart_price, 'subTotal': sub_total}
+                response_data = {'updateQuantity': cart.cart_quantity, 'total': cart.cart_price, 'subTotal': sub_total}
                 return JsonResponse({'success':True,'datas':response_data})
             else:
                 return JsonResponse({'success':False,'message': 'User not found'}, status=400)
@@ -134,11 +135,14 @@ def checkout(request):
         addresses = Address.objects.filter(user=user, is_listed=True).all()   
         obj = Cart.objects.filter(user=user).order_by('id')
         total = sum(obj.values_list('cart_price', flat=True))
+        coupons = Coupons.objects.all().order_by('id')
+
 
         context = {
             'addresses': addresses, 
             'total': total,
             'obj':obj,
+            'coupons':coupons,
         }
 
         return render(request, 'platform/checkout.html', context)
@@ -216,45 +220,53 @@ def add_address(request):
 # fucntion for place order
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def place_order(request):
+    print("////////////////////")
     if 'user' in request.session:
         user_email = request.session.get('user')
         user = CustomUser.objects.get(email=user_email)
-        address_id = request.POST.get('select_address')
+        print(user)
+        address_id = request.POST.get('selected_address')
+        print(address_id)
         new_address = Address.objects.get(id=address_id)
+        print(new_address)
         payment_method = request.POST.get('payment')
+        print(payment_method,'hhuhju')
 
         cart_items = Cart.objects.filter(user=user)
+        print(cart_items)
         for item in cart_items:
-            if item.quantity > item.product.stock:
+            if item.cart_quantity > item.product.stock:
                 return JsonResponse(
                    {"success":False, "message": "Some items out of stock"}
                 )
-            total_amount_coupn = request.POST.get("total")
+               
             
         if cart_items.exists():
+            total_quantity = sum(item.cart_quantity for item in cart_items)
             order = Order.objects.create(
-                user = user,
-                address = new_address,
-                payment_method = payment_method,
-                total_amount = total_amount_coupn,
-                quantity = 0
+            user=user,
+            order_address=new_address,
+            pyment_mode=payment_method,
+            quantity=total_quantity,
+            total_amount = item.cart_price
             )
 
             order.expected_date = order.order_date + timedelta(days=7)
 
-            total_amount = 0
             total_quantity = 0
+            total_amount = 0
 
             # Create OrdersItem objects and calculate the total amount and quantity
             for item in cart_items:
                 order_item = Order_item.objects.create(
                     order = order,
-                    product = item.product,
-                    qantity = item.cart_quantity,
+                    ord_product = item.product,
+                    ord_quantity = item.cart_quantity,
                     price = item.product.discounted_price(),
                     status = "Order confirmed",
                 )
                 order_item.save()
+                print(order_item)
 
                 # calculate the total amount and quantity 
                 total_amount +=item.cart_quantity * item.product.discounted_price()
@@ -267,7 +279,7 @@ def place_order(request):
 
 
                 # update the total_amount and quantity in the order object
-                order.total_amount = total_amount_coupn
+                order.total_amount = item.cart_price
                 order.quantity = total_quantity
                 order.save()
 
@@ -356,3 +368,5 @@ def remove_coupon(request):
 
     response_data = {"success": "removed", "total": total}
     return JsonResponse(response_data)
+
+

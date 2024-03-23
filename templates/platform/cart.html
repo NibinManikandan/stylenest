@@ -37,11 +37,11 @@
                 <td>
                   <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
                     <div class="input-group-prepend">
-                        <button class="btn btn-outline-black decrease" type="button" onclick="cartQuantity({{ item.id }}, -1, {{item.quantity}})">&minus;</button>
+                        <button class="btn btn-outline-black decrease" type="button" onclick="cartQuantity({{ item.id }}, -1, {{item.cart_quantity}})">&minus;</button>
                     </div>
-                    <span class="num-{{ item.id }}">{{ item.quantity }}</span>
+                    <span class="num-{{ item.id }}">{{ item.cart_quantity }}</span>
                     <div class="input-group-append">
-                        <button class="btn btn-outline-black increase" type="button" onclick="cartQuantity({{ item.id }}, 1, {{item.quantity}})">&plus;</button>
+                        <button class="btn btn-outline-black increase" type="button" onclick="cartQuantity({{ item.id }}, 1, {{item.cart_quantity}})">&plus;</button>
                     </div>
                 </div>
                 

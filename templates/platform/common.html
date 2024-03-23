@@ -54,8 +54,8 @@
           <div class="container-fluid">
               <form class="d-flex" action="../../search_products" method="get">
                   <div class="input-group">
-                      <input class="form-control form-control-sm me-2" name="search" type="search" placeholder="Search" aria-label="Search" style="height: 35px;">
-                      <button class="btn btn-outline-success btn-sm" type="submit" style="height: 35px; line-height: 0;">Search</button>
+                      <input class="form-control form-control-sm me-2" name="search" type="search" placeholder="Search" aria-label="Search" style="height: 35px; border-radius: 10px;">
+                      <button class="btn btn-outline-success btn-sm" type="submit" style="height: 35px; line-height: 0; border-radius: 10px;">Search</button>
                   </div>
               </form>
           </div>
@@ -102,7 +102,7 @@
                 </div>
                 
                 {% else %}
-                <div class="btn-group">
+                <div class="btn-group dropstart">
                   <a class="nav-link dropdown-toggle" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="{% static '/images/user.svg' %}"/>
                   </a>
@@ -273,5 +273,6 @@
     <script src="{% static 'js1/custom.js' %}"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
   </body>
 </html>

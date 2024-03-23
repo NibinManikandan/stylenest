@@ -27,7 +27,6 @@ def Product_Details(request, id):
     product = Product.objects.get(id=id)
     cate = Category.objects.filter(is_listed = True)
     image_list = Product_Image.objects.filter(product=product)
-    print(product)
     return render(request, 'platform/product_detail.html',{'products':product,'images':image_list})
 
 
