@@ -1,5 +1,6 @@
 import email
 from itertools import product
+from multiprocessing import context
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
 import requests
@@ -35,10 +36,34 @@ def orders(request):
 # function for order confirmed page
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def view_order(request):
-    order_id = request.session['order_id']
-    current_order = Order.objects.get(order_id=order_id)
-    context = {"current_order":current_order}
+    order_id = request.session.get('order_id')
+    ord_details = Order.objects.get(order_id=order_id)
+    current_order = Order_item.objects.filter(order=ord_details)
+    
+    # Debugging prints
+    print("Order ID:", order_id)
+    print("Order Details:", ord_details)
+    print("Current Order Items:", current_order)
+
+    context = {
+        "current_order": current_order,
+        "ord_details": ord_details
+    }
     return render(request, 'platform/conform.html', context)
+
+
+
+# function for download invoice
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def invoice(request):
+    order_id = request.session['order_id']
+    order_details = Order_item.objects.filter(order_id = order_id).all()
+    invoice_details = Order.objects.get(order_id=order_id)
+    context = {
+        "order_details":order_details,
+        "invoice_details":invoice_details
+    }
+    return render(request, 'platform/invoice.html', context)
 
 
 

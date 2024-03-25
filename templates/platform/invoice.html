@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+      .card {
+        margin-bottom: 1.5rem;
+      }
+      .card {
+        position: relative;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 1px solid #c8ced3;
+        border-radius: 0.25rem;
+      }
+      .card-header:first-child {
+        border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+      }
+      .card-header {
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 0;
+        background-color: #f0f3f5;
+        border-bottom: 1px solid #c8ced3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div id="ui-view" data-select2-id="ui-view">
+        <div>
+          <div class="card">
+            <div class="card-header">
+              Invoice
+              <strong>#ESN-{{invoice_details.order_id}}</strong>
+              <a class="btn btn-sm btn-secondary float-right mr-1 d-print-none" href="#" onclick="javascript:window.print();" data-abc="true"><i class="fa fa-print"></i> Save</a>
+            </div>
+            <div class="card-body">
+              <div class="row mb-4">
+                <div class="col-sm-4">
+                  <h6 class="mb-3">From:</h6>
+                  <div>
+                    <strong>StyleNest.com</strong>
+                  </div>
+                  <div>56, City Complex</div>
+                  <div>Kerala, India, 679121</div>
+                  <div>Email: stylenest@gmail.com</div>
+                  <div>Phone: +48 123 456 789</div>
+                </div>
+                <div class="col-sm-4">
+                  <h6 class="mb-3">To:</h6>
+                  <div>
+                    <strong>{{ invoice_details.user.first_name }}{{ invoice_details.user.last_name }}</strong>
+                  </div>
+                  <div>{{ invoice_details.order_address.street_address }}</div>
+                  <div>
+                    {{ invoice_details.order_address.city }}<br />
+                    {{ invoice_details.order_address.state }} - {{ invoice_details.order_address.pin_code }}<br />
+                    {{ invoice_details.order_address.landmark }}
+                  </div>
+                  <div>{{ invoice_details.user.email }}</div>
+                  <div>Phone: {{ invoice_details.order_address.phone }}</div>
+                </div>
+                <div class="col-sm-4">
+                  <h6 class="mb-3">Details:</h6>
+                  <div>
+                    Invoice
+                    <strong>#ESN-{{invoice_details.order_id}}</strong>
+                  </div>
+                  <div>{{ invoice_details.order_date }}</div>
+                  <div>Account Name: {{ invoice_details.user.first_name }}</div>
+                  {% comment %} <div>
+                    <strong>SWIFT code: 99 8888 7777 6666 5555</strong>
+                  </div> {% endcomment %}
+                </div>
+              </div>
+              <div class="table-responsive-sm">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Description</th>
+                      <th class="center">Quantity</th>
+                      <th class="right">Price</th>
+                      <th class="right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in order_details %}
+                      <tr>
+                        <td class="left">{{ item.ord_product.Pro_name }}</td>
+                        <td class="left">{{ item.ord_product.Pro_description }}</td>
+                        <td class="center">${{ item.ord_quantity }}</td>
+                        <td class="right">${{ item.ord_product.Pro_price }}</td>
+                        <td class="right">${{ item.order.total_amount }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="row">
+                <div class="col-lg-4 col-sm-5">Thank you for choosing us! Your order has been received and is now being processed with care. We appreciate your trust in our platform and look forward to delighting you with a seamless shopping experience. Happy shopping!</div>
+                <div class="col-lg-4 col-sm-5 ml-auto">
+                  <table class="table table-clear">
+                    <tbody>
+                      <tr>
+                        <td class="left">
+                          <strong>Subtotal</strong>
+                        </td>
+                        <td class="right">$ {{ invoice_details.total_amount }}</td>
+                      </tr>
+                      <tr>
+                        <td class="left">
+                          <strong>Discount</strong>
+                        </td>
+                        <td class="right">$ 0</td>
+                      </tr>
+                      <tr>
+                        <td class="left">
+                          <strong>Total</strong>
+                        </td>
+                        <td class="right">
+                          <strong>$ {{ invoice_details.total_amount }}</strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

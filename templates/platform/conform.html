@@ -35,52 +35,64 @@
                       <div> 
                         <span class="badge rounded-pill bg-success">Placed Orders</span>
                       </div>
-                      <div class="d-flex">
-                        <div class="dropdown">
-                          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-cloud-arrow-down"></i>Invoice
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Print</a></li>
-                            <li><a class="dropdown-item" href="#">Download</a></li>
-                          </ul>
+                        <div class="d-flex">
+                          <a href="{% url "invoice" %}">
+                            <button class="btn btn-secondary" type="button" aria-expanded="false">
+                              <i class="fa-solid fa-cloud-arrow-down"></i>Invoice
+                            </button>
+                          </a>
                         </div>
                       </div>
                     </div>
-                    <table class="table table-borderless">
-                      <tbody>
+                    <table class="table-responsive-sm">
+                      <table class="table table">
+                        <thead>
+                          <tr>
+                            <th>Item</th>
+                            <th>Description</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-end">Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in current_order %}
                         <tr>
                           <td>
                             <div class="d-flex mb-2">
                               <div class="flex-shrink-0">
-                                <img src="https://www.bootdey.com/image/280x280/FF69B4/000000" alt="" width="35" class="img-fluid">
-                              </div>
-                              <div class="flex-lg-grow-1 ms-3">
-                                <h6 class="small mb-0"><a href="#" class="text-reset"></a></h6>
-                                <span class="small">Color: White</span>
+                                <img src="{{item.ord_product.images.first.Pro_image.url}}" alt="" width="80" height="80" class="img-fluid">
                               </div>
                             </div>
+                            <td>
+                              <div class="flex-lg-grow-1 ms-3">
+                                <h6 class="small mb-0"><a href="#" class="text-reset"></a></h6>
+                                <span class="text-center">Product: {{ item.ord_product.Pro_name }}</span>
+                              </div>
+                            </td>
                           </td>
-                          <td>1</td>
-                          <td class="text-end">$79.99</td>
+                          <td class="text-center">{{item.ord_quantity}}</td>
+                          <td class="text-end">${{item.ord_product.Pro_price}}</td> 
                         </tr>
+                        {% endfor %}
                       </tbody>
                       <tfoot>
                         <tr>
                           <td colspan="2">Subtotal</td>
-                          <td class="text-end">$159,98</td>
+                          <td></td>
+                          <td class="text-end">${{ord_details.total_amount}}</td>
                         </tr>
-                        <tr>
+                        {% comment %} <tr>
                           <td colspan="2">Shipping</td>
-                          <td class="text-end">$20.00</td>
-                        </tr>
-                        <tr>
+                          <td class="text-end">$</td>
+                        </tr> {% endcomment %}
+                        {% comment %} <tr>
                           <td colspan="2">Discount (Code: NEWYEAR)</td>
                           <td class="text-danger text-end">-$10.00</td>
-                        </tr>
+                        </tr> {% endcomment %}
                         <tr class="fw-bold">
                           <td colspan="2">TOTAL</td>
-                          <td class="text-end">$169,98</td>
+                          <td></td>
+                          <td class="d-flex justify-content-end">${{ord_details.total_amount}}</td>
                         </tr>
                       </tfoot>
                     </table>
@@ -91,22 +103,25 @@
                   <div class="card-body">
                     <div class="row">
                       <div class="col-lg-6">
-                        <h3 class="h6">Payment Method</h3>
-                        <p>Visa -1234 <br>
-                        Total: $169,98 <span class="badge bg-success rounded-pill">PAID</span></p>
+                        <h3 class="h6">Pyment method</h3>
+                        <p>{{ord_details.pyment_mode}} (Cash On Delivery)<br>
                       </div>
                       <div class="col-lg-6">
-                        <h3 class="h6">Billing address</h3>
+                        <h3 class="h6">Delivery Address</h3>
                         <address>
-                          <strong>John Doe</strong><br>
-                          1355 Market St, Suite 900<br>
-                          San Francisco, CA 94103<br>
-                          <abbr title="Phone">P:</abbr> (123) 456-7890
+                          <strong>{{ord_details.user.first_name}}{{ord_details.user.last_name}}</strong><br>
+                          {{ord_details.order_address.street_address}}<br>
+                          {{ord_details.order_address.city}}<br>
+                          {{ord_details.order_address.state}} - {{ord_details.order_address.pin_code}}<br>
+                          {{ord_details.order_address.landmark}}<br>
+                          
+                          <abbr title="Phone">Phone :</abbr> {{ord_details.user.phone}}
                         </address>
                       </div>
                     </div>
                   </div>
                 </div>
+                
               </div>
             </div>
             <div style="display: flex; justify-content: center;">

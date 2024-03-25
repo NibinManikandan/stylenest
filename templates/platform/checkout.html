@@ -146,13 +146,13 @@
 
 				<label for="c_code" class="text-black mb-3">Enter your coupon code if you have one. </label> 
 				<div class="input-group w-90 couponcode-wrap">
-					<input type="text" class="form-control me-2" id="couponCode" placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
+					<input type="text" class="form-control me-2" id="couponCode" name='coupon_code' placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
 					<div class="input-group-append">
-					<button class="btn btn-black btn-sm" type="button" onclick="applyCoupon()" id="button-addon2" style="border-radius: 10px; margin-left: 10px; background-color: green;">Apply </button>
+					<button class="btn btn-black btn-sm" type="submit" onclick="applyCoupon()" id="button-addon2" style="border-radius: 10px; margin-left: 10px; background-color: green;">Apply </button>
 					</div>
 
 					<div class="input-group-append">
-						<button class="btn btn-black btn-sm" type="button" onclick="removeCoupon" id="button-addon2" style="border-radius: 10px; margin-left: 10px; background-color: darkred;">Cancel </button>
+						<button class="btn btn-black btn-sm" type="submit" onclick="removeCoupon()" id="button-addon2" style="border-radius: 10px; margin-left: 10px; background-color: darkred;">Cancel </button>
 					</div>
 
 				</div>
@@ -207,11 +207,17 @@
 					{% endfor %}
 					<tr>
 						<td class="text-black font-weight-bold"><strong>Cart Subtotal</td>
-						<td class="text-black">${{total}}</td>
+						<td class="text-black">${{sub_total}}</td>
 					</tr>
+
+					<tr>
+						<td class="text-black font-weight-bold"><strong>Coupon Discount</strong></td>
+						<td class="text-black font-weight-bold"><strong>${{coupons.discount_value}}</strong></td>
+					</tr>
+
 					<tr>
 						<td class="text-black font-weight-bold"><strong>Order Total</strong></td>
-						<td class="text-black font-weight-bold"><strong>${{total}}</strong></td>
+						<td class="text-black font-weight-bold"><strong>${{coupons.discount_value}}</strong></td>
 					</tr>
 					
 					</tbody>
@@ -267,10 +273,12 @@
         return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
       }
     function applyCoupon() {
+		console.log('asdfghj')
         var couponCode = $('#couponCode').val();
+		console.log(couponCode)
 
         $.ajax({
-            url: 'apply_coupons',
+            url: '../apply_coupons/',
             type: 'POST',
             data: {
                 couponCode: couponCode,
@@ -309,7 +317,7 @@
         console.log("clicked")
     
         $.ajax({
-            url: 'remove_coupon',
+            url: '../remove_coupon/',
             type: 'POST',
             data: {
                 couponCode: couponCode,

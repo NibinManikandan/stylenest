@@ -1,0 +1,121 @@
+
+
+{% comment %} # cart view coupon functions  {% endcomment %}
+
+
+# function for apply coupons
+def apply_coupons(request):
+    if request.method == 'POST':
+        email = request.session.get('email')
+        user = CustomUser.objects.get(email=email)
+
+        coupon_code = request.POST.get('couponCode', '')
+        coupon_check = Coupons.objects.filter(code=coupon_code, is_active = True).first()
+        if coupon_check:
+            if CouponUsage.objects.filter(user=user, coupon=coupon_check).exists():
+                return JsonResponse({'error': "Coupon already applied."})
+            else:
+                if coupon_check.used_count < coupon_check.usage_limit:
+                    cart_total = sum(
+                        Cart.objects.filter(user=user).values_list(
+                        "cart_price", flat=True
+                    )
+                    )
+
+                    if cart_total >= coupon_check.min_purchase:
+                        if coupon_check.expiry_date < datetime.now().date():
+                            return JsonResponse({"error": f"Coupon Expired"})
+                        
+                        total = cart_total - coupon_check.discount_value
+
+                        response_data = {
+                            "success":"added",
+                            "total":total,
+                            "coupon_code":coupon_code,
+                            "discount_amount":coupon_check.discount_value,
+                        }
+
+                        coupon_check.used_count += 1
+                        coupon_check.save()
+
+                        CouponUsage.objects.create(user=user, coupon=coupon_check)
+
+                        return JsonResponse(response_data)
+                    
+                    else:
+                        return JsonResponse({"error": f"Minimum purchase amount of {round(coupon_check.min_purchase)} required"})
+                    
+                else:
+                    return JsonResponse({"error": "Sorry! This code has reached its usage limit."})
+                
+        else:
+            return JsonResponse({"error":"Invalid Coupon"})
+        
+    return JsonResponse({"error":"Inavalid request"})
+
+
+
+# function for Remove coupon
+def remove_coupon(request):
+    email = request.session.get("email")
+    user = CustomUser.objects.get(email=email)
+
+    coupon_code = request.POST.get("couponCode", "")
+    coupon_check = Coupons.objects.filter(code=coupon_code, is_active=True).first()
+    if coupon_check:
+        usage_check = CouponUsage.objects.filter(user=user, coupon=coupon_check).first()
+        if usage_check:
+            coupon_check.used_count -= 1
+            coupon_check.save()
+            usage_check.delete()
+
+    # Update the cart total
+    total = sum(Cart.objects.filter(user=user).values_list("cart_price", flat=True))
+
+    response_data = {"success": "removed", "total": total}
+    return JsonResponse(response_data)
+
+
+
+
+
+
+
+
+
+    {% comment %} oder function  {% endcomment %}
+
+
+# function for cancel the order
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def cancel_order(request, id):
+    email = request.session['email']
+    user = CustomUser.objects.get(email = email)
+    order = Order_item.objects.get(id=id)
+    order_status = "Cancelled"
+
+    if order.order.payment_method == 'COD':
+        order.ord_product.stock += order.ord_quantity
+        order.save()
+        order.ord_product.save()
+
+    return redirect('orders')
+
+
+# function for return product
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def return_order(request, id):
+    email = request.session['email']
+    user = CustomUser.objects.get(email=email)
+
+    order = Order_item.objects.get(id=id)
+    order_status = "Returned"
+    order.ord_product.stock += order.ord_quantity
+    
+    amount = order.price * order.ord_quantity
+
+    balance = 0
+
+    order.save()
+    order.ord_product.save()
+    return redirect('orders')
