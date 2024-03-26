@@ -18,6 +18,10 @@ urlpatterns = [
     path('add_category/', views.add_category, name = 'add_category'),
     path('adm_category/edit_category/<int:id>/', views.edit_category, name='edit_category'),
 
+    path('orders/', views.orders, name='orders'),
+    path('orders/order_info/<str:id>', views.order_info, name='order_info'),
+    path('orders/order_status_change/<str:id>', views.order_status_change, name='order_status_change'),
+
     path('admin_logout/', views.admin_logout, name = 'admin_logout'),
     
 ]    

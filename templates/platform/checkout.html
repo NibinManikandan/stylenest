@@ -174,7 +174,16 @@
 						<div class="modal-body">
 							<ul>
 								{% for coupon in coupons %}
-								<li>{{coupon.name}} - {{coupon.code}}</li>
+								<div class="container">
+									<div class="label">
+										{{coupon.name}}
+									</div>
+									<div class="copy-text">
+										<input type="text" class="text" value="{{coupon.code}}" readonly style="border-radius: 5px;"/>
+										<button style="border-radius: 5px;" onclick="copy_fun()"><i class="fa fa-clone"></i></button>
+										<p id="demo"></p>
+									</div>
+								</div>
 								{% endfor %}
 							</ul>
 						</div>
@@ -260,11 +269,31 @@
 </div>
 
 
+
+<!--coupon modal-->
+
 <script>
 	function showCouponModal() {
-	  $('#couponModal').modal('show'); // Show the modal
+		$('#couponModal').modal('show'); // Show the modal
+	  }
+    document.querySelector(".copy-text button").addEventListener("click", function () {
+        let input = document.querySelector(".copy-text input.text");
+        input.select();
+        document.execCommand("copy");
+        copyMessage.classList.add("active");
+        setTimeout(function () {
+            copyMessage.classList.remove("active");
+        }, 2000);
+    });
+</script>
+
+<script>
+	function copy_fun() {
+	  document.getElementById("demo").innerHTML = "Copied &#x2713;";
 	}
 </script>
+
+<!--coupon applay-->
 
 <script>
     function getCSRFToken() {
@@ -355,6 +384,9 @@
 
     
 </script>
+
+
+<!--place the order-->
 
 <script>
     function place_order() {

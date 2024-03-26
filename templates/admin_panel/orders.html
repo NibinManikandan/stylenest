@@ -1,0 +1,61 @@
+{% extends 'admin_panel/adm_base.html' %}
+{% load static %}
+{% block title %} Orders{% endblock title %}
+{% block orders %}{% endblock orders %}
+{% block content %}
+
+<main id="main" class="main">
+
+        <div class="pagetitle">
+            <h1 >Orders</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Admin</li>
+                    <li class="breadcrumb-item active">Orders</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+
+                <div class="card-body">
+                    <table class="table table-borderless datatable mt-3">
+                        <thead>
+                            <tr class="align-middle">
+                                <th>ID</th>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>User</th>
+                                <th>Method</th>
+                                <th>Actions</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            
+                        {% for item in items %}
+                            <tr>
+                                <td class="align-middle">{{item.id}}</td>
+                                <td><center><img src="{{item.ord_product.images.first.Pro_image.url}}" height="80px"/><center></td>
+                                <td class="align-middle">{{item.ord_product.Pro_name}} x {{item.ord_quantity}}</td>
+                                <td class="align-middle">{{item.order.user.first_name}}</td>
+                                <td class="align-middle">{{item.order.pyment_mode}}</td>
+                                <td class="align-middle"><a href="order_info/{{item.id}}" class="btn btn-outline-dark">View</a></td>
+                                <td class="align-middle {% if item.status == "Cancelled" %}text-danger {% elif item.status == "Delivered" %} text-success {% elif item.status == "Order confirmed" %} text-warning {% else %}text-primary{% endif %}">{{item.status}}</td>
+                            </tr>
+
+                        
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+        </div><!-- End Recent Sales -->
+
+    </main><!-- End #main -->
+{% endblock content %}

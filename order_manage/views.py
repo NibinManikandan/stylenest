@@ -24,11 +24,12 @@ from django_countries import countries as django_countries
 # function for list orders
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def orders(request):
-    if 'email' in request.session:
-        email = request.session['email']
+    if request.user:
+        email = request.user
         user = CustomUser.objects.get(email=email)
         orders = Order.objects.filter(user=user)
         order_items = Order_item.objects.filter(order__in = orders).order_by('-id')
+        
     return render(request, 'platform/order_details.html',{"order_items":order_items})
 
 

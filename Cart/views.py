@@ -135,10 +135,6 @@ def checkout(request):
         obj = Cart.objects.filter(user=user).order_by('id')
         sub_total = sum(obj.values_list('cart_price', flat=True))
         coupons = Coupons.objects.all().order_by('id')
-        
-        total = sub_total - coupons
-        
-
 
         context = {
             'addresses': addresses, 
@@ -234,11 +230,8 @@ def place_order(request):
         print(cart_items)
         for item in cart_items:
             if item.cart_quantity > item.product.stock:
-                return JsonResponse(
-                   {"success":False, "message": "Some items out of stock"}
-                )
-            
-            
+                return JsonResponse({"success":False, "message": "Some items out of stock"})
+              
         total_amount_coupon = request.POST.get("total_amount")
         print(total_amount_coupon)
             
@@ -297,7 +290,6 @@ def place_order(request):
     
 
 
-
 # function for apply coupons
 def apply_coupons(request):
     if request.method == 'POST':
@@ -313,9 +305,7 @@ def apply_coupons(request):
                 else:
                     if coupon_check.used_count < coupon_check.usage_limit:
                         cart_total = sum(
-                            Cart.objects.filter(user=user).values_list(
-                            "cart_price", flat=True
-                        )
+                            Cart.objects.filter(user=user).values_list("cart_price", flat=True)
                         )
 
                         if cart_total >= coupon_check.min_purchase:

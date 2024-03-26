@@ -42,6 +42,7 @@ class Order_item(models.Model):
     status = models.CharField(max_length=20, default='Order confirmed')
     ord_product = models.ForeignKey(Product, on_delete=models.CASCADE)
     category_name = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    
 
     def total_price(self):
         return self.ord_quantity * self.price

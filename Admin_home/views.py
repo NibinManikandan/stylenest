@@ -3,8 +3,11 @@ from Admin_home.models import Category, Product, Product_Image
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
+from order_manage.models import Order_item
 from userAuth.models import CustomUser
 from django.contrib import messages
+
+from wallet.models import Wallet
 
 
 # Create your views here.
@@ -12,7 +15,6 @@ from django.contrib import messages
 # admin login
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
-
 def Dashboard(request):
     return render(request, "admin_panel/dashboard.html")
 
@@ -21,7 +23,6 @@ def Dashboard(request):
 # listing users in admin
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-
 def User_list(request):
     Users = CustomUser.objects.all().exclude(is_superuser=True).order_by('id')
     return render(request, "admin_panel/user_list.html", {'Users': Users})
@@ -31,7 +32,6 @@ def User_list(request):
 # user status block
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-
 def user_status(request, id):
     user = CustomUser.objects.filter(id=id).first()
     if user.is_active==True:
@@ -49,7 +49,6 @@ def user_status(request, id):
 # function for showing all catogerys
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-
 def admin_catogory(request):
     category = Category.objects.all().order_by('id')
     return render(request, 'admin_panel/adm_category.html', {'categories': category})
@@ -59,7 +58,6 @@ def admin_catogory(request):
 #category status block
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-
 def category_status(request, id):
     category = Category.objects.filter(id=id).first()
     if category.is_listed == True:
@@ -77,7 +75,6 @@ def category_status(request, id):
 # edit category block
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-
 def edit_category(request, id):
     category = Category.objects.get(id = id)
 
@@ -101,7 +98,6 @@ def edit_category(request, id):
 # add category block
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url= 'admin_login')
-
 def add_category(request):
     if request.method == 'POST':
         new_cate_name = request.POST.get('new_updated_category')
@@ -123,7 +119,6 @@ def add_category(request):
 # prouct list block
 @cache_control(no_cache=True, must_revalidate=True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url= 'admin_login')
-
 def products_list(request):
     product = Product.objects.all().order_by('id')
     return render(request, "admin_panel/product.html", {'product': product})
@@ -133,7 +128,6 @@ def products_list(request):
 # product_status block
 @cache_control(no_cache=True, must_revalidate=True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url= 'admin_login')
-
 def product_status(request, id):
     P_status = Product.objects.filter(id=id).first()
     if P_status.is_listed == True:
@@ -151,7 +145,6 @@ def product_status(request, id):
 # add products block
 @cache_control(no_cache=True, must_revalidate=True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url= 'admin_login')
-
 def add_products(request):
     category_list = Category.objects.all()
     context ={
@@ -163,8 +156,6 @@ def add_products(request):
         category_id = request.POST.get('category')
         Pro_price = request.POST.get('price')
         stock = request.POST.get('stock')
-        print(stock)
-        print('--------------------------')
         # checkthe product already exist with the same name
         try:
             existing_product = Product.objects.get(Pro_name__iexact=Pro_name)
@@ -199,12 +190,10 @@ def add_products(request):
 # Edit products
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @user_passes_test(lambda u: u.is_superuser, login_url="admin_login")
-
 def Edit_product(request, id):
     Category_list = Category.objects.all()
     prod = Product.objects.get(id=id) 
     pro_img = Product_Image.objects.all()
-
     context = {'Cat': Category_list, 'Prod': prod,}
     
     if request.method =='POST':
@@ -230,10 +219,68 @@ def Edit_product(request, id):
 
 
 
+# function for list order items
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
+def orders(request):
+    order_items = Order_item.objects.all().order_by('-id')
+    return render(request, "admin_panel/orders.html", {"items": order_items})
+
+
+
+# function for change the order status
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
+def order_status_change(request, id):
+    order = Order_item.objects.get(id=id)
+    status = request.POST.get('status_change')
+    if status == "Cancelled" or status == "Returned":
+        if order.order.pyment_mode != 'COD':
+            order.status = status
+            order.ord_product.stock += order.ord_quantity
+
+            wallet = Wallet.objects.filter(order.order.user).order_by('-id')
+            if wallet:
+                balance = wallet.first().balance
+            else:
+                balance = 0
+
+            new_balance = balance + order.total_price()
+
+            Wallet.objects.create(
+                user = order.order.user,
+                amount = order.total_price,
+                balance = new_balance,
+                transaction_type = 'Credit',
+                transaction_details = f"Recieved money through Order {status} By Seller"
+            )
+            order.status = status
+            order.ord_product.stock += order.ord_quantity
+            order.save()
+            order.ord_product.save()
+            return redirect("order_info")
+        
+        else:
+            order.status = status
+            order.save()
+        return redirect("order_info", id=id)
+
+
+
+
+# function for view order details
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
+def order_info(request, id):
+    obj = Order_item.objects.get(id=id)
+    return render(request, 'admin_panel/order_info.html', {"obj":obj})
+
+
+
+
 # admin_logout
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-
 def admin_logout(request):
     request.session.flush()
     return redirect('admin_login')

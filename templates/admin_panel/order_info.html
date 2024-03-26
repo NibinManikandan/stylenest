@@ -1,0 +1,112 @@
+{% extends 'admin_panel/adm_base.html' %}
+{% load static %}
+{% block title %}Orders Informations{% endblock title %}
+{% block orders %}{% endblock orders %}
+{% block content %}
+
+<div class="main-panel" style="margin-left: 300px;">
+    <div class="content-wrapper">
+      <div class="row">
+        <div class="mt-5 col-12 grid-margin mx-auto">
+          <div class="card mb-5">
+            <div class="card-body">
+              <div class="mb-5">
+                <ul class="navbar-nav w-100">
+                  <li class="nav-item w-100"></li>
+                </ul>
+              </div>
+              <div class="col-md-6 ms-3">
+                <h3>View Orders</h3>
+              </div>
+              <nav>
+                <ol class="breadcrumb ms-4">
+                  <li class="breadcrumb-item">Admin</li>
+                  <li class="breadcrumb-item">Orders</li>
+                  <li class="breadcrumb-item active">View Orders</li>
+                </ol>
+              </nav>
+              <div class="table-responsive">
+                <div class="container-fluid d-flex flex-column justify-content-center">
+                  <div class="card col-12 my-3 mx-auto p-2" style="border: 0.2px solid #494949;">
+                    <div class="card-header d-flex justify-content-between w-100">
+                      <div class="d-flex flex-column">
+                        <p class="text-primary" >{{obj.status}}</p>
+                        <h6> Expected Delivery {{obj.order.expected_delivery_date}}</h6>
+                      </div>
+                    </div>
+                    <hr class="m-0 mb-1">
+                    <div>
+                      
+                    </div>
+                    <div class="card-body row col-12 d-flex">
+                      <div class="col-md-4 col-12 mx-auto">
+                        <img class="mt-4" src="{{obj.ord_product.images.first.Pro_image.url}}" style="height: 250px; border-radius: 7px;" alt="">
+                        <p class="card-text"></p>
+            
+                      </div>
+                      <div class="col-md-7 col-12">
+                        <h4 class="card-title">{{obj.ord_product.Pro_name}}</h4>
+
+                        <p class="card-text">
+                            <p>Order ID: <b>{{obj.order.order_id}}</b></p>
+                            <p>User : <b>{{obj.order.user.first_name}} {{obj.order.user.last_name}}</b></p>
+                            <p>Quantity: <b>{{obj.ord_quantity}}</b></p>
+                          <p>Order Date: <b>{{obj.order.order_date}}</b></p>
+                          Payment Method: {{ obj.order.payment_mod }}
+                        </p>
+                        <h5 class="card-title mb-2">RS: {{ obj.total_price }}</h5>
+                        <hr class="bg-secondary">
+                        <h5 class="card-title" style="font-size: 15px;">Shipping Address</h5>
+                        <h6 class="card-text" style="font-size: 15px;"> <b>FULL NAME :</b> {{ obj.order.order_address.first_name }} {{ obj.order.order_address.last_name }}</h6>
+                        <p class="card-text"><b>Location:</b><br>
+                            {{obj.order.order_address.street_address}},<br>
+                            {{obj.order.order_address.city}},<br>
+                            {{obj.order.order_address.state}},<br>
+                            {{obj.order.order_address.pin_code}}
+                        <p class="card-text">PHONE: <b>{{obj.order.order_address.phone}}</b></p>
+                        <hr class="bg-secondary">
+
+                        <h5 class="card-title" style="font-size: 15px;">Change Order Status: </h5>
+                          <form method="POST" action="../order_status_change/{{obj.id}}">
+                          {% csrf_token %}
+                          <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" class="btn-check" name="status_change" id="btnradio1" value="Order confirmed" autocomplete="off" {% if obj.status == "Order confirmed" %}checked{% endif %}{% if obj.status == "Cancelled" or obj.status == "Delivered" or obj.status == "Returned"  %}disabled{% endif %}>
+                            <label class="btn btn-outline-warning" for="btnradio1" style="width: 170px;">Order confirmed</label>
+                          
+                            <input type="radio" class="btn-check" name="status_change" id="btnradio2" value="Shipped" autocomplete="off" {% if obj.status == "Shipped" %}checked{% endif %}{% if obj.status == "Cancelled" or obj.status == "Delivered" or obj.status == "Returned"  %}disabled{% endif %}>
+                            <label class="btn btn-outline-secondary" for="btnradio2" style="width: 170px;">Shipped</label>
+                          
+                            <input type="radio" class="btn-check" name="status_change" id="btnradio3" value="Out for delivery" autocomplete="off" {% if obj.status == "Out for delivery" %}checked{% endif %}{% if obj.status == "Cancelled" or obj.status == "Delivered" or obj.status == "Returned"  %}disabled{% endif %}>
+                            <label class="btn btn-outline-primary" for="btnradio3" style="width: 170px;">Out for delivery</label>
+
+                          </div>
+                          
+                          <div class="btn-group mt-2" role="group" aria-label="Basic radio toggle button group">
+                            
+                            <input type="radio" class="btn-check" name="status_change" id="btnradio4" value="Delivered" autocomplete="off" {% if obj.status == "Delivered" %}checked{% endif %}{% if obj.status == "Cancelled" or obj.status == "Returned"  %}disabled{% endif %}>
+                            <label class="btn btn-outline-success" for="btnradio4" style="width: 170px;">Delivered</label>
+                          
+                            <input type="radio" class="btn-check" name="status_change" id="btnradio5" value="Cancelled" autocomplete="off" {% if obj.status == "Cancelled" %}checked{% endif %} {% if obj.status == "Delivered" or obj.status == "Returned" %}disabled{% endif %}>
+                            <label class="btn btn-outline-danger" for="btnradio5" style="width: 170px;">Cancelled</label>
+
+                            <input type="radio" class="btn-check" name="status_change" id="btnradio6" value="Returned" autocomplete="off" {% if obj.status == "Returned" %}checked{% endif %}{% if obj.status == "Cancelled"%}disabled{% endif %}>
+                            <label class="btn btn-outline-info" for="btnradio6" style="width: 170px;">Returned</label>
+                          </div>
+                          <br><br>
+                          <button class="btn btn-primary border-0">Change Status</button>
+                          </form>
+                          
+                          
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+{% endblock %}
