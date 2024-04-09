@@ -1,4 +1,8 @@
+import code
 from datetime import timedelta
+from genericpath import exists
+from itertools import product
+from lib2to3.fixes.fix_input import context
 from urllib import response
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
@@ -6,6 +10,7 @@ import requests
 
 import coupon
 from coupon.models import CouponUsage, Coupons
+from wallet.models import Wallet
 from .models import Cart
 from userAuth.models import *
 from Admin_home.models import *
@@ -25,10 +30,11 @@ from django_countries import countries as django_countries
 def cart_page(request):
     email = request.session.get('user')
     if email:
-        user = get_object_or_404(CustomUser, email = email)
+        user = get_object_or_404(CustomUser, email=email)
         cart_items = Cart.objects.filter(user=user).order_by('id')
+        cart_items = cart_items.filter(product__is_listed=True)
         subPrice = sum(cart_items.values_list('cart_price', flat=True))
-        return render(request, 'platform/cart.html', {'cart_items':cart_items, 'subPrice':subPrice})
+        return render(request, 'platform/cart.html', {'cart_items': cart_items, 'subPrice': subPrice})
     else:
         return redirect('Userlogin')
 
@@ -39,23 +45,30 @@ def add_to_cart(request):
     if request.method == 'POST':
         if 'user' in request.session:
             email = request.session['user']
-            user = CustomUser.objects.get(email = email)
+            user = get_object_or_404(CustomUser, email=email)
             product_id = request.POST.get('id')
-            products = Product.objects.get(id = product_id)
+            product = get_object_or_404(Product, id=product_id)
             
-            if (Cart.objects.filter(user=user, product = products).first()):
-                return JsonResponse({'success':False,'status' : "Product already in cart"})
+            # Check if the product is in stock
+            if product.stock > 0:
+                # Check if the product is already in the user's cart
+                if Cart.objects.filter(user=user, product=product).exists():
+                    return JsonResponse({'success': False, 'status': "Product already in cart"})
+                else:
+                    Cart.objects.create(
+                        user=user, 
+                        product=product, 
+                        created_at=timezone.now(), 
+                        cart_price=product.Pro_price
+                    )
+                    cart_count_ajax = Cart.objects.filter(user=user).count()
+                    return JsonResponse({'status': "Product added successfully", 'success': True, 'cart_count_ajax': cart_count_ajax})
             else:
-                Cart.objects.create(user=user, product=products, created_at =timezone.now(), cart_price = products.Pro_price)
-                cart_count_ajax = Cart.objects.filter(user = user).count()
-                return JsonResponse({'status' : "Product added successfully",'success':True ,'cart_count_ajax' : cart_count_ajax})
-        
+                return JsonResponse({'success': False, 'status': "Product is out of stock"})
         else:
             return redirect('Userlogin')
-        
     else:
         return render(request, 'platform/home.html')
-
 
 
 # fucntion for remove item from the cart
@@ -133,9 +146,10 @@ def checkout(request):
         user = CustomUser.objects.get(email=user_email)
         addresses = Address.objects.filter(user=user, is_listed=True).all()   
         obj = Cart.objects.filter(user=user).order_by('id')
-        sub_total = sum(obj.values_list('cart_price', flat=True))
+        obj = obj.filter(product__is_listed=True)
         coupons = Coupons.objects.all().order_by('id')
-
+        sub_total = sum(obj.values_list('cart_price', flat=True))
+        
         context = {
             'addresses': addresses, 
             'sub_total': sub_total,
@@ -224,46 +238,51 @@ def place_order(request):
         address_id = request.POST.get('selected_address')
         new_address = Address.objects.get(id=address_id)
         payment_method = request.POST.get('payment')
-        
+        coupon_code = request.POST.get('couponCode')
+        coupon = Coupons.objects.filter(code = coupon_code).first()
+        total = 0        
 
         cart_items = Cart.objects.filter(user=user)
-        print(cart_items)
         for item in cart_items:
             if item.cart_quantity > item.product.stock:
-                return JsonResponse({"success":False, "message": "Some items out of stock"})
+                return JsonResponse({"success":False, "message": "Some items are out of stock"})
               
-        total_amount_coupon = request.POST.get("total_amount")
-        print(total_amount_coupon)
-            
+            else:
+                total += ((item.cart_quantity) * (item.product.Pro_price))
+ 
+        if coupon:
+            if coupon.min_purchase <= total:
+                total -= coupon.discount_value
+
         if cart_items.exists():
             total_quantity = sum(item.cart_quantity for item in cart_items)
-            order = Order.objects.create(
+            order = Order(
             user=user,
             order_address=new_address,
             pyment_mode=payment_method,
             quantity=total_quantity,
-            total_amount = total_amount_coupon
+            total_amount = total
             )
+            order.save()
 
             order.expected_date = order.order_date + timedelta(days=7)
 
             total_quantity = 0
-            total_amount = 0
+            total = 0
 
             # Create OrdersItem objects and calculate the total amount and quantity
             for item in cart_items:
-                order_item = Order_item.objects.create(
+                order_item = Order_item (
                     order=order,
                     ord_product=item.product,
                     ord_quantity=item.cart_quantity,
-                    price=item.product.discounted_price(),
+                    price=item.product.Pro_price,
                     status="Order confirmed",
                 )
                 order_item.save()
-                print(order_item)
 
                 # Calculate the total amount and quantity
-                total_amount += item.cart_quantity * item.product.discounted_price()
+                total += item.cart_quantity * item.product.Pro_price
                 total_quantity += item.cart_quantity
 
                 # Reduce the quantity of the product in the order
@@ -271,23 +290,107 @@ def place_order(request):
                 prod_quantity.stock -= item.cart_quantity
                 prod_quantity.save()
 
-                # Update the total_amount and quantity in the order object
-                order.total_amount = total_amount
+            # Update the total_amount and quantity in the order object
+            order.quantity = total_quantity
+            order.save()
+
+            # Order_id moving to session for further use
+            request.session['order_id'] = str(order.order_id)
+
+            # Clearing the cart items after placing the order
+            cart_items.delete()
+
+            return JsonResponse({"success": "Order placed successfully"})
+        else:
+            return JsonResponse({"success": False, "message": "your cart is empty"})
+            
+    return JsonResponse({"error": "User not authenticated"}, status = 400)
+    
+
+
+# function for place order wallet
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def place_order_wallet(request):
+    if request.user.is_authenticated:
+        user = request.user
+        address_id = request.POST.get('selected_address')
+        new_address = Address.objects.get(id=address_id)
+        payment = request.POST.get('payment')
+        couponCode = request.POST.get('couponCode')
+        coupon = Coupons.objects.filter(code=couponCode).first()
+        request.session['used_coupon']=couponCode
+        
+        cart_items = Cart.objects.filter(user=user)
+        for item in cart_items:
+            if item.cart_quantity > item.product.stock:
+                return JsonResponse({"success": False, "message": "Some items are Out of Stock"})
+                
+        if cart_items.exists():
+            wallet = Wallet.objects.filter(user=user).order_by('-id')
+            if wallet:
+                balance = wallet.first().balance
+            else:
+                balance = 0
+
+            total_cart_price = sum(cart_items.values_list("cart_price", flat=True))
+
+            total_coupon_amount = total_cart_price # Initialize total_coupon_amount
+            
+            if coupon:
+                total_coupon_amount -= coupon.discount_value
+
+            if balance >= total_coupon_amount:
+                order = Order.objects.create(
+                    user=user,
+                    order_address=new_address,
+                    pyment_mode=payment,
+                    total_amount=total_coupon_amount,
+                    quantity=0  # This needs to be defined before calculating it
+                )
+                order.expected_date = order.order_date + timezone.timedelta(days=7)
+
+                total_quantity = 0  # Initialize total_quantity
+                total_amount = 0  # Initialize total_amount
+
+                for item in cart_items:
+                    Order_item.objects.create(
+                        order=order,
+                        ord_product=item.product,
+                        ord_quantity=item.cart_quantity,
+                        price=item.product.Pro_price * item.cart_quantity,
+                        status="Order confirmed",
+                    )
+                    print(Order_item)
+
+                    total_amount += item.cart_quantity * item.product.Pro_price
+                    total_quantity += item.cart_quantity
+
+                    prod_quantity = item.product
+                    prod_quantity.stock -= item.cart_quantity
+                    prod_quantity.save()
+
                 order.quantity = total_quantity
+                order.total_amount = total_coupon_amount
                 order.save()
 
-                # Order_id moving to session for further use
+                new_balance = balance - total_coupon_amount
+                Wallet.objects.create(
+                    user=user,
+                    amount=total_coupon_amount,
+                    balance=new_balance,
+                    transaction_type="Debit",
+                    transaction_details="Debited Money Through Purchase",
+                )
+                print(balance)
                 request.session['order_id'] = str(order.order_id)
-
-                # Clearing the cart items after placing the order
                 cart_items.delete()
-
+                
                 return JsonResponse({"success": "Order placed successfully"})
             else:
-                return JsonResponse({"success": False, "message": "your cart is empty"})
+                return JsonResponse({"success": False, "message": "Insufficient balance in wallet"})
             
-        return JsonResponse({"error": "User not authenticated"})
-    
+    return JsonResponse({"error": "User not authenticated"}, status=400)
+
 
 
 # function for apply coupons
@@ -301,7 +404,7 @@ def apply_coupons(request):
             coupon_check = Coupons.objects.filter(code=coupon_code, is_active = True).first()
             if coupon_check:
                 if CouponUsage.objects.filter(user=user, coupon=coupon_check).exists():
-                    return JsonResponse({'error': "Coupon already applied."})
+                    return JsonResponse({'error': "Coupon already applied."}, status = 400)  
                 else:
                     if coupon_check.used_count < coupon_check.usage_limit:
                         cart_total = sum(
@@ -310,7 +413,7 @@ def apply_coupons(request):
 
                         if cart_total >= coupon_check.min_purchase:
                             if coupon_check.expiry_date < datetime.now().date():
-                                return JsonResponse({"error": f"Coupon Expired"})
+                                return JsonResponse({"error": f"Coupon Expired"}, status = 400)
                             
                             total = cart_total - coupon_check.discount_value
 
@@ -329,15 +432,15 @@ def apply_coupons(request):
                             return JsonResponse(response_data)
                         
                         else:
-                            return JsonResponse({"error": f"Minimum purchase amount of {round(coupon_check.min_purchase)} required"})
+                            return JsonResponse({"error": f"Minimum purchase amount of {round(coupon_check.min_purchase)} required"}, status = 400)
                         
                     else:
-                        return JsonResponse({"error": "Sorry! This code has reached its usage limit."})
+                        return JsonResponse({"error": "Sorry! This code has reached its usage limit."}, status = 400)
                     
             else:
-                return JsonResponse({"error":"Invalid Coupon"})
+                return JsonResponse({"error":"Invalid Coupon"}, status = 400)
             
-        return JsonResponse({"error":"Inavalid request"})
+        return JsonResponse({"error":"Inavalid request"}, status = 400)
 
 
 

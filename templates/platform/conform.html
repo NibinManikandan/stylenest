@@ -71,7 +71,7 @@
                             </td>
                           </td>
                           <td class="text-center">{{item.ord_quantity}}</td>
-                          <td class="text-end">${{item.ord_product.Pro_price}}</td> 
+                          <td class="text-end">&#8377; {{item.ord_product.Pro_price}}</td> 
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -79,20 +79,12 @@
                         <tr>
                           <td colspan="2">Subtotal</td>
                           <td></td>
-                          <td class="text-end">${{ord_details.total_amount}}</td>
+                          <td class="text-end">&#8377; {{ord_details.total_amount}}</td>
                         </tr>
-                        {% comment %} <tr>
-                          <td colspan="2">Shipping</td>
-                          <td class="text-end">$</td>
-                        </tr> {% endcomment %}
-                        {% comment %} <tr>
-                          <td colspan="2">Discount (Code: NEWYEAR)</td>
-                          <td class="text-danger text-end">-$10.00</td>
-                        </tr> {% endcomment %}
                         <tr class="fw-bold">
                           <td colspan="2">TOTAL</td>
                           <td></td>
-                          <td class="d-flex justify-content-end">${{ord_details.total_amount}}</td>
+                          <td class="d-flex justify-content-end">&#8377; {{ord_details.total_amount}}</td>
                         </tr>
                       </tfoot>
                     </table>
@@ -104,7 +96,7 @@
                     <div class="row">
                       <div class="col-lg-6">
                         <h3 class="h6">Pyment method</h3>
-                        <p>{{ord_details.pyment_mode}} (Cash On Delivery)<br>
+                        <p>{{ord_details.pyment_mode}}<br>
                       </div>
                       <div class="col-lg-6">
                         <h3 class="h6">Delivery Address</h3>

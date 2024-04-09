@@ -19,40 +19,28 @@
 		  <img src="" />
     <div class="col-md-6">
       
-		<div id="carouselExampleRide" class="carousel slide" data-bs-ride="true">
+		<div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2300">
 			{% for img in images%}
 			<div class="carousel-inner">
 			  <div class="carousel-item {% if forloop.counter == 1  %}active{% endif %}">
-				<img src="{{img.Pro_image.url}}" class="d-block w-100" height="400px" alt="...">
+				<img src="{{img.Pro_image.url}}" class="d-block w-60" height="400px" alt="Product">
 			  </div>
 			</div>
 			{% endfor %}
       
-      {% csrf_token %}
-      <form action="" method="POST">
-        <a href="{% url 'add_to_wishlist' %}">
+      <form action="">
+        {% csrf_token %}
+      </form>
           <div class="wishlist-icon-container">
-              <button class="wishlist-icon">
+              <button class="wishlist-icon" type="button" onclick="addToWishlist({{products.id}})">
                 <i class="far fa-heart" style="color: black; font-size: 24px;"></i>
               </button>
           </div>
-        </a>
-      </form>
-    
-      
-			<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="prev">
-			  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-			  <span class="visually-hidden">Previous</span>
-			</button>
-			<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="next">
-			  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-			  <span class="visually-hidden">Next</span>
-			</button>
-		  </div>
+		</div>
 
 		  <div class="carousel" style="margin-top: 5px;">
 			{% for img in images%}
-				<img src="{{img.Pro_image.url}}" height="100px", width="130px">
+				<img src="{{img.Pro_image.url}}" height="100px", width="95px">
 			{% endfor %}
 		  </div>
 
@@ -76,11 +64,13 @@
               </div>
               <span>3 Reviews</span>
             </div>
-            <div class="product-price-discount">
-              <span></span>{{ products.Pro_price }}<span class="line-through"></span>
-            </div>
           </div>
           <p>{{ products.Pro_description }}</p>
+
+          <h6><p style="color: red;">{% if products.stock == 0 %}Out of Stock {% elif products.stock <= 5 %}Limitted stocks are available{% endif %}</p></h6>
+          <div>
+            <p style="color: green;">{% if products.Pro_offer > 0 %}&#8595;{{products.Pro_offer}}% <del style="color: red;">{{products.Pro_price}}</del> &#8377;{{offer_price}} {% else %}&#8377;{{products.Pro_price}}{% endif %}</p>
+          </div> </del> 
 
             <div class="product-count">
               <h4>Here You Can</h4>
@@ -88,7 +78,6 @@
                 {% csrf_token %}
               </form>
               <div onclick="addToCart({{products.id}})" type="button" class="round-black-btn">Add to Cart</div>
-              <a href="{% url 'checkout' %}"><button type="button" class="round-black-btn" style="background-color:darkorange;">Buy Now</button></a>
             </div>
         </div>
       </div>
@@ -233,6 +222,40 @@
           }
       });
   }
+
+  function addToWishlist(id) {
+    console.log('dfdsfdfdfsdf')
+      var csrftoken = getCSRFToken();
+      
+      // AJAX request to add the product to the cart
+      $.ajax({
+          url: "/add_to_wishlist/",
+          method: "POST",
+          data: { id: id, csrfmiddlewaretoken: csrftoken },
+          dataType: "json", 
+          success: function(data) {
+              console.log(data);
+              if (data.success) {
+                  Swal.fire({
+                      title: data.status,
+                      icon: "success"
+                  }).then(function() {
+                      
+                  });
+              } else {
+                  Swal.fire({
+                      title: data.status,
+                      icon: "error"
+                  });
+              }
+          },
+          error: function() {
+              alert('An error occurred while processing your request.');
+          }
+      });
+  }
+
+
 </script>
 
 

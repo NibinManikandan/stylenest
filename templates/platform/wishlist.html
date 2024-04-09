@@ -3,6 +3,9 @@
 {% block content %}
 
 <section class="h-100" style="background-color: #eee;">
+  <div class="heading-section" style="text-align: center; margin-top: 40px;">
+      <h2>My Wishlist</h2>
+    </div>
     <div class="container h-100 py-5">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-10">
@@ -18,40 +21,49 @@
           </div>
           {% else %}
           
-          <div class="card rounded-3 mb-4">
-            <div class="card-body p-4">
-              <div class="row d-flex justify-content-between align-items-center">
-                <div class="col-md-2 col-lg-2 col-xl-2">
-                  <img
-                    src="wishlist.product.Pro_image.url"
-                    class="img-fluid rounded-3" alt="#">
+          {% for item in wishlist %}
+            <div class="card mb-3" style="width: 120%; margin-left: -10%;">
+              <div class="row g-0">
+                <div class="col-md-3">
+                  <a class="product-thumb" href="../prod_details/{{ item.product.id }}">
+                    <img src="{{ item.product.images.first.Pro_image.url }}" class="img-fluid rounded-start" alt="product">
+                  </a>
                 </div>
-                <div class="col-md-3 col-lg-3 col-xl-3">
-                  <p class="lead fw-normal mb-2">{{wishlist.product.Pro_name}}</p>
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ item.product.Pro_name }}</h5>
+                    <p class="card-text">{{ item.product.Pro_description }}</p>
+                    <p class="card-title">
+                      {% if item.product.Pro_offer > 0 %}
+                      &#8595;{{ item.product.Pro_offer }} % off
+                      {% endif %}
+                    </p>
+                    <p class="card-title">&#8377; {{ item.product.Pro_price }}</p>
+                    <h6 class="card-text" style="color: red;">
+                      {% if item.product.stock == 0 %}
+                      Out of Stock
+                      {% elif item.product.stock <= 5 %}
+                      Limitted stocks are available
+                      {% else %}
+                      <span style="color:green">In Stock</span>
+                      {% endif %}
+                    </h6>
+                    <div class="d-flex justify-content-between align-items-end">
+                      <div>
+                        <a href="{% url 'remove_wish' item.id %}" class="text-danger"><i class="fas fa-trash fa-lg"></i></a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                  <h5 class="mb-0">${{wishlist.product.Pro_price}}</h5>
-                </div>
-
-                <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                    <a href="{% url 'add_to_cart' %}" class="text-dark"><i class="fas fa-shopping-cart fa-lg"></i></a>
-                </div>
-                <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                  <a href="{% url 'remove_wish' %}" class="text-danger"><i class="fas fa-trash fa-lg"></i></a>
-                </div>
-
               </div>
             </div>
-          </div>
-          
-          <div class="card">
-            <div class="card-body">
-              <button type="button" class="btn btn-warning btn-block btn-lg">Continue Shop</button>
-            </div>
-          </div>
+            {% endfor %}
+
           {% endif %}
         </div>
+      </div>
+      <div class="text-center">
+        <a href="{% url "shop" %}"><button type="button" class="btn btn-warning btn-lg">Continue</button></a>
       </div>
     </div>
   </section>  

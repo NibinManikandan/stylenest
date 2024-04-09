@@ -33,7 +33,11 @@
                 <td class="product-name">
                   <h2 class="h5 text-black">{{ item.product.Pro_name }}</h2>
                 </td>
-                <td>${{ item.product.Pro_price }}</td>
+                {% if item.product.Pro_offer > 0 %}
+                <td>&#8377; {{ item.product.Pro_price }}</td>
+                {% else %}
+                <td>&#8377; {{ item.product.Pro_price }}</td>
+                {% endif %}
                 <td>
                   <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
                     <div class="input-group-prepend">
@@ -46,7 +50,7 @@
                 </div>
                 
                 </td>
-                <td class="price-{{item.id}}">${{ item.cart_price }}</td>
+                <td class="price-{{item.id}}">&#8377; {{ item.product.Pro_price }}</td>
                 <td>
                   <a onclick="confirmDelete({{item.id}})"><i class="bi bi-x-circle-fill"></i></a>
                 </td>
@@ -79,7 +83,7 @@
                 <span class="text-black">Subtotal</span>
               </div>
               <div class="col-md-6 text-right">
-                <strong class="cart-total text-black ">${{ subPrice }}</strong>
+                <strong class="cart-total text-black ">&#8377; {{ subPrice }}</strong>
               </div>
             </div>
             <div class="row mb-5">
@@ -87,7 +91,7 @@
                 <span class="text-black">Total</span>
               </div>
               <div class="col-md-6 text-right">
-                <strong class="cart-total text-black">${{ subPrice }}</strong>
+                <strong class="cart-total text-black">&#8377; {{ subPrice }}</strong>
               </div> 
             </div>
             <div class="row">

@@ -297,10 +297,12 @@ select.form-control {
     </div>
     <div class="container padding-bottom-3x mb-1">
 
-        <div class="search-box">
-            <button class="btn-search"><i class="fas fa-search"></i></button>
-            <input type="text" class="input-search" placeholder="Type to Search...">
-        </div>
+        <form action="../../item_search" method="get">
+            <div class="search-box">
+                <button class="btn-search"><i class="fas fa-search"></i></button>
+                <input type="text" name="search" class="input-search" placeholder="Type to Search...">
+            </div>
+        </form>
           
 
     <!-- Shopping Cart-->
@@ -318,12 +320,11 @@ select.form-control {
         <table class="table">
             <thead>
                 <tr>
-                    <th>Product Name</th>
-                    <th class="text-center">Count</th>
-                    <th class="text-center">Subtotal</th>
-                    <th class="text-center">Discount</th>
+                    <th>Product</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-center">Price/Qty</th>
                     <th class="text-center">Status</th>
-                    <th class = "text-center">Actions</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -340,20 +341,17 @@ select.form-control {
                     <td class="text-center">
                         <h6>{{order.ord_quantity}}</h6>
                     </td>
-                    <td class="text-center text-lg text-medium">${{order.price}}</td>
-                    <td class="text-center text-lg text-medium">${{order.cou}}</td>
+                    <td class="text-center text-lg text-medium">&#8377; {{order.price}}</td>
+                    {% comment %} <td class="text-center text-lg text-medium">{{order.ord_product.Pro_offer}} %</td> {% endcomment %}
                     <td class="text-center text-lg text-medium"><span class="badge {% if order.status == "Cancelled" %}text-danger {% elif order.status == "Delivered" %} text-success {% elif order.status == "Order confirmed" %} text-warning {% else %}text-primary{% endif %}">{{order.status}}<span></td>
                     {% if order.status == "Cancelled" or order.status == "Returned" %}
-                    <td><a href="../product_details/{{order.variant.id}}" class="btn btn-sm btn-outline-primary">View Product<a></td>
+                    <td><a href="../prod_details/{{order.ord_product.id}}" class="btn btn-sm btn-outline-primary">View Product<a></td>
                     
                     {% elif order.status == "Delivered" %}
-                    <td><a href="#Return-{{forloop.counter}}" class="btn btn-sm btn-outline-secondary" data-toggle="modal">Return<a></td>
-            
+                    <td><button class="btn btn-sm btn-outline-secondary" onclick="returnOrder({{ order.id }})">Return</button></td>
                     {% else %}
-                    <td><a href="#deleteAddress-{{forloop.counter}}" class="delete btn btn-sm btn-outline-danger" data-toggle="modal">Cancel<a></td>
+                    <td><button class="delete btn btn-sm btn-outline-danger" onclick="cancelOrder({{ order.id }})">Cancel</button></td>
                     {% endif %}
-                    </tr>
-                </tr>
                 {% endfor %}
                 </tbody>
              </table>
@@ -361,5 +359,95 @@ select.form-control {
         </div>
     </div>
 </div>
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    function getCSRFToken() {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.startsWith('csrftoken=')) {
+                return cookie.substring('csrftoken='.length, cookie.length);
+            }
+        }
+        return '';
+    }
+</script>
+
+<!--cancel function-->
+<script>
+
+    function cancelOrder(orderId) {
+        Swal.fire({
+            title: "Are you sure want to cancel?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Cancel it!"
+        }).then((willCancel) => {
+            if (willCancel.isConfirmed) {
+                $.ajax({
+                    type: 'POST',
+                    url: '../cancel_order/' + orderId + '/',
+                    data: {
+                        csrfmiddlewaretoken: getCSRFToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#order-' + orderId).remove();
+                            window.location.reload();
+                        } else {
+                            swal("message", "Failed to cancel order");
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        swal("message", "Failed to cancel order");
+                    }
+                });
+            }
+        });
+    }
+    
+</script>
+
+<script>
+    //function for return product-info
+    function returnOrder(orderId) {
+        Swal.fire({
+            title: "Are you sure want to Return it?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Return it!"
+        }).then((willReturn) => {
+            if (willReturn.isConfirmed) {
+                $.ajax({
+                    type: 'POST',
+                    url: '../return_order/' + orderId + '/',
+                    data: {
+                        csrfmiddlewaretoken: getCSRFToken()
+                    },
+                    success: function(response) {
+                        if (response && response.success) { 
+                            $('#order-' + orderId).remove();
+                            location.reload();
+                        } else {
+                            console.error("Failed to return order");
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.error("Failed to return order");
+                    }
+                });
+            }
+        });
+    }
+    
+</script>
 
 {% endblock %}

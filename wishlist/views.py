@@ -1,5 +1,5 @@
 from itertools import product
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from Admin_home.models import *
 from userAuth.models import CustomUser
 from wallet.models import Wallet
@@ -28,13 +28,17 @@ def add_to_wishlist(request):
         if 'user' in request.session:
             email = request.session['user']
             user = CustomUser.objects.get(email=email)
-            prod_id = int(request.POST.get('product_id'))
-            products = Product.objects.get(id=prod_id)
-
-            if (Wallet.objects.filter(user=user, product=products).first()):
+            prod_id = request.POST.get('id')
+            print(prod_id)
+            products = get_object_or_404(Product, id=prod_id)
+            
+            if Wishlist.objects.filter(user=user, product=products).exists():
                 return JsonResponse({'success':False,'status' : "Product already in Wishlist"})
             else:
-                Wishlist.objects.create(user=user, product=products)
+                Wishlist.objects.create(
+                    user=user, 
+                    product=products,
+                )
                 return JsonResponse({"status": "Product added successfully", "success": True})
         else:
             return redirect('Userlogin')
@@ -46,6 +50,9 @@ def add_to_wishlist(request):
 
 # function for remove item from wish list
 def remove_wish(request, id):
-    item = Wishlist.objects.get(id=id)
-    item.delete()
+    wishlist_item = get_object_or_404(Wishlist, id=id)
+    if wishlist_item.user != request.user:
+        return redirect('home') 
+
+    wishlist_item.delete()
     return redirect('wishlist')

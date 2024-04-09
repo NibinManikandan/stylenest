@@ -90,8 +90,8 @@
                       <th>Item</th>
                       <th>Description</th>
                       <th class="center">Quantity</th>
-                      <th class="right">Price</th>
-                      <th class="right">Total</th>
+                      <th class="center">Price</th>
+                      <th class="center">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -99,9 +99,9 @@
                       <tr>
                         <td class="left">{{ item.ord_product.Pro_name }}</td>
                         <td class="left">{{ item.ord_product.Pro_description }}</td>
-                        <td class="center">${{ item.ord_quantity }}</td>
-                        <td class="right">${{ item.ord_product.Pro_price }}</td>
-                        <td class="right">${{ item.order.total_amount }}</td>
+                        <td class="center">{{ item.ord_quantity }}</td>
+                        <td class="center">&#8377; {{ item.ord_product.Pro_price }}</td>
+                        <td class="center">&#8377; {{ item.order.total_amount }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -116,20 +116,20 @@
                         <td class="left">
                           <strong>Subtotal</strong>
                         </td>
-                        <td class="right">$ {{ invoice_details.total_amount }}</td>
+                        <td class="right">&#8377; {{ invoice_details.total_amount }}</td>
                       </tr>
-                      <tr>
+                      {% comment %} <tr>
                         <td class="left">
                           <strong>Discount</strong>
                         </td>
-                        <td class="right">$ 0</td>
-                      </tr>
+                        <td class="right">&#8377; 0</td>
+                      </tr> {% endcomment %}
                       <tr>
                         <td class="left">
                           <strong>Total</strong>
                         </td>
                         <td class="right">
-                          <strong>$ {{ invoice_details.total_amount }}</strong>
+                          <strong>&#8377; {{ invoice_details.total_amount }}</strong>
                         </td>
                       </tr>
                     </tbody>

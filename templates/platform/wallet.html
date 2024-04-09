@@ -20,7 +20,7 @@
     <div class="container-xl">
       <div class="row center_o1 text-center">
        <div class="col-md-12">
-         <h1>MY WALLET</h1>
+         <h1>My Wallet</h1>
        </div>
       </div>
     </div>
@@ -44,9 +44,9 @@
               <div class="input-group w-75 couponcode-wrap">
                 <input type="text" class="form-control me-2" id="c_amount" placeholder="Amount in INR" aria-label="amount" aria-describedby="button-addon2">
                 <div class="input-group-append">
-                <button class="btn btn-black btn-sm" type="button" id="button-addon2" style="border-radius: 10px;">Add</button>
+                <button class="btn btn-black btn-sm add-to-wallet-btn" type="button" id="button-addon2" style="border-radius: 10px;">Add</button>
                 </div>
-            </div>
+              </div>
               
           </div>
           <!-- Add more balance-related information or actions here -->
@@ -69,18 +69,16 @@
                   <th>Payment Details</th>
                   <th>Payment Type</th>
                   <th>Amount</th>
-                  <th>Balance</th>
                 </tr>
               </thead>
               <tbody>
-                {% for item in wallet %}
+                {% for item in wallett %}
                 <tr>
                   <td>{{item.date.date}}</td>
                   <td>{{item.date.time}}</td>
                   <td>{{item.transaction_details}}</td>
                   <td class= "fw-bold {% if item.transaction_type == 'Credit' %}text-success{% else %}text-danger{% endif %}">{{item.transaction_type}}</td>
-                  <td>{{item.amount}}</td>
-                  <td>{{item.balance}}</td>
+                  <td>&#8377; {{item.amount}}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -105,12 +103,10 @@
     
     $(document).ready(function () {
       $(".add-to-wallet-btn").click(function () {
-        // Get the entered amount
         var amount = $("input[type='number']").val();
 
         var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
 
-        // Validate the amount
         if (
           amount &&
           !isNaN(amount) &&
@@ -118,27 +114,27 @@
           /^[0-9]+$/.test(amount) &&
           parseFloat(amount) <= 100000
         ) {
-          // AJAX request to send the amount to the server
+          
           $.ajax({
             type: "POST",
-            url: "add_to_wallet",  // Replace with the actual URL for your add amount view
+            url: "add_amount", 
             data: { amount: amount,
-              csrfmiddlewaretoken: csrfToken, // Include the CSRF token
+              csrfmiddlewaretoken: csrfToken, 
              },
             success: function (data) {
-              // Handle success response
+          
               console.log("Amount added successfully:", data);
-              // You can update the UI or perform additional actions here
+            
               var options = {
-                "key": "rzp_test_364uDI7fwiadCE", // Enter the Key ID generated from the Dashboard
-                "amount": data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "key": "rzp_test_364uDI7fwiadCE", 
+                "amount": data.amount, 
                 "currency": "INR",
                 "name": "Acme Corp",
                 "description": "Test Transaction",
                 "image": "https://example.com/your_logo",
-                "order_id": data.payment_id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "order_id": data.payment_id, 
                 "handler": function (response){
-                    window.location.href= "../wallet/update_wallet"
+                    window.location.reload();
                   
                 },
                 "prefill": {
@@ -164,7 +160,7 @@
             rzp1.open();
             },
             error: function (xhr, status, error) {
-              // Handle error response
+          
               Swal.fire({
                 icon: 'error',
                 title: 'Money Not Added',
@@ -174,7 +170,7 @@
             },
           });
         } else {
-          // Display an error message or perform other actions for invalid input
+          
           alert("Invalid amount entered");
         }
       });

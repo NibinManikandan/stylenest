@@ -5,6 +5,9 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
 import requests
 from django.db import transaction
+
+from coupon.models import Coupons
+from wallet.models import Wallet
 from .models import *
 from Cart.models import *
 from userAuth.models import *
@@ -29,6 +32,7 @@ def orders(request):
         user = CustomUser.objects.get(email=email)
         orders = Order.objects.filter(user=user)
         order_items = Order_item.objects.filter(order__in = orders).order_by('-id')
+        order_items = order_items.filter(ord_product__is_listed=True)
         
     return render(request, 'platform/order_details.html',{"order_items":order_items})
 
@@ -40,11 +44,7 @@ def view_order(request):
     order_id = request.session.get('order_id')
     ord_details = Order.objects.get(order_id=order_id)
     current_order = Order_item.objects.filter(order=ord_details)
-    
-    # Debugging prints
-    print("Order ID:", order_id)
-    print("Order Details:", ord_details)
-    print("Current Order Items:", current_order)
+    current_order = current_order.filter(ord_product__is_listed=True)
 
     context = {
         "current_order": current_order,
@@ -59,6 +59,7 @@ def view_order(request):
 def invoice(request):
     order_id = request.session['order_id']
     order_details = Order_item.objects.filter(order_id = order_id).all()
+    order_details = order_details.filter(ord_product__is_listed=True)
     invoice_details = Order.objects.get(order_id=order_id)
     context = {
         "order_details":order_details,
@@ -71,33 +72,91 @@ def invoice(request):
 # function for cancel the order
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def cancel_order(request, id):
-    email = request.session['email']
-    user = CustomUser.objects.get(email = email)
-    order = Order_item.objects.get(id=id)
-    order_status = "Cancelled"
+    if request.user:
+        email = request.user
+        user=CustomUser.objects.get(email=email)
+        order = Order_item.objects.get(id=id)
+        order.status = "Cancelled"
 
-    if order.order.payment_method == 'COD':
-        order.ord_product.stock += order.ord_quantity
-        order.save()
-        order.ord_product.save()
+        if order.order.pyment_mode == 'COD':
+            order.ord_product.stock += order.ord_quantity
+            order.ord_product.save()
+            order.save()
+            
+        elif order.order.pyment_mode == 'wallet':
+            order.ord_product.stock += order.ord_quantity
+            print('quantity is the',order.ord_quantity)
+            amount = order.ord_product.Pro_price * order.ord_quantity
+            print('the product price',order.ord_product.Pro_price)
+            print(amount)
 
-    return redirect('orders')
+            user_wallet = Wallet.objects.filter(user=user).order_by('-id').first()
+
+            if user_wallet:
+                balance=user_wallet.balance
+            else:
+                balance=0
+
+            used_coupon = request.session.get('used_coupon')
+            coupon = Coupons.objects.filter(code=used_coupon).first()
+            
+            if coupon:
+                amount = amount - coupon.discount_value
+                new_balance = (balance + amount)
+
+            else:
+                new_balance = balance + amount
+
+            print(new_balance)
+
+            Wallet.objects.create(
+                user=user,
+                amount=amount,
+                balance=new_balance,
+                transaction_type="Credit",
+                transaction_details=f"Received Money through Order Cancel",
+            )
+            order.save()
+            order.ord_product.save()
+
+            return JsonResponse({'success': False, 'message': 'This order cannot be cancelled as it was not paid via Cash on Delivery.'}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Order not found.'}, status=400)
+   
+
 
 
 # function for return product
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def return_order(request, id):
-    email = request.session['email']
-    user = CustomUser.objects.get(email=email)
+    if request.user:
+        email = request.user
+        user = CustomUser.objects.get(email=email)
 
-    order = Order_item.objects.get(id=id)
-    order_status = "Returned"
-    order.ord_product.stock += order.ord_quantity
-    
-    amount = order.price * order.ord_quantity
+        order = Order_item.objects.get(id=id)
+        order.status = "Returned"
+        order.ord_product.stock += order.ord_quantity
+        
+        amount = order.price * order.ord_quantity
 
-    balance = 0
+        user_wallet = Wallet.objects.filter(user=user).order_by('id').first()
 
-    order.save()
-    order.ord_product.save()
-    return redirect('orders')
+        if not user_wallet:
+            balance = 0
+        else:
+            balance = user_wallet.balance
+
+        new_balance = balance + amount
+        Wallet.objects.create(
+            user = user,
+            amount = amount,
+            balance = new_balance,
+            transaction_type = 'Credit',
+            transaction_details = f"Refund amount received"
+        )
+
+        order.save()
+        order.ord_product.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'message': 'Order not found.'}, status=400)

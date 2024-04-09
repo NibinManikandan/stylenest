@@ -1,3 +1,6 @@
+from itertools import product
+from tkinter.tix import Tree
+from unicodedata import category
 from django.shortcuts import render, redirect
 from Admin_home.models import Category, Product, Product_Image
 from django.views.decorators.cache import cache_control
@@ -222,7 +225,7 @@ def Edit_product(request, id):
 # function for list order items
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-def orders(request):
+def adm_orders(request):
     order_items = Order_item.objects.all().order_by('-id')
     return render(request, "admin_panel/orders.html", {"items": order_items})
 
@@ -233,48 +236,180 @@ def orders(request):
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
 def order_status_change(request, id):
     order = Order_item.objects.get(id=id)
-    status = request.POST.get('status_change')
-    if status == "Cancelled" or status == "Returned":
-        if order.order.pyment_mode != 'COD':
-            order.status = status
-            order.ord_product.stock += order.ord_quantity
 
-            wallet = Wallet.objects.filter(order.order.user).order_by('-id')
-            if wallet:
-                balance = wallet.first().balance
+    if request.method == 'POST':
+        status = request.POST.get('status_change')
+
+        if status == "Cancelled" or status == "Returned":
+            if order.order.pyment_mode != 'COD':
+                order.status = status
+                order.ord_product.stock += order.ord_quantity
+
+                wallet = Wallet.objects.filter(order.order.user).order_by('-id')
+                if wallet:
+                    balance = wallet.first().balance
+                else:
+                    balance = 0
+
+                new_balance = balance + order.total_price()
+
+                Wallet.objects.create(
+                    user = order.order.user,
+                    amount = order.total_price,
+                    balance = new_balance,
+                    transaction_type = 'Credit',
+                    transaction_details = f"Recieved money through Order {status} By Seller"
+                )
+                order.status = status
+                order.ord_product.stock += order.ord_quantity
+                order.save()
+                order.ord_product.save()
+                return redirect("adm_orders")
+            
             else:
-                balance = 0
+                order.status = status
 
-            new_balance = balance + order.total_price()
-
-            Wallet.objects.create(
-                user = order.order.user,
-                amount = order.total_price,
-                balance = new_balance,
-                transaction_type = 'Credit',
-                transaction_details = f"Recieved money through Order {status} By Seller"
-            )
-            order.status = status
-            order.ord_product.stock += order.ord_quantity
-            order.save()
-            order.ord_product.save()
-            return redirect("order_info")
+                order.save()
+                return redirect("adm_orders")
         
         else:
             order.status = status
             order.save()
-        return redirect("order_info", id=id)
-
+            return redirect("adm_orders")
+        
+    return render(request, 'admin_panel/order_info.html', {'obj':order})
 
 
 
 # function for view order details
-@cache_control(no_cache = True, must_revalidate = True, no_store = True)
-@user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-def order_info(request, id):
-    obj = Order_item.objects.get(id=id)
-    return render(request, 'admin_panel/order_info.html', {"obj":obj})
+# @cache_control(no_cache = True, must_revalidate = True, no_store = True)
+# @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
+# def order_info(request, id):
+#     obj = Order_item.objects.get(id=id)
+#     return render(request, 'admin_panel/order_info.html', {"obj":obj})
 
+
+
+# function for check offers
+@cache_control(no_cache =True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def offers(request):
+    return render(request, 'admin_panel/offers.html')
+
+
+
+#function for show available product offers
+@cache_control(no_cache =True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def productOffer(request):
+    product = Product.objects.filter(Pro_offer__gt = 0)
+    return render(request, 'admin_panel/prod_offer.html', {'product':product})
+
+
+
+# function for add product offer
+@cache_control(no_cache = True, must_revalidate =  True, no_store = True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def addProductOffer(request):
+    products = Product.objects.all().order_by('id')
+
+    if request.method == 'POST':
+        prod = request.POST.get('product')
+        discounted_price = request.POST.get('discount')
+
+        offerProduct = Product.objects.get(id=prod)
+        offerProduct.Pro_offer = discounted_price
+        offerProduct.save()
+
+        return redirect('productOffer')
+    
+    return render(request, 'admin_panel/addPordOffer.html',{'products':products})
+
+
+
+# function for edit product offer
+@cache_control(no_cache = True, must_revaldate = True, no_store = True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def edit_prod_offer(request, id):
+    products = Product.objects.all().order_by('id')
+    item = Product.objects.get(id=id)
+
+    if request.method == 'POST':
+        product_discount = request.POST.get('discount')
+
+        item.Pro_offer = product_discount
+        item.save()
+        return redirect('productOffer')
+    
+    return render(request, 'admin_panel/edit_prod_offer.html', {'item':item, 'products':products})
+
+
+
+# function for cancell product offer
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def cancel_prod_offer(request, id):
+    item = Product.objects.get(id=id)
+    item.Pro_offer = 0
+    item.save()
+    return redirect('productOffer')
+
+
+
+# function for add all category offers
+@cache_control(no_cache=True, must_revalidate = True, no_store=True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def cateOffer(request):
+    category = Category.objects.filter(Cate_offer__gt=0)
+    return render(request, 'admin_panel/cate_offer.html',{'category':category})
+
+
+
+# function for add cetegory offers
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def add_cate_offers(request):
+    categories=Category.objects.all().order_by('id')
+
+    if request.method == 'POST':
+        cate = request.POST.get('category')
+        cate_offer_val = request.POST.get('category_offer')
+
+        Category_offer = Category.objects.get(id=cate)
+        Category_offer.Cate_offer = cate_offer_val
+        Category_offer.save()
+
+        return redirect('cateOffer')
+    
+    return render(request, 'admin_panel/addCateOffer.html', {'categories':categories})
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def edit_cate_offer(request, id):
+    categories = Category.objects.all().order_by('id')
+    item = Category.objects.get(id=id)
+
+    if request.method == 'POST':
+        cate_discount = request.POST.get('discount')
+
+        item.Cate_offer = cate_discount
+        item.save()
+        return redirect(cateOffer)
+    
+    return render(request, 'admin_panel/edit_cate_offer.html',{'item':item, 'categories':categories})
+
+
+
+#function for cancel category offer
+@cache_control(no_cache=True, must_revalidate=True, no_sore=True)
+@user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
+def cancel_category_offers(request, id):
+    item = Category.objects.get(id=id)
+    item.Cate_offer = 0
+    item.save()
+    return redirect('cateOffer')
 
 
 

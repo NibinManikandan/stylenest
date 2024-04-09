@@ -180,8 +180,7 @@
 									</div>
 									<div class="copy-text">
 										<input type="text" class="text" value="{{coupon.code}}" readonly style="border-radius: 5px;"/>
-										<button style="border-radius: 5px;" onclick="copy_fun()"><i class="fa fa-clone"></i></button>
-										<p id="demo"></p>
+										<button style="border-radius: 5px;" onclick="copyCouponCode(this)"><i class="fa fa-clone"></i></button>
 									</div>
 								</div>
 								{% endfor %}
@@ -211,22 +210,22 @@
 						{% for items in obj  %}
 					<tr>
 						<td>{{items.product.Pro_name}} <strong class="mx-2"></td>
-						<td>${{items.cart_price}}</td>
+						<td>&#8377; {{items.cart_price}}</td>
 					</tr> 
 					{% endfor %}
 					<tr>
 						<td class="text-black font-weight-bold"><strong>Cart Subtotal</td>
-						<td class="text-black">${{sub_total}}</td>
+						<td class="text-black">&#8377; {{sub_total}}</td>
 					</tr>
 
 					<tr>
-						<td class="text-black font-weight-bold"><strong>Coupon Discount</strong></td>
-						<td class="text-black font-weight-bold"><strong>${{coupons.discount_value}}</strong></td>
+						<td class="text-black font-weight-bold"><strong>Coupon Offer</strong></td>
+						<td class="text-black coupon-discount">&#8377; 0</td>
 					</tr>
 
 					<tr>
 						<td class="text-black font-weight-bold"><strong>Order Total</strong></td>
-						<td class="text-black font-weight-bold"><strong>${{coupons.discount_value}}</strong></td>
+						<td class="final-total"><strong> &#8377; {{sub_total}}</strong></td>
 					</tr>
 					
 					</tbody>
@@ -234,7 +233,7 @@
 
 				<h6 style="margin-bottom: 20px; color: black;">Choose your payment Source</h6>
 				  <div class="form-check">
-					<input class="form-check-input" type="radio" name="payment" value="COD" id="flexRadioDefault1" checked>
+					<input class="form-check-input" type="radio" name="payment" value="COD" id="flexRadioDefault1" >
 					<label class="form-check-label" for="flexRadioDefault1">
 					  Cash On Delivery
 					</label>
@@ -273,116 +272,130 @@
 <!--coupon modal-->
 
 <script>
-	function showCouponModal() {
-		$('#couponModal').modal('show'); // Show the modal
-	  }
-    document.querySelector(".copy-text button").addEventListener("click", function () {
-        let input = document.querySelector(".copy-text input.text");
-        input.select();
-        document.execCommand("copy");
-        copyMessage.classList.add("active");
-        setTimeout(function () {
-            copyMessage.classList.remove("active");
-        }, 2000);
-    });
-</script>
-
-<script>
-	function copy_fun() {
-	  document.getElementById("demo").innerHTML = "Copied &#x2713;";
+	function copyCouponCode(button) {
+		let input = button.parentElement.querySelector(".text");
+		input.select();
+		document.execCommand("copy");
+		showCopyMessage();
+	}
+	
+	function showCopyMessage() {
+		let copyMessage = document.querySelector(".copy-message");
+		copyMessage.classList.add("active");
+		setTimeout(function () {
+			copyMessage.classList.remove("active");
+		}, 2000);
 	}
 </script>
+
 
 <!--coupon applay-->
 
 <script>
-    function getCSRFToken() {
-        // Implement the logic to retrieve the CSRF token
-        // This might involve selecting an input element or using a different method
-        return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-      }
-    function applyCoupon() {
-		console.log('asdfghj')
-        var couponCode = $('#couponCode').val();
-		console.log(couponCode)
 
-        $.ajax({
-            url: '../apply_coupons/',
-            type: 'POST',
-            data: {
-                couponCode: couponCode,
-                csrfmiddlewaretoken: getCSRFToken()
-            },
-            success: function (data) {
-                // Handle the response from the server, e.g., update total prices
-                console.log(data);
-
-                if ('error' in data) {
-                    // Display the error message below the input field
-                    $('#couponError').text(data.error);
-                } else {
-                    $('.coupon-discount').text(data.discount_amount);
-                    $('.final-total').text(data.total);
-                    
-                    // Clear the error message on success
-                    $('#couponError').text('');
-                    Swal.fire({
-                        icon: 'success',
-                        title: "Coupon Applied Successfully",
-                        confirmButtonText: 'OK',
-                    });
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.error('Error:', errorThrown);
-
-                // Display a generic error message below the input field
-                $('#couponError').text('Error applying coupon. Please try again.');
-            }
-        });
-    }
-    function removeCoupon() {
-        var couponCode = $('#couponCode').val();
-        console.log("clicked")
-    
-        $.ajax({
-            url: '../remove_coupon/',
-            type: 'POST',
-            data: {
-                couponCode: couponCode,
-                csrfmiddlewaretoken: getCSRFToken()
-            },
-            success: function (data) {
-                // Handle the response from the server, e.g., update total prices
-                console.log(data);
-    
-                if ('error' in data) {
-                    // Display the error message below the input field
-                    $('#couponError').text(data.error);
-                } else {
-                    $('.coupon-discount').text(''); // Clear the coupon discount display
-                    $('.final-total').text(data.total);
-    
-                    // Clear the error message on success
-                    $('#couponError').text('');
-                    Swal.fire({
-                        icon: 'success',
-                        title: "Coupon Removed Successfully",
-                        confirmButtonText: 'OK',
-                    });
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.error('Error:', errorThrown);
-    
-                // Display a generic error message below the input field
-                $('#couponError').text('Error removing coupon. Please try again.');
-            }
-        });
-    }
+	function getCSRFToken() {
+		var cookies = document.cookie.split(';');
+		for (var i = 0; i < cookies.length; i++) {
+			var cookie = cookies[i].trim();
+			if (cookie.startsWith('csrftoken=')) {
+				return cookie.substring('csrftoken='.length, cookie.length);
+			}
+		}
+		return '';
+	}
 	
 
-    
+	function applyCoupon() {
+		var couponCode = $('#couponCode').val();
+		console.log(couponCode);
+
+		$.ajax({
+			url: '../apply_coupons/',
+			type: 'POST',
+			data: {
+				couponCode: couponCode,
+				csrfmiddlewaretoken: getCSRFToken()
+			},
+			success: function (data) {
+				console.log(data);
+
+				if ('error' in data) {
+					$('#couponError').text(data.error);
+				} else {
+					$('.coupon-discount').text('₹ ' + data.discount_amount);
+					$('.final-total').text('₹ ' + data.total);
+
+					
+					$('#couponCode').val(couponCode); 
+
+					$('#couponError').text('');
+					Swal.fire({
+						icon: 'success',
+						title: "Coupon Applied Successfully",
+						confirmButtonText: 'OK',
+					});
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.error('Error:', errorThrown);
+				var errorResponse = JSON.parse(jqXHR.responseText);
+				var errorMessage = errorResponse.error;
+				Swal.fire({
+					icon: 'error',
+					title: "Error",
+					text: errorMessage,
+					confirmButtonText: 'OK',
+				});
+			}
+		});
+	}
+
+	function removeCoupon() {
+		var couponCode = $('#couponCode').val();
+		console.log("clicked");
+
+		$.ajax({
+			url: '../remove_coupon/',
+			type: 'POST',
+			data: {
+				couponCode: couponCode,
+				csrfmiddlewaretoken: getCSRFToken()
+			},
+			success: function (data) {
+				console.log(data);
+
+				if ('error' in data) {
+					$('#couponError').text(data.error);
+					
+				}else {
+					$('.coupon-discount').text('₹ '+ 0);
+					$('.final-total').text('₹ '+data.total);
+
+					// Clear the value of the coupon code input field
+					$('#couponCode').val(''); // Remove the coupon code
+
+					$('#couponError').text('');
+					Swal.fire({
+						icon: 'success',
+						title: "Coupon Removed Successfully",
+						confirmButtonText: 'OK',
+					});
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.error('Error:', errorThrown);
+				var errorResponse = JSON.parse(jqXHR.responseText);
+				var errorMessage = errorResponse.error;
+				Swal.fire({
+					icon: 'error',
+					title: "Error",
+					text: errorMessage,
+					confirmButtonText: 'OK',
+				});
+			}
+		});
+	}
+
 </script>
 
 
@@ -390,20 +403,21 @@
 
 <script>
     function place_order() {
-		console.log('hello');
+		var couponCode = $('#couponCode').val();
 		var selectedAddress = $("input[name='select_address']:checked").val();
 		var selectedPayment = $("input[name='payment']:checked").val();
 		var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
-		console.log(selectedAddress);
-		console.log(selectedPayment);
+		
 		if (selectedAddress && selectedPayment) {
-			var data = {
-				selected_address: selectedAddress,
-				payment: selectedPayment,
-				csrfmiddlewaretoken: csrfToken,
-			};
+			
 	
 			if (selectedPayment === 'COD') {
+				var data = {
+					selected_address: selectedAddress,
+					couponCode: couponCode,
+					payment: selectedPayment,
+					csrfmiddlewaretoken: csrfToken,
+				};
 				$.ajax({
 					url: '../place_order/',
 					type: 'post',
@@ -421,7 +435,38 @@
 						}
 					}
 				});
+				
+			}else if (selectedPayment === 'wallet') {
+				var data = {
+					selected_address:selectedAddress,
+					payment:selectedPayment,
+					couponCode:couponCode,
+					csrfmiddlewaretoken: csrfToken,
+				};
+				$.ajax({
+					type: 'post',
+					url: '../place_order_wallet/',
+					data: data,
+					success: function(response) {
+						console.log('success');
+						if (response.success) {
+							console.log('done');
+							window.location.href='../view_order/'
+						} else {
+							Swal.fire({
+								icon: 'error',
+								title: 'Error',
+								text: response.message,
+								confirmButtonText: 'Ok'
+							});
+						}
+					}
+
+				});
 			}
+		  	else {
+			  alert("Please select an address and payment method.");
+		  	}
 		}
 	}
 	

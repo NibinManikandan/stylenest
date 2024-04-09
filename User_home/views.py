@@ -7,6 +7,7 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.hashers import check_password
 from userAuth.models import *
 from Userprofile.models import *
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
 
@@ -17,8 +18,24 @@ def Home(request):
 
 # product page
 def Shop(request):
-    product = Product.objects.filter(is_listed = True)
-    return render(request, 'platform/shop.html', {'products':product})
+    products = Product.objects.filter(is_listed = True)
+
+    items_per_page = 4
+    
+    paginator = Paginator(products, items_per_page)
+    page_number = request.GET.get('page')
+
+    try:
+        page_obj = paginator.page(page_number)
+
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+
+    return render(request, 'platform/shop.html', {'products':products, 'page_obj': page_obj})
 
 
 
@@ -27,7 +44,14 @@ def Product_Details(request, id):
     product = Product.objects.get(id=id)
     cate = Category.objects.filter(is_listed = True)
     image_list = Product_Image.objects.filter(product=product)
-    return render(request, 'platform/product_detail.html',{'products':product,'images':image_list})
+    offer_price = product.Pro_price-product.discounted_price()
+    context={
+        'products':product,
+        'images':image_list, 
+        'cate':cate,
+        'offer_price':offer_price,
+        }
+    return render(request, 'platform/product_detail.html', context)
 
 
 # Search function

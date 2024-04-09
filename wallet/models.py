@@ -5,7 +5,6 @@ from userAuth.models import *
 
 # Create your models here.
 
-
 class Wallet(models.Model):
     user = models.ForeignKey(CustomUser, on_delete = models.CASCADE)
     date = models.DateTimeField(auto_now_add = True)

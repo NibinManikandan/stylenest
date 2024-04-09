@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.utils import timezone
 
@@ -5,10 +6,12 @@ from django.utils import timezone
 
 
 class Category(models.Model):
-    C_name = models.CharField(max_length=100, unique=True, null=True)
+    C_name = models.CharField(max_length=100, unique=True)
     C_description = models.TextField(blank=True)
     C_image = models.ImageField(upload_to='category/', blank=True)
     is_listed = models.BooleanField(default=True) 
+    Cate_offer = models.IntegerField(null=True)
+    
 
 
     def __str__(self):
@@ -20,14 +23,25 @@ class Product(models.Model):
     Pro_price = models.DecimalField(max_digits = 10, decimal_places = 2)
     category = models.ForeignKey(Category, null = True, on_delete = models.CASCADE)
     is_listed = models.BooleanField(default=True) 
-    Pro_offer = models.PositiveIntegerField(default = 0)
     stock = models.PositiveIntegerField(blank = True, null = True)
+    Pro_offer = models.IntegerField(default=0)
+    
+    
 
+
+    def discount(self):
+        discount_percentage = 0
+
+        if self.Pro_offer > self.category.Cate_offer:
+            discount_percentage = self.Pro_offer
+        else:
+            discount_percentage = self.category.Cate_offer
+        return discount_percentage
+    
 
     def discounted_price(self):
-        discount_percentage = 0
-        if discount_percentage > self.Pro_offer:
-            return self.Pro_price - ((self.Pro_price * discount_percentage) / 100)
+        if self.discount() > 0:
+            return  ((self.Pro_price/100 )* self.discount())
         else:
             return self.Pro_price
 

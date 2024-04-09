@@ -15,10 +15,11 @@ def wallet(request):
     user_name=CustomUser.objects.get(email = user)
     wallett = Wallet.objects.filter(user = user_name).order_by('-id')
 
-    if wallett:
-        balance = wallett.first().balance
+    if wallett.exists():
+        latest_transaction = wallett.first() 
+        balance = latest_transaction.balance
     else:
-        balance=0
+        balance = 0  
 
     return render(request, 'platform/wallet.html', {'wallett':wallett, 'balance':balance})
 

@@ -1,0 +1,101 @@
+{% extends 'admin_panel/adm_base.html' %}
+{% load static %}
+{% block title %} Product Offers{% endblock title %}
+{% block offers %}{% endblock offers %}
+{% block content %}
+
+<main id="main" class="main">
+    <div class="d-flex justify-content-between">
+        <div class="pagetitle">
+            <h1>Product Offers</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Admin</li>
+                    <li class="breadcrumb-item ">Offers</li>
+                    <li class="breadcrumb-item active">Product Offers</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+        <a href="{% url "addProductOffer" %}" class="btn btn-primary btn-rounded h-50">Add Product Offers</a>
+    </div>
+    <!-- Recent Sales -->
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+
+            <div class="card-body">
+                <table class="table table-borderless datatable mt-3">
+                    <thead>
+                        <tr>
+                            <th>Prod Image</th>
+                            <th>Prod Name</th>
+                            <th>Price</th>
+                            <th>Prod Discount</th>
+                            <th>Offer Price</th>
+                            <th>Cancel Offer</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for prod in product %}
+                            <tr>
+                                <td><center><img src="{{prod.images.first.Pro_image.url}}" height="80px"/><center></td>
+                                <td class="align-middle">{{prod.Pro_name}}</td>
+                                <td class="align-middle">{{prod.Pro_price}}</td>
+                                <td class="align-middle">{{prod.Pro_offer}}%</td>
+                                <td class="align-middle">{{prod.discounted_price}}</td>
+
+                                <td class="align-middle">
+                                    <button class="btn btn-danger" onclick="confirmCancellation('{{ prod.id }}')">Cancel</button>
+                                </td>
+                                <td class="align-middle" style='font-size:20px'>
+                                    <a href="edit_prod_offer/{{prod.id}}" class="btn btn-warning">Edit</a>
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div><!-- End Recent Sales -->
+
+</main><!-- End #main -->
+
+<!-- Include SweetAlert library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<!-- Add script for SweetAlert confirmation -->
+<script>
+    function confirmCancellation(productId) {
+        Swal.fire({
+            title: 'Confirm Cancel Offer',
+            text: 'Are you sure you want to cancel the offer for this product?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Cancelled!',
+                    text: 'The offer has been cancelled.',
+                    icon: 'success',
+                    timer: 2000, // 2 seconds
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                }).then(() => {
+                    // Redirect after the delay
+                    window.location.href = "cancel_prod_offer/" + productId;
+                });
+            }
+        });
+    }
+</script>
+
+{% endblock content %}
