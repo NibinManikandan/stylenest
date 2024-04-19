@@ -7,6 +7,7 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.hashers import check_password
 from userAuth.models import *
 from Userprofile.models import *
+from django.core.mail import send_mail
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
@@ -18,24 +19,21 @@ def Home(request):
 
 # product page
 def Shop(request):
-    products = Product.objects.filter(is_listed = True)
-
-    items_per_page = 4
+    products = Product.objects.filter(is_listed=True)
+    page_number = request.GET.get('page', 1)
     
-    paginator = Paginator(products, items_per_page)
-    page_number = request.GET.get('page')
-
+    paginator = Paginator(products, 12)
+    
     try:
-        page_obj = paginator.page(page_number)
+        products = paginator.page(page_number)
 
     except PageNotAnInteger:
-        page_obj = paginator.page(1)
+        products = paginator.page(1)
 
     except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
+        products = paginator.page(paginator.num_pages)
 
-
-    return render(request, 'platform/shop.html', {'products':products, 'page_obj': page_obj})
+    return render(request, 'platform/shop.html', {'products':products})
 
 
 
@@ -98,3 +96,11 @@ def filtter(request):
 
 
 
+# function for about us
+def about_us(request):
+    return render(request, 'platform/about_us.html')
+
+
+# function for contact us
+def contact(request):
+    return render(request, 'platform/contact.html')

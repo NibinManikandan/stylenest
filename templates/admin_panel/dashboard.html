@@ -26,33 +26,31 @@
               <div class="card info-card sales-card">
 
                 <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <a class="icon" href="../../dashboard?sort=today" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item " href="../../dashboard?sort=today">Today</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=month">This Month</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=year">This Year</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Sales <span>| Today</span></h5>
+                  <h5 class="card-title">Sales </h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-cart"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>145</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
+                      <h6>{{sales_rate}}</h6>
                     </div>
                   </div>
-                </div>
 
+                </div>
               </div>
             </div><!-- End Sales Card -->
 
@@ -61,29 +59,27 @@
               <div class="card info-card revenue-card">
 
                 <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <a class="icon" href="../../dashboard?sort=today" data-bs-toggle="dropdown"></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=today">Today</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=month">This Month</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=year">This Year</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Revenue <span>| This Month</span></h5>
+                  <h5 class="card-title">Revenue </h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-currency-dollar"></i>
+                      <i class="bi bi-currency-rupee"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>$3,264</h6>
-                      <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
+                      <h6>&#8377;{{revenue_data}}</h6>
                     </div>
                   </div>
                 </div>
@@ -97,29 +93,26 @@
               <div class="card info-card customers-card">
 
                 <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <a class="icon" href="#" data-bs-toggle="dropdown"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                      <li class="dropdown-header text-start">
+                          <h6>Filter</h6>
+                      </li>
+                      <li><a class="dropdown-item" href="../../dashboard?sort=today">Today</a></li>
+                      <li><a class="dropdown-item" href="../../dashboard?sort=month">This Month</a></li>
+                      <li><a class="dropdown-item" href="../../dashboard?sort=year">This Year</a></li>
                   </ul>
-                </div>
+              </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Customers <span>| This Year</span></h5>
+                  <h5 class="card-title">Customers </h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-people"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>1244</h6>
-                      <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-
+                      <h6>{{users_data}}</h6>
                     </div>
                   </div>
 
@@ -133,89 +126,149 @@
               <div class="card">
 
                 <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <a class="icon" href="../../dashboard?sort=today" data-bs-toggle="dropdown"></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=today">Today</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=month">This Month</a></li>
+                    <li><a class="dropdown-item" href="../../dashboard?sort=year">This Year</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Reports <span>/Today</span></h5>
+                  <h5 class="card-title">Reports </h5>
 
-                  <!-- Line Chart -->
-                  <div id="reportsChart"></div>
+                  <!-- Pie Chart -->
+               
+                  <div id="pieChart" style="min-height: 400px;" class="echart"></div>
 
                   <script>
                     document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#reportsChart"), {
-                        series: [{
-                          name: 'Sales',
-                          data: [31, 40, 28, 51, 42, 82, 56],
-                        }, {
-                          name: 'Revenue',
-                          data: [11, 32, 45, 32, 34, 52, 41]
-                        }, {
-                          name: 'Customers',
-                          data: [15, 11, 32, 18, 9, 24, 11]
-                        }],
-                        chart: {
-                          height: 350,
-                          type: 'area',
-                          toolbar: {
-                            show: false
-                          },
+                      const salesData = {{ sales_rate|safe }};
+                      const revenueData = {{ revenue_data|safe }};
+                      const usersData = {{ users_data|safe }};
+                      const totalSum = salesData + revenueData + usersData;
+    
+                      // Calculate percentages
+                      const revenuePercentage = (revenueData / totalSum) * 100;
+
+                      // Create the pie chart using ECharts
+                      const chart = echarts.init(document.querySelector("#pieChart"));
+                      
+                      // Data for the pie chart
+                      const pieChartData = [
+                        { 
+                          value: salesData, 
+                          name: 'Sales' 
                         },
-                        markers: {
-                          size: 4
+
+                        { 
+                          value: revenueData, 
+                          name: `Revenue (${revenuePercentage.toFixed(2)}%)` 
                         },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                        fill: {
-                          type: "gradient",
-                          gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.3,
-                            opacityTo: 0.4,
-                            stops: [0, 90, 100]
-                          }
-                        },
-                        dataLabels: {
-                          enabled: false
-                        },
-                        stroke: {
-                          curve: 'smooth',
-                          width: 2
-                        },
-                        xaxis: {
-                          type: 'datetime',
-                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+
+                        { 
+                          value: usersData, 
+                          name: 'Customers'
+                        }
+                      ];
+                  
+                      // Options for the pie chart
+                      const options = {
+                        title: {
+                          subtext: 'Report',
+                          left: 'center'
                         },
                         tooltip: {
-                          x: {
-                            format: 'dd/MM/yy HH:mm'
-                          },
-                        }
-                      }).render();
+                          trigger: 'item'
+                        },
+                        legend: {
+                          orient: 'vertical',
+                          left: 'left'
+                        },
+                        series: [{
+                          name: 'Access From',
+                          type: 'pie',
+                          radius: '50%',
+                          data: pieChartData,
+                          emphasis: {
+                            itemStyle: {
+                              shadowBlur: 10,
+                              shadowOffsetX: 0,
+                              shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                          }
+                        }]
+                      };
+                      // Set the options and render the chart
+                      chart.setOption(options);
                     });
                   </script>
-                  <!-- End Line Chart -->
+                  
+                  <!-- Pie Line Chart -->
 
                 </div>
-
               </div>
             </div>
             <!-- End Reports -->
 
+            <div class="col-lg-12">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Top Selling Products</h5>
+    
+                  <!--Top Selling Products Bar Chart -->
+                  <canvas id="barChart" style="max-height: 400px;"></canvas>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      const productNames = {{product_names | safe}};
+                      const salesData = {{ sales_data | safe}};
+                      new Chart(document.querySelector('#barChart'), {
+                        type: 'bar',
+                        data: {
+                          labels: productNames,
+                          datasets: [{
+                            label: 'Bar Chart',
+                            data: salesData,
+                            backgroundColor: [
+                              'rgba(255, 99, 132, 0.2)',
+                              'rgba(255, 159, 64, 0.2)',
+                              'rgba(255, 205, 86, 0.2)',
+                              'rgba(75, 192, 192, 0.2)',
+                              'rgba(54, 162, 235, 0.2)',
+                            ],
+                            borderColor: [
+                              'rgb(255, 99, 132)',
+                              'rgb(255, 159, 64)',
+                              'rgb(255, 205, 86)',
+                              'rgb(75, 192, 192)',
+                              'rgb(54, 162, 235)',
+                            ],
+                            borderWidth: 1
+                          }]
+                        },
+                        options: {
+                          scales: {
+                            y: {
+                              beginAtZero: true
+                            }
+                          }
+                        }
+                      });
+                    });
+                  </script>
+                  <!-- End product Bar CHart -->
+                </div>
+              </div>
+            </div>
 
         <!-- Right side columns -->
-        <div class="col-lg-5">
+        {% comment %} <div class="col-lg-5"> {% endcomment %}
           <!-- Recent Activity -->
-          <div class="card">
+          {% comment %} <div class="card">
             <div class="filter">
               <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -287,7 +340,7 @@
             </div>
           </div>
           <!-- End Recent Activity -->
-              </div>
+              </div> {% endcomment %}
               <!-- End sidebar recent posts-->
 
             </div>
@@ -300,7 +353,6 @@
       </div>
     </section>
 
-  </main><!-- End #main -->
-
-
+  </main><!-- End main -->
+  
   {% endblock %}

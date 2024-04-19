@@ -9,7 +9,7 @@ from django.utils import timezone
 class CustomUser(AbstractUser):
     phone = models.CharField(max_length = 12, unique=True, null = False)
     otp = models.CharField(max_length = 6)
-    date_of_join = models.DateField(default = timezone.now, null =True, blank = True)
+    date_of_join = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.username

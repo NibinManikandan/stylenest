@@ -67,7 +67,7 @@
 
 				<div class="collapse" id="ship_different_address">
 					<div class="py-2">
-
+					<form action="{% url "ship_to_another" %}" method="POST">
 						{% csrf_token %}
 						<div class="form-group row">
 						<div class="col-md-6">
@@ -128,7 +128,7 @@
 						<hr />
 						<button type="submit" class="btn btn-primary">Add New</button>
 					  </div>
-					{% comment %} </form> {% endcomment %}
+					</form>
 				</div>
 			    </div>
 			</div>
@@ -224,6 +224,11 @@
 					</tr>
 
 					<tr>
+						<td class="text-black font-weight-bold"><strong>Delivery Charge</strong></td>
+						<td class="text-black"><strong>{% if sub_total < 1000 %} &#8377;  {{delivery_charge}} {% else %}<p style="color: green;">free delivery</p>{% endif %}</strong></td>
+					</tr>
+
+					<tr>
 						<td class="text-black font-weight-bold"><strong>Order Total</strong></td>
 						<td class="final-total"><strong> &#8377; {{sub_total}}</strong></td>
 					</tr>
@@ -266,8 +271,6 @@
 		</div>
 	</div>
 </div>
-
-
 
 <!--coupon modal-->
 
@@ -407,6 +410,15 @@
 		var selectedAddress = $("input[name='select_address']:checked").val();
 		var selectedPayment = $("input[name='payment']:checked").val();
 		var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+
+		if (!selectedAddress) {
+			alert("Please select a shipping address.");
+			return;
+		}
+		if (!selectedPayment) {
+			alert("Please select a payment method.");
+			return;
+		}
 		
 		if (selectedAddress && selectedPayment) {
 			
@@ -461,16 +473,85 @@
 							});
 						}
 					}
-
 				});
+			}else if (selectedPayment === 'razorepay') {
+				console.log('entering into the payment')
+				var data = {
+					selected_address:selectedAddress,
+					payment:selectedPayment,
+					couponCode:couponCode,
+					csrfmiddlewaretoken: csrfToken,
+				};
+				$.ajax({
+					type: 'post',
+					url: '../order_razorpay/',
+					data: data,
+					success:function (response){
+						console.log('working')
+						var options = {
+							"key": "rzp_test_94QwzUo1UZWOiT", 
+							"amount": response.amount, 
+							"currency": "INR",
+							"name": "StyleNest", 
+							"description": "Thank You for Buying from Us",
+							"image": "{% static '/images/logo.jpeg' %}",
+							"callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+							
+							"handler": function (responseb){
+								console.log(response);
+								// alert(responseb.razorpay_order_id);
+								//alert(responseb.razorpay_payment_id);
+								// alert(responseb.razorpay_signature);
+								var data = {
+									selected_address: selectedAddress,
+									payment: selectedPayment,
+									csrfmiddlewaretoken: csrfToken, 
+									total_amount: responseb.amount,	
+									payment_id : responseb.razorpay_payment_id,
+								};
+								console.log('entered')
+								$.ajax({
+									type: 'post',
+									url: '../order_place/',
+									data: data,
+									success: function(response) {
+										console.log('its working');
+										if (response.success) {
+											window.location.href = '../view_order/';
+										} else {
+											alert('Error: ' + response.message);
+										}
+									}
+								});$.ajax({
+									type: 'post',
+									url: '../order_place/',
+									data: data,
+									success: function(response) {
+										console.log('its working');
+										if (response.success) {
+											window.location.href = '../view_order/';
+										} else {
+											alert('Error: ' + response.message);
+										}
+									}
+								});								
+							}
+						};
+						var rzp1 = new Razorpay(options);
+						rzp1.open();
+					}					
+				});				
 			}
 		  	else {
 			  alert("Please select an address and payment method.");
 		  	}
+		}else{
+			alert('There is no items in your cart');
 		}
 	}
 	
 </script>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 {% endblock %}

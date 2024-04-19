@@ -5,7 +5,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
 import requests
 from django.db import transaction
-
+from django.views.decorators.cache import never_cache
 from coupon.models import Coupons
 from wallet.models import Wallet
 from .models import *
@@ -20,9 +20,10 @@ from Userprofile.models import *
 from order_manage.models import *
 from django.views.decorators.cache import cache_control
 from django_countries import countries as django_countries
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
+
 
 # function for list orders
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -33,18 +34,46 @@ def orders(request):
         orders = Order.objects.filter(user=user)
         order_items = Order_item.objects.filter(order__in = orders).order_by('-id')
         order_items = order_items.filter(ord_product__is_listed=True)
+
+        page_number = request.GET.get('page', 1)
+    
+        paginator = Paginator(order_items, 8)
         
+        try:
+            order_items = paginator.page(page_number)
+
+        except PageNotAnInteger:
+            order_items = paginator.page(1)
+
+        except EmptyPage:
+            order_items = paginator.page(paginator.num_pages)
+            
     return render(request, 'platform/order_details.html',{"order_items":order_items})
+
+
+
+# search function
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def search(request):
+    if request.method == 'GET':
+        query = request.GET.get('query')
+        if query:
+            order_items = Order_item.objects.filter(ord_product__Pro_name__icontains=query)
+            return render(request, 'platform/order_details.html', {'order_items':order_items})
+        else:
+            return render(request, 'platform/order_details.html')
 
 
 
 # function for order confirmed page
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
 def view_order(request):
     order_id = request.session.get('order_id')
     ord_details = Order.objects.get(order_id=order_id)
     current_order = Order_item.objects.filter(order=ord_details)
     current_order = current_order.filter(ord_product__is_listed=True)
+    print(current_order)
 
     context = {
         "current_order": current_order,
@@ -57,7 +86,7 @@ def view_order(request):
 # function for download invoice
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def invoice(request):
-    order_id = request.session['order_id']
+    order_id = request.session.get('order_id')
     order_details = Order_item.objects.filter(order_id = order_id).all()
     order_details = order_details.filter(ord_product__is_listed=True)
     invoice_details = Order.objects.get(order_id=order_id)
@@ -77,19 +106,24 @@ def cancel_order(request, id):
         user=CustomUser.objects.get(email=email)
         order = Order_item.objects.get(id=id)
         order.status = "Cancelled"
+        delivery_charge = 50
 
         if order.order.pyment_mode == 'COD':
             order.ord_product.stock += order.ord_quantity
             order.ord_product.save()
             order.save()
             
-        elif order.order.pyment_mode == 'wallet':
+        elif order.order.pyment_mode == 'wallet' or order.order.pyment_mode == 'razorepay':
             order.ord_product.stock += order.ord_quantity
             print('quantity is the',order.ord_quantity)
             amount = order.ord_product.Pro_price * order.ord_quantity
+            if amount < 1000:
+                amount = amount + delivery_charge
+            else:
+                amount
             print('the product price',order.ord_product.Pro_price)
             print(amount)
-
+        
             user_wallet = Wallet.objects.filter(user=user).order_by('-id').first()
 
             if user_wallet:

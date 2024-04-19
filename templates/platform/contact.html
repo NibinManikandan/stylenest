@@ -1,0 +1,129 @@
+{% extends 'platform/common.html' %}
+{% load static %}
+{% block content1%} Contact {% endblock content1 %}
+{% block content %}
+
+<div class="untree_co-section">
+    <div class="container">
+
+      <div class="block">
+        <div class="row justify-content-center">
+
+
+          <div class="col-md-8 col-lg-8 pb-4">
+
+
+            <div class="row mb-5">
+              <div class="col-lg-4">
+                <div  class="service no-shadow align-items-center link horizontal d-flex active" data-aos="fade-left" data-aos-delay="0">
+                  <div class="service-icon color-1 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                      <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                    </svg>
+                  </div> <!-- /.icon -->
+                  <div class="service-contents">
+                    <a href="#" id="shareLocationLink"><p>Aroor - Thoppumpady Rd, Valummel, Kochi, Kerala 682005</p></a>
+                  </div> <!-- /.service-contents-->
+                </div> <!-- /.service -->
+              </div>
+
+              <div class="col-lg-4">
+                <div  class="service no-shadow align-items-center link horizontal d-flex active" data-aos="fade-left" data-aos-delay="0">
+                  <div class="service-icon color-1 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-fill" viewBox="0 0 16 16">
+                      <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555zM0 4.697v7.104l5.803-3.558L0 4.697zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757zm3.436-.586L16 11.801V4.697l-5.803 3.546z"/>
+                    </svg>
+                  </div> <!-- /.icon -->
+                  <div class="service-contents">
+                    <a href="https://mail.google.com/"><p>stylenestcart@gmail.com</p></a>
+                  </div> <!-- /.service-contents-->
+                </div> <!-- /.service -->
+              </div>
+
+              <div class="col-lg-4">
+                <div  class="service no-shadow align-items-center link horizontal d-flex active" data-aos="fade-left" data-aos-delay="0">
+                  <div class="service-icon color-1 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone-fill" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+                    </svg>
+                  </div> <!-- /.icon -->
+                  <div class="service-contents">
+                    <a href="tel:9747619883"><p>9747619883</p></a>
+                  </div> <!-- /.service-contents-->
+                </div> <!-- /.service -->
+              </div>
+            </div>
+
+            <form action="https://api.web3forms.com/submit" method="POST">
+                {% csrf_token %}
+              <div class="row">
+                <input type="hidden" name="access_key" value="403ae517-cae9-4362-9772-bc0cfec7ba31">
+                <div class="col-6">
+                  <div class="form-group">
+                    <label class="text-black" for="fname">First name</label>
+                    <input type="text" name="fname" class="form-control" id="fname">
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group">
+                    <label class="text-black" for="lname">Last name</label>
+                    <input type="text" name="lname" class="form-control" id="lname">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="text-black" for="email">Email address</label>
+                <input type="email" name="email" class="form-control" id="email">
+              </div>
+
+              <div class="form-group mb-5">
+                <label class="text-black" for="message">Message</label>
+                <textarea name="message" class="form-control" id="message" cols="30" rows="5"></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary-hover-outline">Send Message</button>
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </div>
+</div>
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    document.getElementById('shareLocationLink').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default action of the link
+    
+        // Check if Geolocation is supported by the browser
+        if ("geolocation" in navigator) {
+            // Get the current location
+            navigator.geolocation.getCurrentPosition(function(position) {
+                // Construct a link with the latitude and longitude data
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+                var link = "https://www.google.com/maps?q=" + latitude + "," + longitude;
+    
+                // Open the link in a new tab
+                window.open(link, '_blank');
+            }, function(error) {
+                console.error("Error getting current position:", error.message);
+                alert("Unable to retrieve your location.");
+            });
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
+    });
+    
+</script>
+
+
+{% endblock content %}

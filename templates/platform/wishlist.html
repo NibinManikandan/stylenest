@@ -7,9 +7,11 @@
       <h2>My Wishlist</h2>
     </div>
     <div class="container h-100 py-5">
+      <div class="text-end" style="margin-bottom: 30px;">
+        <a href="{% url "shop" %}"><button type="button" class="btn btn-warning btn-lg">Add More</button></a>
+      </div>
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-10">
-  
           {% if not wishlist %}
           <div class="empty-cart-message" style="margin-bottom: 20px;">
             <center>
@@ -62,9 +64,37 @@
           {% endif %}
         </div>
       </div>
-      <div class="text-center">
-        <a href="{% url "shop" %}"><button type="button" class="btn btn-warning btn-lg">Continue</button></a>
-      </div>
+
+      <div aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            {% if wishlist.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ wishlist.previous_page_number }}">Previous</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+            {% endif %}
+            
+            {% for num in wishlist.paginator.page_range %}
+                <li class="page-item {% if wishlist.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endfor %}
+            
+            {% if wishlist.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ wishlist.next_page_number }}">Next</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
     </div>
   </section>  
 

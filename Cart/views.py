@@ -6,9 +6,7 @@ from lib2to3.fixes.fix_input import context
 from urllib import response
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
-import requests
-
-import coupon
+from django.conf import settings
 from coupon.models import CouponUsage, Coupons
 from wallet.models import Wallet
 from .models import Cart
@@ -21,6 +19,7 @@ from datetime import timedelta, datetime
 from Userprofile.models import *
 from order_manage.models import *
 from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import never_cache
 from django_countries import countries as django_countries
 
 
@@ -140,6 +139,7 @@ def update_cart(request):
 
 # function for checkout
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
 def checkout(request):
     if 'user' in request.session:
         user_email = request.session['user']
@@ -149,12 +149,23 @@ def checkout(request):
         obj = obj.filter(product__is_listed=True)
         coupons = Coupons.objects.all().order_by('id')
         sub_total = sum(obj.values_list('cart_price', flat=True))
+        cart_items_queryset = Cart.objects.filter(user=user).all()
+        cart_items = [item for item in cart_items_queryset]
+        delivery_charge = 0
+
+        if sub_total < 1000 and sub_total > 0:
+            delivery_charge = 50
+            sub_total = sub_total + delivery_charge
+        else:
+            sub_total
         
         context = {
             'addresses': addresses, 
             'sub_total': sub_total,
             'obj':obj,
             'coupons':coupons,
+            'delivery_charge':delivery_charge,
+            'cart_items':cart_items
         }
 
         return render(request, 'platform/checkout.html', context)
@@ -163,7 +174,7 @@ def checkout(request):
 
 # function for add address
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def add_address(request):
+def ship_to_another(request):
     if request.method == "POST":
         user = CustomUser.objects.filter(email = request.user).first()
         country = request.POST.get('country')
@@ -240,7 +251,7 @@ def place_order(request):
         payment_method = request.POST.get('payment')
         coupon_code = request.POST.get('couponCode')
         coupon = Coupons.objects.filter(code = coupon_code).first()
-        total = 0        
+        total = 0 
 
         cart_items = Cart.objects.filter(user=user)
         for item in cart_items:
@@ -253,26 +264,132 @@ def place_order(request):
         if coupon:
             if coupon.min_purchase <= total:
                 total -= coupon.discount_value
+        
+        if total > 1000:
+            if cart_items.exists():
+                total_quantity = sum(item.cart_quantity for item in cart_items)
+                order = Order(
+                user=user,
+                order_address=new_address,
+                pyment_mode=payment_method,
+                quantity=total_quantity,
+                total_amount = total
+                )
+                order.save()
 
+                order.expected_date = order.order_date + timedelta(days=7)
+
+                total_quantity = 0
+                total = 0
+
+                # Create OrdersItem objects and calculate the total amount and quantity
+                for item in cart_items:
+                    order_item = Order_item (
+                        order=order,
+                        ord_product=item.product,
+                        ord_quantity=item.cart_quantity,
+                        price=item.product.Pro_price,
+                        status="Order confirmed",
+                    )
+                    order_item.save()
+
+                    # Calculate the total amount and quantity
+                    total += item.cart_quantity * item.product.Pro_price
+                    total_quantity += item.cart_quantity
+
+                    # Reduce the quantity of the product in the order
+                    prod_quantity = item.product
+                    prod_quantity.stock -= item.cart_quantity
+                    prod_quantity.save()
+
+                # Update the total_amount and quantity in the order object
+                order.quantity = total_quantity
+                order.save()
+
+                # Order_id moving to session for further use
+                request.session['order_id'] = str(order.order_id)
+
+                # Clearing the cart items after placing the order
+                cart_items.delete()
+
+                return JsonResponse({"success": "Order placed successfully"})
+            else:
+                return JsonResponse({"success": False, "message": "your cart is empty"})
+        else:
+            return JsonResponse({"success":False, "message":"Orders exceeding 1000 rupees cannot be placed using cash on delivery."})
+            
+    return JsonResponse({"error": "User not authenticated"}, status = 400)
+    
+
+
+# function for place order using razorpay
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def order_razorpay(request):
+    if request.user:
+        email = request.user
+        user = CustomUser.objects.filter(email=email)
+        coupon_code = request.POST.get('couponCode')
+        coupon = Coupons.objects.filter(code = coupon_code).first()
+        delivery_charge = 0
+        cart_items = Cart.objects.filter(user=user[0]).all()
+        total=0
+        for item in cart_items:
+            if item.cart_quantity > item.product.stock:
+                return JsonResponse({"success": False, "message":"Some items are Out of Stock"})
+            total += ((item.cart_quantity) * (item.product.Pro_price))
+        
+        if coupon:
+            if coupon.min_purchase <= total:
+                total -= coupon.discount_value
+        
+        if total < 1000 and total > 0:
+            delivery_charge = 50
+            total +=  delivery_charge
+        
+        data = {'success':True,'amount':(total*100), "currency":"INR"}
+
+        return JsonResponse(data)
+    
+
+def order_place(request):
+    if request.user:
+        user_email = request.user
+        user = CustomUser.objects.get(email=user_email)
+        address_id = request.POST.get('selected_address')
+        new_address = Address.objects.get(id=address_id)
+        payment_method = request.POST.get('payment')
+        coupon_code = request.POST.get('couponCode')
+        coupon = Coupons.objects.filter(code = coupon_code).first()
+        total = 0
+
+        cart_items = Cart.objects.filter(user=user)
+        for item in cart_items:
+            if item.cart_quantity > item.product.stock:
+                return JsonResponse({"success": False, "message":"Some items are out of Stock"})
+            else:
+                total += ((item.cart_quantity) * (item.product.Pro_price))
+ 
+        if coupon:
+            if coupon.min_purchase <= total:
+                total -= coupon.discount_value
+            
         if cart_items.exists():
             total_quantity = sum(item.cart_quantity for item in cart_items)
             order = Order(
-            user=user,
-            order_address=new_address,
-            pyment_mode=payment_method,
-            quantity=total_quantity,
-            total_amount = total
-            )
+                user=user,
+                order_address=new_address,
+                pyment_mode=payment_method,
+                quantity=total_quantity,
+                total_amount=total
+                )
             order.save()
 
-            order.expected_date = order.order_date + timedelta(days=7)
-
-            total_quantity = 0
-            total = 0
-
-            # Create OrdersItem objects and calculate the total amount and quantity
+            order.expected_date=order.order_date + timedelta(days=7)
+            total_quantity=0
+            total=0
+        
             for item in cart_items:
-                order_item = Order_item (
+                order_item = Order_item(
                     order=order,
                     ord_product=item.product,
                     ord_quantity=item.cart_quantity,
@@ -281,7 +398,6 @@ def place_order(request):
                 )
                 order_item.save()
 
-                # Calculate the total amount and quantity
                 total += item.cart_quantity * item.product.Pro_price
                 total_quantity += item.cart_quantity
 
@@ -290,22 +406,18 @@ def place_order(request):
                 prod_quantity.stock -= item.cart_quantity
                 prod_quantity.save()
 
-            # Update the total_amount and quantity in the order object
+                # Update the total_amount and quantity in the order object
             order.quantity = total_quantity
             order.save()
 
-            # Order_id moving to session for further use
             request.session['order_id'] = str(order.order_id)
 
-            # Clearing the cart items after placing the order
             cart_items.delete()
-
-            return JsonResponse({"success": "Order placed successfully"})
-        else:
-            return JsonResponse({"success": False, "message": "your cart is empty"})
             
-    return JsonResponse({"error": "User not authenticated"}, status = 400)
-    
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'message':'Your catr is empty'})
+
 
 
 # function for place order wallet
@@ -319,6 +431,7 @@ def place_order_wallet(request):
         couponCode = request.POST.get('couponCode')
         coupon = Coupons.objects.filter(code=couponCode).first()
         request.session['used_coupon']=couponCode
+        delivery_charge = 50
         
         cart_items = Cart.objects.filter(user=user)
         for item in cart_items:
@@ -333,7 +446,10 @@ def place_order_wallet(request):
                 balance = 0
 
             total_cart_price = sum(cart_items.values_list("cart_price", flat=True))
-
+            if total_cart_price < 1000:
+                total_cart_price = total_cart_price + delivery_charge
+            else:
+                total_cart_price=total_cart_price
             total_coupon_amount = total_cart_price # Initialize total_coupon_amount
             
             if coupon:

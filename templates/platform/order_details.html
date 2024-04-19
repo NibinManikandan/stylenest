@@ -297,15 +297,15 @@ select.form-control {
     </div>
     <div class="container padding-bottom-3x mb-1">
 
-        <form action="../../item_search" method="get">
+        <form action="../../search" method="get">
             <div class="search-box">
-                <button class="btn-search"><i class="fas fa-search"></i></button>
-                <input type="text" name="search" class="input-search" placeholder="Type to Search...">
+                <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
+                <input type="text" name="query" id="searchInput" class="input-search" placeholder="Type to Search...">
             </div>
         </form>
           
 
-    <!-- Shopping Cart-->
+    <!--orders-->
     <div class="table-responsive shopping-cart" style="margin-top: 30px; margin-bottom: 30px; background-color: white;">
         {% if not order_items %}
         <div class="empty-cart-message" style="margin-bottom: 20px;">
@@ -342,13 +342,16 @@ select.form-control {
                         <h6>{{order.ord_quantity}}</h6>
                     </td>
                     <td class="text-center text-lg text-medium">&#8377; {{order.price}}</td>
-                    {% comment %} <td class="text-center text-lg text-medium">{{order.ord_product.Pro_offer}} %</td> {% endcomment %}
-                    <td class="text-center text-lg text-medium"><span class="badge {% if order.status == "Cancelled" %}text-danger {% elif order.status == "Delivered" %} text-success {% elif order.status == "Order confirmed" %} text-warning {% else %}text-primary{% endif %}">{{order.status}}<span></td>
+                    <td class="text-center text-lg text-medium"><span class="badge {% if order.status == "Cancelled" %}text-danger {% elif order.status == "Delivered" %} text-success {% elif order.status == "Order confirmed" %} text-warning {% elif order.status == "Order Pending" %} text-warning {% else %}text-primary{% endif %}">{{order.status}}<span></td>
                     {% if order.status == "Cancelled" or order.status == "Returned" %}
                     <td><a href="../prod_details/{{order.ord_product.id}}" class="btn btn-sm btn-outline-primary">View Product<a></td>
                     
-                    {% elif order.status == "Delivered" %}
-                    <td><button class="btn btn-sm btn-outline-secondary" onclick="returnOrder({{ order.id }})">Return</button></td>
+                    {% elif order.status == "Order Pending" %}
+                    <td><a href="../checkout/{{order.ord_product.id}}" class="btn btn-sm btn-outline-primary">Continue<a></td>
+
+                    {% elif order.status == "Order Pending" %}
+                    <td><button class="btn btn-sm btn-outline-secondary" onclick="continuePayment({{ order.id }})">Return</button></td>
+
                     {% else %}
                     <td><button class="delete btn btn-sm btn-outline-danger" onclick="cancelOrder({{ order.id }})">Cancel</button></td>
                     {% endif %}
@@ -358,6 +361,37 @@ select.form-control {
         {% endif %}
         </div>
     </div>
+
+    <div aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            {% if order_items.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ order_items.previous_page_number }}">Previous</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+            {% endif %}
+            
+            {% for num in order_items.paginator.page_range %}
+                <li class="page-item {% if order_items.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endfor %}
+            
+            {% if order_items.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ order_items.next_page_number }}">Next</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
 </div>
 
 
@@ -399,7 +433,7 @@ select.form-control {
                     success: function(response) {
                         if (response.success) {
                             $('#order-' + orderId).remove();
-                            window.location.reload();
+                            location.reload();
                         } else {
                             swal("message", "Failed to cancel order");
                         }

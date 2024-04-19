@@ -1,15 +1,18 @@
 from itertools import product
+from multiprocessing import context
+from django.utils import timezone
 from tkinter.tix import Tree
+from django.db.models import Sum, Count
 from unicodedata import category
 from django.shortcuts import render, redirect
 from Admin_home.models import Category, Product, Product_Image
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
-from order_manage.models import Order_item
+from order_manage.models import Order_item, Order
 from userAuth.models import CustomUser
 from django.contrib import messages
-
+from django.http import JsonResponse
 from wallet.models import Wallet
 
 
@@ -19,7 +22,62 @@ from wallet.models import Wallet
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @user_passes_test(lambda u:u.is_superuser, login_url='admin_login')
 def Dashboard(request):
-    return render(request, "admin_panel/dashboard.html")
+    sort = request.GET.get('sort')
+    sales_rate = 0
+    revenue_data = 0
+    users_data = 0
+    if sort == 'today':
+        sales_rate = Order.objects.filter(order_date__date=timezone.now().date()).count()
+        revenue_queryset = Order.objects.filter(order_date__date=timezone.now().date())
+        revenue_data = revenue_queryset.aggregate(total_sales=Sum('total_amount'))['total_sales'] or 0
+        users_data = CustomUser.objects.filter(date_of_join=timezone.now().date()).count()
+        
+    elif sort == 'month':
+        sales_rate = Order.objects.filter(order_date__month=timezone.now().month, order_date__year=timezone.now().year).count()
+        revenue_queryset = Order.objects.filter(order_date__month=timezone.now().month, order_date__year=timezone.now().year)
+        revenue_data = revenue_queryset.aggregate(total_sales=Sum('total_amount'))['total_sales'] or 0
+        users_data = CustomUser.objects.filter(date_of_join__month=timezone.now().month, date_of_join__year=timezone.now().year).count()
+
+    elif sort == 'year':
+        sales_rate = Order.objects.filter(order_date__year=timezone.now().year).count()
+        revenue_queryset = Order.objects.filter(order_date__year=timezone.now().year)
+        revenue_data = revenue_queryset.aggregate(total_sales=Sum('total_amount'))['total_sales'] or 0
+        users_data = CustomUser.objects.filter(date_of_join__year=timezone.now().year).count()
+
+    else:
+        sales_rate = Order.objects.filter(order_date__date=timezone.now().date()).count()
+        revenue_queryset = Order.objects.filter(order_date__date=timezone.now().date())
+        revenue_data = revenue_queryset.aggregate(total_sales=Sum('total_amount'))['total_sales'] or 0
+        users_data = CustomUser.objects.filter(date_of_join=timezone.now().date()).count()
+
+    # top selling products
+    top_sell_prod = Order_item.objects.values('ord_product__Pro_name') \
+        .annotate(total_sales=Sum('ord_quantity')) \
+        .order_by('-total_sales')[:5]
+    
+    product_names = [item['ord_product__Pro_name'] for item in top_sell_prod]
+    sales_data = [item['total_sales'] for item in top_sell_prod]
+
+    # top selling categories
+    top_sell_category = Order_item.objects.values('category_name__C_name') \
+        .annotate(total_sales=Sum('ord_quantity')) \
+        .order_by('-total_sales')[:5]
+    
+    category_name = [item['category_name__C_name'] for item in top_sell_category]
+    sale_data = [item['total_sales'] for item in top_sell_category]
+
+    context = {
+        'sales_rate': sales_rate,
+        'revenue_data': revenue_data,
+        'users_data': users_data,
+        'product_names': product_names,
+        'sales_data': sales_data,
+        'category_name':category_name,
+        'sale_data':sale_data
+    }
+
+    return render(request, 'admin_panel/dashboard.html', context)
+
 
 
 
@@ -278,15 +336,6 @@ def order_status_change(request, id):
             return redirect("adm_orders")
         
     return render(request, 'admin_panel/order_info.html', {'obj':order})
-
-
-
-# function for view order details
-# @cache_control(no_cache = True, must_revalidate = True, no_store = True)
-# @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
-# def order_info(request, id):
-#     obj = Order_item.objects.get(id=id)
-#     return render(request, 'admin_panel/order_info.html', {"obj":obj})
 
 
 

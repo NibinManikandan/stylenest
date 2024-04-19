@@ -5,6 +5,7 @@ from userAuth.models import CustomUser
 from wallet.models import Wallet
 from wishlist.models import Wishlist
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
 
@@ -15,6 +16,20 @@ def wishlist(request):
         email = request.session['user']
         user = CustomUser.objects.get(email=email)
         wishlist = Wishlist.objects.filter(user=user).order_by('-id')
+
+        page_number = request.GET.get('page', 1)
+    
+        paginator = Paginator(wishlist, 5)
+        
+        try:
+            wishlist = paginator.page(page_number)
+
+        except PageNotAnInteger:
+            wishlist = paginator.page(1)
+
+        except EmptyPage:
+            wishlist = paginator.page(paginator.num_pages)
+
 
         return render(request, 'platform/wishlist.html', {"wishlist":wishlist})
     

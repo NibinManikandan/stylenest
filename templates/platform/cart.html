@@ -237,8 +237,8 @@
             var newQuantity = data.datas.updateQuantity;
             console.log(newQuantity)
             $(`.num-${id}`).text(newQuantity);
-            $(`.price-${id}`).text('$'+data.datas.total)
-            $(`.cart-total`).text('$'+data.datas.subTotal)
+            $(`.price-${id}`).text('₹ '+data.datas.total)
+            $(`.cart-total`).text('₹ '+data.datas.subTotal)
             
           } else {
             // Display error message if the request was not successful
