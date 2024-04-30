@@ -1,19 +1,33 @@
-from itertools import product
+from ast import Expression, If
+from datetime import datetime, timedelta
+import html
+from io import BytesIO
 from multiprocessing import context
+from re import template
+from tkinter import font
+from urllib import response
+from django.db.models import Q  
 from django.utils import timezone
 from tkinter.tix import Tree
-from django.db.models import Sum, Count
+from django.db.models import Sum, F, Count, ExpressionWrapper, DecimalField
 from unicodedata import category
 from django.shortcuts import render, redirect
-from Admin_home.models import Category, Product, Product_Image
+from Admin_home.models import Banner, Category, Product, Product_Image
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from order_manage.models import Order_item, Order
 from userAuth.models import CustomUser
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from wallet.models import Wallet
+from django.db.models.functions import TruncMonth, TruncYear
+import csv
+from django.views import View
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import xlwt
+from urllib.parse import quote
 
 
 # Create your views here.
@@ -59,11 +73,11 @@ def Dashboard(request):
     sales_data = [item['total_sales'] for item in top_sell_prod]
 
     # top selling categories
-    top_sell_category = Order_item.objects.values('category_name__C_name') \
+    top_sell_category = Order_item.objects.values('ord_product__category__C_name') \
         .annotate(total_sales=Sum('ord_quantity')) \
         .order_by('-total_sales')[:5]
     
-    category_name = [item['category_name__C_name'] for item in top_sell_category]
+    categry_name = [item['ord_product__category__C_name'] for item in top_sell_category]
     sale_data = [item['total_sales'] for item in top_sell_category]
 
     context = {
@@ -72,7 +86,7 @@ def Dashboard(request):
         'users_data': users_data,
         'product_names': product_names,
         'sales_data': sales_data,
-        'category_name':category_name,
+        'categry_name':categry_name,
         'sale_data':sale_data
     }
 
@@ -320,18 +334,20 @@ def order_status_change(request, id):
                 )
                 order.status = status
                 order.ord_product.stock += order.ord_quantity
+                status_change_time = timezone.now()
                 order.save()
                 order.ord_product.save()
                 return redirect("adm_orders")
             
             else:
                 order.status = status
-
+                status_change_time = timezone.now()
                 order.save()
                 return redirect("adm_orders")
         
         else:
             order.status = status
+            status_change_time = timezone.now()
             order.save()
             return redirect("adm_orders")
         
@@ -460,6 +476,240 @@ def cancel_category_offers(request, id):
     item.save()
     return redirect('cateOffer')
 
+
+
+# function for sales report
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
+def sales_report(request):
+    frm = request.GET.get('from', '')
+    to = request.GET.get('to', '')
+
+    if frm == '':
+        frm = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
+
+    if to == '':
+        to = (datetime.now().strftime('%Y-%m-%d'))
+
+    request.session['from'] = frm
+    request.session['to'] = to
+
+    sales = Order.objects.filter(order_date__date__gte=frm, order_date__date__lte=to).order_by('-order_date').all()
+    stock = Product.objects.all()
+    cancelled = Order.objects.filter(order_items__status__contains="Cancelled").distinct()
+
+    context={
+        'sales':sales,
+        'stock':stock,
+        'cancelled':cancelled,
+    }
+
+    return render(request, 'admin_panel/sales_report.html', context)
+
+
+
+# function to render
+def render_to_pdf(template_src, context_dict=None):
+    if context_dict is None:
+        context_dict={}
+    
+    template = get_template(template_src)
+    html = template.render(context_dict)
+
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("utf-8")), result)
+
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    
+    return None
+
+
+
+class DownloadPDF2(View):
+    def get(self, request, *args, **kwargs):
+        data = {'stock': Product.objects.all()}
+        pdf = render_to_pdf('admin_panel/stock_report.html', data)
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        file_name = "Stock_report_%s.pdf" % ("12341231")
+
+        # Encode the filename using quote to handle special characters
+        content = 'attachment; filename="%s"' % quote(file_name)
+        response['Content-Disposition'] = content
+
+        return response
+
+
+
+class DownloadPDF1(View):
+    def get(self, request, *args, **kwargs):
+
+        
+        data = {'sales': Order.objects.filter(order_date__date__gte=request.session.get('from'),order_date__date__lte=request.session.get('to')).order_by('-order_date').all(),'from':request.session.get('from'),'to':request.session.get('to')}
+        pdf = render_to_pdf('admin_panel/report.html', data)
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        file_name = "Sales_report_%s.pdf" % ("12341231")
+
+        # Encode the filename using quote to handle special characters
+        content = 'attachment; filename="%s"' % quote(file_name)
+        response['Content-Disposition'] = content
+
+        return response
+
+
+
+
+class DownloadPDF3(View):
+        def get(self, request, *args, **kwargs):
+            data = {'cancelled': Order.objects.filter(order_items__status__contains='Cancelled').distinct()}
+            pdf = render_to_pdf('admin_panel/cancel_report.html', data)
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            file_name = "Cancel_report_%s.pdf" % ("12341231")
+
+            # Encode the filename using quote to handle special characters
+            content = 'attachment; filename="%s"' % quote(file_name)
+            response['Content-Disposition'] = content
+
+            return response
+
+
+
+# function for download as Excel
+def download_exel1(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['content-Disposition']='attachment; filename=StockReport-'+str(datetime.now())+'-.xls'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('SalesReport')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold=True
+    columns = ['Order ID', 'User', 'Order Date', 'Products', 'Quantity', 'Price','Payment Method','Status']
+    for col_num in range(len(columns)):
+        ws.write(row_num,col_num,columns[col_num], font_style)
+    
+    font_style = xlwt.XFStyle()
+
+    sales_from = request.session.get('from','')
+    sales_to = request.session.get('to','')
+
+    if not sales_from:
+        sales_from = datetime.now() - timedelta(days=365)
+    
+    if not sales_to:
+        sales_to = datetime.now()
+
+    orders = Order.objects.all().order_by('-order_date').filter(order_date__range=[sales_from, sales_to]).values_list('order_id','user__first_name','order_date__date','order_items__ord_product__Pro_name','order_items__ord_quantity','order_items__price','pyment_mode','order_items__status')
+
+    for order in orders:
+        row_num+=1
+        for col_num in range(len(order)):
+            ws.write(row_num,col_num,str(order[col_num]),font_style)
+
+    wb.save(response)
+
+    return response
+
+def download_exel2(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=StockReport-'+ str(datetime.now())+'-.xls' 
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('SalesReport')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold=True
+    columns = ['Product Name', 'Category', 'Current Price', 'Stock']
+    for col_num in range(len(columns)):
+        ws.write(row_num,col_num,columns[col_num], font_style)
+    
+    font_style = xlwt.XFStyle()
+
+
+    stocks = Product.objects.all().values_list('Pro_name','category__C_name' , 'Pro_offer', 'stock')
+
+    for stock in stocks:
+        row_num+=1
+        for col_num in range(len(stock)):
+            ws.write(row_num,col_num,str(stock[col_num]),font_style)
+
+    wb.save(response)
+
+    return response
+
+
+def download_exel3(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=CancelReport-'+ str(datetime.now())+'-.xls' 
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('SalesReport')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold=True
+    columns = ['Order ID', 'User', 'Order Date', 'Products', 'Quantity', 'Price','Payment Method','Status']
+    for col_num in range(len(columns)):
+        ws.write(row_num,col_num,columns[col_num], font_style)
+    
+    font_style = xlwt.XFStyle()
+
+
+    orders = Order.objects.all().order_by('-order_date').filter(order_items__status__contains='Cancelled').values_list('order_id','user__first_name','order_date__date','order_items__ord_product__Pro_name','order_items__ord_quantity','order_items__price','pyment_mode','order_items__status')
+
+    for order in orders:
+        row_num+=1
+        for col_num in range(len(order)):
+            ws.write(row_num,col_num,str(order[col_num]),font_style)
+
+    wb.save(response)
+
+    return response
+
+
+
+# functoin to show Banner
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
+def banners(request):
+    banner = Banner.objects.all()
+
+    return render(request, 'admin_panel/banner.html', {'banner':banner})
+
+
+
+# function to controll banner
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@user_passes_test(lambda u:u.is_superuser, login_url='login')        
+def banner_controlling(request,id):
+    m=Banner.objects.filter(id=id).first()
+    if m.is_listed==True:
+        m.is_listed=False
+    else:
+        m.is_listed=True
+    
+    m.save()
+    return redirect('banners')  
+
+
+
+# functoin to add Banner
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+@user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
+def add_banners(request):
+    if request.method=='POST': 
+        image=request.FILES.get('image')
+        
+        header=request.POST.get('header')
+        header=header.strip()
+        
+        if header!='':
+            banner=Banner(image=image,header=header)
+            banner.save()
+            return redirect('banners')
+        else:
+            return redirect('add_banners')
+
+    return render(request, 'admin_panel/add_banners.html')
 
 
 # admin_logout

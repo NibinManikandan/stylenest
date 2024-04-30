@@ -1,0 +1,48 @@
+{% extends "admin_panel/adm_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1>Add Banners</h1>
+            </div>
+        </div>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">Admin</li>
+                <li class="breadcrumb-item active">Add Banners</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-lg-12">
+                        <form id="bannerForm" enctype="multipart/form-data" action='' method='POST'>
+                            {% csrf_token %}
+                            <div class="form-group" style="color: white;">
+                                <label for="image">Upload Banner Here   <span style='font-size:9px;'>(image dimension should be 3663x3321 pixels)</span></label>
+                                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
+                            </div>
+    
+                            <div class="form-group" style="margin-top: 10px;">
+                                <label for="header" style="color: white;">Header  <span style='font-size:9px;'>(Less than 100 words)</span></label>
+                                <input type="text" class="form-control" id="header" name="header" maxlength="100" required>
+                            </div>
+    
+                            <div style="margin-top: 15px;">
+                                <button type="submit" class="btn btn-dark">Add Banner</button>
+                            </div>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</main>
+
+{% endblock %}

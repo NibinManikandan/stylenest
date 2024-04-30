@@ -1,8 +1,10 @@
+from cgi import print_directory
 import code
 from datetime import timedelta
 from genericpath import exists
 from itertools import product
 from lib2to3.fixes.fix_input import context
+from math import prod
 from urllib import response
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
@@ -20,7 +22,6 @@ from Userprofile.models import *
 from order_manage.models import *
 from django.views.decorators.cache import cache_control
 from django.views.decorators.cache import never_cache
-from django_countries import countries as django_countries
 
 
 
@@ -56,7 +57,7 @@ def add_to_cart(request):
                 else:
                     Cart.objects.create(
                         user=user, 
-                        product=product, 
+                        product=product,
                         created_at=timezone.now(), 
                         cart_price=product.Pro_price
                     )
@@ -284,12 +285,15 @@ def place_order(request):
 
                 # Create OrdersItem objects and calculate the total amount and quantity
                 for item in cart_items:
+                    ord_prod_cate = Category.objects.get(C_name=item.product.category.C_name)
                     order_item = Order_item (
                         order=order,
                         ord_product=item.product,
                         ord_quantity=item.cart_quantity,
                         price=item.product.Pro_price,
+                        category_name=ord_prod_cate,
                         status="Order confirmed",
+                        payment_status="Pending"
                     )
                     order_item.save()
 
@@ -308,6 +312,8 @@ def place_order(request):
 
                 # Order_id moving to session for further use
                 request.session['order_id'] = str(order.order_id)
+                request.session['flag']= 0
+
 
                 # Clearing the cart items after placing the order
                 cart_items.delete()
@@ -327,11 +333,16 @@ def place_order(request):
 def order_razorpay(request):
     if request.user:
         email = request.user
-        user = CustomUser.objects.filter(email=email)
+        user = CustomUser.objects.filter(email=email).first()
+        address_id = request.POST.get('selected_address')
+        new_address = Address.objects.get(id=address_id)
+        payment_method = request.POST.get('payment')
         coupon_code = request.POST.get('couponCode')
+        flag = request.POST.get('flag')
         coupon = Coupons.objects.filter(code = coupon_code).first()
         delivery_charge = 0
-        cart_items = Cart.objects.filter(user=user[0]).all()
+
+        cart_items = Cart.objects.filter(user=user).all()
         total=0
         for item in cart_items:
             if item.cart_quantity > item.product.stock:
@@ -345,34 +356,7 @@ def order_razorpay(request):
         if total < 1000 and total > 0:
             delivery_charge = 50
             total +=  delivery_charge
-        
-        data = {'success':True,'amount':(total*100), "currency":"INR"}
 
-        return JsonResponse(data)
-    
-
-def order_place(request):
-    if request.user:
-        user_email = request.user
-        user = CustomUser.objects.get(email=user_email)
-        address_id = request.POST.get('selected_address')
-        new_address = Address.objects.get(id=address_id)
-        payment_method = request.POST.get('payment')
-        coupon_code = request.POST.get('couponCode')
-        coupon = Coupons.objects.filter(code = coupon_code).first()
-        total = 0
-
-        cart_items = Cart.objects.filter(user=user)
-        for item in cart_items:
-            if item.cart_quantity > item.product.stock:
-                return JsonResponse({"success": False, "message":"Some items are out of Stock"})
-            else:
-                total += ((item.cart_quantity) * (item.product.Pro_price))
- 
-        if coupon:
-            if coupon.min_purchase <= total:
-                total -= coupon.discount_value
-            
         if cart_items.exists():
             total_quantity = sum(item.cart_quantity for item in cart_items)
             order = Order(
@@ -389,12 +373,15 @@ def order_place(request):
             total=0
         
             for item in cart_items:
-                order_item = Order_item(
+                ord_prod_cate = Category.objects.get(C_name=item.product.category.C_name)
+                order_item = Order_item (
                     order=order,
                     ord_product=item.product,
                     ord_quantity=item.cart_quantity,
                     price=item.product.Pro_price,
-                    status="Order confirmed",
+                    category_name=ord_prod_cate,
+                    status="Order pending",
+                    payment_status="Pending"
                 )
                 order_item.save()
 
@@ -411,14 +398,38 @@ def order_place(request):
             order.save()
 
             request.session['order_id'] = str(order.order_id)
+            request.session['flag']= 0
+
 
             cart_items.delete()
-            
-            return JsonResponse({'success': True})
+            data = {'success':True,'amount':int(total*100), "currency":"INR",'order_id':order.order_id}
+
+            return JsonResponse(data)
         else:
             return JsonResponse({'success': False, 'message':'Your catr is empty'})
 
+        
+def payment_confirm(request):
+    order_id = request.POST.get('order_id')
+    product=Order.objects.filter(order_id=order_id).first()
+    order_items=Order_item.objects.filter(order=product).all()
+    for items in order_items:
+        items.status='Order confirmed'
+        items.payment_status='Paid'
+        items.save()
+    return JsonResponse({'success':True,"message":"Product ordered Successfully"})
 
+
+
+def payment_confirm_order(request):
+    order_id = request.POST.get('order_id')
+    items=Order_item.objects.filter(id=order_id).first()
+    items.status='Order confirmed'
+    items.payment_status='Paid'
+    items.save()
+    request.session['order_id'] = order_id
+    request.session['flag'] = 1
+    return JsonResponse({'success':True,"message":"Payment is Successfull"})
 
 # function for place order wallet
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -469,14 +480,17 @@ def place_order_wallet(request):
                 total_amount = 0  # Initialize total_amount
 
                 for item in cart_items:
-                    Order_item.objects.create(
+                    ord_prod_cate = Category.objects.get(C_name=item.product.category.C_name)
+                    order_item = Order_item (
                         order=order,
                         ord_product=item.product,
                         ord_quantity=item.cart_quantity,
-                        price=item.product.Pro_price * item.cart_quantity,
+                        price=item.product.Pro_price,
+                        category_name=ord_prod_cate,
                         status="Order confirmed",
+                        payment_status="Pending"
                     )
-                    print(Order_item)
+                    order_item.save()
 
                     total_amount += item.cart_quantity * item.product.Pro_price
                     total_quantity += item.cart_quantity
@@ -497,8 +511,8 @@ def place_order_wallet(request):
                     transaction_type="Debit",
                     transaction_details="Debited Money Through Purchase",
                 )
-                print(balance)
                 request.session['order_id'] = str(order.order_id)
+                request.session['flag']= 0
                 cart_items.delete()
                 
                 return JsonResponse({"success": "Order placed successfully"})
@@ -557,6 +571,7 @@ def apply_coupons(request):
                 return JsonResponse({"error":"Invalid Coupon"}, status = 400)
             
         return JsonResponse({"error":"Inavalid request"}, status = 400)
+        
 
 
 

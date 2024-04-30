@@ -1,3 +1,4 @@
+from email import header
 from email.policy import default
 from django.db import models
 from django.utils import timezone
@@ -10,7 +11,7 @@ class Category(models.Model):
     C_description = models.TextField(blank=True)
     C_image = models.ImageField(upload_to='category/', blank=True)
     is_listed = models.BooleanField(default=True) 
-    Cate_offer = models.IntegerField(null=True)
+    Cate_offer = models.IntegerField(default=0)
     
 
 
@@ -57,3 +58,13 @@ class Product_Image(models.Model):
 
     def __str__(self):
         return f'Image of {self.product.Pro_name}'
+
+
+
+class Banner(models.Model):
+    image = models.ImageField(upload_to='banner_images/',null=True, blank=True)
+    header = models.CharField(max_length=100, null=False, blank=False)
+    is_listed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.header

@@ -35,13 +35,15 @@ class Order(models.Model):
 
 
 class Order_item(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     ord_quantity = models.PositiveBigIntegerField(default=1)
     modified_time = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, default='Order confirmed')
     ord_product = models.ForeignKey(Product, on_delete=models.CASCADE)
     category_name = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    payment_status = models.CharField(max_length=20, default='Pending')
+    status_change_time = models.DateTimeField(auto_now=True)
     
 
     def total_price(self):

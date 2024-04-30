@@ -36,10 +36,6 @@
 
 <div class="container">
       <div class="row">
-
-        {% for ca in cate %}
-        {{ca.Cate_offer}}
-        {% endfor %}
         
         {% for product in products %}
         <div class="col-12 col-md-3 col-lg-3 mb-3">
@@ -47,7 +43,13 @@
                 <img src="{{ product.images.all.0.Pro_image.url }}" class="img-fluid product-thumbnail" alt="{{ product.Pro_name }}">
                 <h3 class="product-title">{{ product.Pro_name }}</h3>
                 <h6><p style="color: red;">{% if product.stock == 0 %}Out of Stock {% elif product.stock <= 5 %}Limitted stocks are available{% endif %}</p></h6>
-                <h6 style="color: green;">{% if product.Pro_offer > 0 or cate.Cate_offer > 0 %}&#8595;{{product.Pro_offer}} % off{% endif %}</h6>
+                <h6 style="color: green;">
+                    {% if product.Pro_offer > 0 or product.category.Cate_offer < product.Pro_offer %}
+                        &#8595;{{ product.Pro_offer }} % off
+                    {% elif product.category.Cate_offer > product.Pro_offer %}
+                        &#8595;{{ product.category.Cate_offer }}% off
+                    {% endif %}
+                </h6>
                 <strong class="product-price">&#8377; {{ product.Pro_price }}</strong>
             </a>
         </div> 

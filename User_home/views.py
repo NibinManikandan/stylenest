@@ -15,7 +15,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # home page 
 def Home(request):
-    return render(request, 'platform/home.html')
+    banners = Banner.objects.filter(is_listed=True).all()
+    return render(request, 'platform/home.html', {'banners':banners})
 
 # product page
 def Shop(request):

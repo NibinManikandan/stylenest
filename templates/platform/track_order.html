@@ -1,0 +1,233 @@
+{% extends "platform/common.html" %}
+{% load static %}  
+
+{% block content %}
+
+<style>
+  .card {
+    box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+  }
+  .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      word-wrap: break-word;
+      background-color: #fff;
+      background-clip: border-box;
+      border: 0 solid rgba(0,0,0,.125);
+      border-radius: 1rem;
+  }
+  .text-reset {
+      --bs-text-opacity: 1;
+      color: inherit!important;
+  }
+  a {
+      color: #5465ff;
+      text-decoration: none;
+  }
+  .track-line {
+    height: 2px !important;
+    background-color: #488978;
+    opacity: 1;
+    }
+    
+    .dot {
+    height: 10px;
+    width: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 0px;
+    background-color: #488978;
+    border-radius: 50%;
+    display: inline-block
+    }
+    
+    .big-dot {
+    height: 25px;
+    width: 25px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    background-color: #488978;
+    border-radius: 50%;
+    display: inline-block;
+    }
+    
+    .big-dot i {
+    font-size: 12px;
+    }
+    
+    .card-stepper {
+    z-index: 0
+    }
+</style>
+
+<div class="container-fluid">
+  <div class="container">
+    <!-- Title -->
+    <div class="d-flex justify-content-between align-items-center py-3">
+      <h2 class="h5 mb-0"><a href="#" class="text-muted"></a> Order ID #{{orders.order_id}}</h2>
+    </div>
+
+    <!-- Main content -->
+    <div class="row">
+      <div class="col-lg-12">
+        <!-- Details -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="mb-3 d-flex justify-content-between">
+              <div>
+                <span class="me-3">{{orders.order_date}}</span>
+                <span class="me-3">#{{orders.order_id}}</span>
+              </div>
+            </div>
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="d-flex mb-2">
+                      <div class="flex-shrink-0">
+                        <img src="{{Orders.ord_product.images.first.Pro_image.url}}" alt="" width="80" class="img-fluid"/>
+                      </div>
+                      <div class="flex-lg-grow-1 ms-3">
+                        <h6 class="small mb-0"><a href="#" class="text-reset">{{Orders.ord_product.Pro_name}}</a></h6>
+                        <span class="small">{{Orders.ord_product.Pro_description}}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{Orders.ord_quantity}}</td>
+                  <td class="text-end">₹{{Orders.price}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2">Subtotal</td>
+                  <td class="text-end">₹ {{Orders.price}}</td>
+                </tr>
+                <tr>
+                  <td colspan="2">Delivey Charge</td>
+                  <td class="text-end">{% if Orders.price < 1000 %}₹ 50 {% else %} -₹ 0{% endif %}</td>
+                </tr>
+                <tr>
+                  {% if coupon_used %}
+                  <td colspan="2">Discount (Code: {{coupon_used.coupon.code}})</td>
+                  <td class="text-danger text-end">-₹{{coupon_used.coupon.discount_value}}</td>
+                  {% else %}
+                  <td colspan="2">Discount (Code: No Coupon Applied)</td>
+                  <td class="text-end">-₹ 0</td>
+                  {% endif %}
+                </tr>
+                <tr class="fw-bold">
+                  <td colspan="2">TOTAL</td>
+                  <td class="text-end">₹ {{Orders.price}}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <!-- Payment -->
+        <div class="card mb-12">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-6">
+                <h3 class="h6">Payment Method</h3>
+                <p>
+                  Total: ₹ {{Orders.price}} 
+                  {% if Orders.payment_status == "Pending" %}<span class="badge bg-warning rounded-pill">{{Orders.payment_status}} 
+                    {% elif Orders.payment_status == "Paid" %} <span class="badge bg-success rounded-pill">{{Orders.payment_status}} 
+                        {% endif %}</span>
+                </p>
+              </div>
+              <div class="col-lg-6">
+                <h3 class="h6">Billing address</h3>
+                <address>
+                  <strong>{{orders.order_address.first_name}}</strong><br />
+                  {{orders.order_address.street_address}}, {{orders.order_address.city}}<br />
+                  {{orders.order_address.landmark}}, {{orders.order_address.country}}<br />
+                  {{orders.order_address.state}}, {{orders.order_address.pin_code}}<br />
+                  <abbr title="Phone">Ph:</abbr> {{orders.order_address.phone}}
+                </address>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- order tracking -->
+        <div class="container py-5 h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col">
+              <div class="card card-stepper" style="border-radius: 10px;">
+                <div class="card-body p-4">
+      
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-column">
+                      <span class="lead fw-normal">Your order has been delivered</span>
+                      <span class="text-muted small">{{Orders.order.order_date}}</span>
+                    </div>
+                    <div>
+                      <h5>Track your order</h5>
+                    </div>
+                  </div>
+                  <hr class="my-4">
+      
+                  <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+                    <span class="dot"></span>
+                    {% if Orders.status == "Order confirmed" %}
+                    <hr class="flex-fill track-line"><span
+                      class="d-flex justify-content-center align-items-center big-dot dot">
+                      <i class="fa fa-check text-white"></i></span>
+                    {% else %}
+                    <hr class="flex-fill track-line"><span class="dot"></span>                   
+                    {% endif %}
+                    
+                    {% if Orders.status == "Shipped" %}
+                    <hr class="flex-fill track-line"><span
+                      class="d-flex justify-content-center align-items-center big-dot dot">
+                      <i class="fa fa-check text-white"></i></span>
+                    {% else %}
+                    <hr class="flex-fill track-line"><span class="dot"></span>                   
+                    {% endif %}
+
+                    {% if Orders.status == "Out for delivery" %}
+                    <hr class="flex-fill track-line"><span
+                      class="d-flex justify-content-center align-items-center big-dot dot">
+                      <i class="fa fa-check text-white"></i></span>
+                    {% else %}
+                    <hr class="flex-fill track-line"><span class="dot"></span>                   
+                    {% endif %}
+
+                    {% if Orders.status == "Delivered" %}
+                    <hr class="flex-fill track-line"><span
+                      class="d-flex justify-content-center align-items-center big-dot dot">
+                      <i class="fa fa-check text-white"></i></span>
+                    {% else %}
+                    <hr class="flex-fill track-line"><span class="dot"></span>                   
+                    {% endif %}
+                    
+                  </div>
+      
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <div class="d-flex flex-column align-items-start"><span>Order Processed</span>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center"><span>{{orders.order_date}}</span><span>Order
+                        Placed</span></div>
+                    <div class="d-flex flex-column justify-content-center align-items-center"><span>{{ Orders.status_change_time|date:"d M" }}
+                        </span><span>Order Shipped</span></div>
+                    <div class="d-flex flex-column align-items-center"><span>{{ Orders.status_change_time|date:"d M" }}</span><span>Out for
+                        Delivery</span></div>
+                    <div class="d-flex flex-column align-items-end"><span>{{ Orders.status_change_time|date:"d M" }}</span><span>Delivered</span></div>
+                  </div>
+      
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

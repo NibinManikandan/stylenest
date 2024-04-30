@@ -323,7 +323,9 @@ select.form-control {
                     <th>Product</th>
                     <th class="text-center">Qty</th>
                     <th class="text-center">Price/Qty</th>
-                    <th class="text-center">Status</th>
+                    <th class="text-center">Order Status</th>
+                    <th class="text-center">Payment Status</th>
+                    <th class="text-center">Payment Method</th>
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
@@ -332,7 +334,7 @@ select.form-control {
                 <tr>
                     <td>
                         <div class="product-item">
-                            <a class="product-thumb" href="../prod_details/{{order.ord_product.id}}"><img src="{{order.ord_product.images.first.Pro_image.url}}" alt="Product"></a>
+                            <a class="product-thumb" href="{% url 'track_order' order.id %}"><img src="{{order.ord_product.images.first.Pro_image.url}}" alt="Product"></a>
                             <div class="product-info">
                                 <h4 class="product-title"><a href="../prod_details/{{order.ord_product.id}}">{{order.ord_product.Pro_name}}</a></h4>
                             </div>
@@ -342,19 +344,34 @@ select.form-control {
                         <h6>{{order.ord_quantity}}</h6>
                     </td>
                     <td class="text-center text-lg text-medium">&#8377; {{order.price}}</td>
-                    <td class="text-center text-lg text-medium"><span class="badge {% if order.status == "Cancelled" %}text-danger {% elif order.status == "Delivered" %} text-success {% elif order.status == "Order confirmed" %} text-warning {% elif order.status == "Order Pending" %} text-warning {% else %}text-primary{% endif %}">{{order.status}}<span></td>
-                    {% if order.status == "Cancelled" or order.status == "Returned" %}
-                    <td><a href="../prod_details/{{order.ord_product.id}}" class="btn btn-sm btn-outline-primary">View Product<a></td>
+
+                    <td class="text-center text-lg text-medium"><span class="badge {% if order.status == "Cancelled" %}text-danger 
+                        {% elif order.status == "Delivered" %} text-success {% elif order.status == "Out for delivery" %} text-success 
+                        {% elif order.status == "Order confirmed" %} text-warning {% elif order.status == "Order pending" %} text-warning 
+                        {% else %}text-primary{% endif %}">{{order.status}}<span></td>
+
+                    <td class="text-center text-lg text-medium">
+                        <span class="badge {% if order.payment_status == 'Pending' %} text-warning {% else %} text-success {% endif %}"></span>
+                        {{ order.payment_status }}
+                    </td>
                     
-                    {% elif order.status == "Order Pending" %}
-                    <td><a href="../checkout/{{order.ord_product.id}}" class="btn btn-sm btn-outline-primary">Continue<a></td>
+                    <td class="text-center text-lg text-medium">
+                        <span class="badge {% if order.order.pyment_mode == 'COD' %} text-warning {% else %} text-success {% endif %}"></span>
+                        {{ order.order.pyment_mode }}
+                    </td>
 
+                    {% if order.status == "Cancelled" or order.status == "Returned" %}
+                        <td><a href="../prod_details/{{ order.ord_product.id }}" class="btn btn-sm btn-outline-primary">View Product</a></td>
+                    {% elif order.status == "Order Confirmed" and order.payment_status == "Pending" %}
+                    <td><a  class="btn btn-sm btn-outline-primary text-white" onclick='paying({{ order.id }}, {{ order.price }},{{ order.ord_quantity }})'>Pay Now</a></td>
+                    {% elif order.status == "Order pending" or order.status == "Order Pending" %}
+                    <td><a  class="btn btn-sm btn-outline-primary text-white" onclick='paying({{ order.id }}, {{ order.price }},{{ order.ord_quantity }})'>Pay Now</a></td>
                     {% elif order.status == "Order Pending" %}
-                    <td><button class="btn btn-sm btn-outline-secondary" onclick="continuePayment({{ order.id }})">Return</button></td>
-
+                        <td><button class="btn btn-sm btn-outline-secondary" onclick="continuePayment({{ order.id }})">Return</button></td>
                     {% else %}
-                    <td><button class="delete btn btn-sm btn-outline-danger" onclick="cancelOrder({{ order.id }})">Cancel</button></td>
+                        <td><button class="delete btn btn-sm btn-outline-danger" onclick="cancelOrder({{ order.id }})">Cancel</button></td>
                     {% endif %}
+
                 {% endfor %}
                 </tbody>
              </table>
@@ -481,7 +498,48 @@ select.form-control {
             }
         });
     }
+    function paying(orderId,orderPrice,quantity) {
+        var csrftoken = getCSRFToken();
+        console.log(orderId)
+        console.log(orderPrice)
+        console.log('entering into the payment');
+        console.log('working');
+        console.log(Number(orderPrice * 100))
+        var options = {
+            "key": "rzp_test_94QwzUo1UZWOiT", 
+            "amount": Number(orderPrice * 100)*Number(quantity), 
+            "currency": "INR",
+            "name": "StyleNest", 
+            "description": "Thank You for Buying from Us",
+            "image": "{% static '/images/logo.jpeg' %}",
+            "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+            
+            "handler": function(responseb) {
+                var data = {
+                    order_id: orderId,
+                    csrfmiddlewaretoken: csrftoken 
+                };
+                console.log('entered');
+                $.ajax({
+                    type: 'post',
+                    url: '../payment_confirm_order/',
+                    data: data,
+                    success: function(response) {
+                        console.log('its working');
+                        if (response.success) {
+                            window.location.href = '../view_order/';
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    }
+                });							
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
     
 </script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 {% endblock %}

@@ -16,7 +16,6 @@ urlpatterns = [
     path('', include('coupon.urls')),
     path('', include('wishlist.urls')),
     path('', include('wallet.urls')),
-    
 ]
 
 if settings.DEBUG:

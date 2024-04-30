@@ -44,7 +44,6 @@ def add_to_wishlist(request):
             email = request.session['user']
             user = CustomUser.objects.get(email=email)
             prod_id = request.POST.get('id')
-            print(prod_id)
             products = get_object_or_404(Product, id=prod_id)
             
             if Wishlist.objects.filter(user=user, product=products).exists():

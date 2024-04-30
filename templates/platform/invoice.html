@@ -91,7 +91,7 @@
                       <th>Description</th>
                       <th class="center">Quantity</th>
                       <th class="center">Price</th>
-                      <th class="center">Total</th>
+                      {% comment %} <th class="center">Total</th> {% endcomment %}
                     </tr>
                   </thead>
                   <tbody>
@@ -101,7 +101,11 @@
                         <td class="left">{{ item.ord_product.Pro_description }}</td>
                         <td class="center">{{ item.ord_quantity }}</td>
                         <td class="center">&#8377; {{ item.ord_product.Pro_price }}</td>
-                        <td class="center">&#8377; {{ item.order.total_amount }}</td>
+                        {% comment %} {% if flag == 0 %}
+                        <td class="center">&#8377; {{ item.price }}</td>
+                        {%else%}
+                        <td class="center">&#8377; {{ item.price }}</td>
+                        {% endif %} {% endcomment %}
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -116,7 +120,11 @@
                         <td class="left">
                           <strong>Subtotal</strong>
                         </td>
+                        {% if flag == 0 %}
                         <td class="right">&#8377; {{ invoice_details.total_amount }}</td>
+                        {%else%}
+                        <td class="center">&#8377; {{ product }}</td>
+                        {% endif %}
                       </tr>
                       {% comment %} <tr>
                         <td class="left">
@@ -129,7 +137,11 @@
                           <strong>Total</strong>
                         </td>
                         <td class="right">
+                        {% if flag == 0 %}
                           <strong>&#8377; {{ invoice_details.total_amount }}</strong>
+                        {%else%}
+                          <strong>&#8377; {{ product }}</strong>
+                        {% endif %}
                         </td>
                       </tr>
                     </tbody>

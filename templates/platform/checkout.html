@@ -477,6 +477,7 @@
 			}else if (selectedPayment === 'razorepay') {
 				console.log('entering into the payment')
 				var data = {
+					
 					selected_address:selectedAddress,
 					payment:selectedPayment,
 					couponCode:couponCode,
@@ -487,6 +488,7 @@
 					url: '../order_razorpay/',
 					data: data,
 					success:function (response){
+						var order_id=response.order_id
 						console.log('working')
 						var options = {
 							"key": "rzp_test_94QwzUo1UZWOiT", 
@@ -503,6 +505,7 @@
 								//alert(responseb.razorpay_payment_id);
 								// alert(responseb.razorpay_signature);
 								var data = {
+									order_id:response.order_id,
 									selected_address: selectedAddress,
 									payment: selectedPayment,
 									csrfmiddlewaretoken: csrfToken, 
@@ -512,7 +515,7 @@
 								console.log('entered')
 								$.ajax({
 									type: 'post',
-									url: '../order_place/',
+									url: '../payment_confirm/',
 									data: data,
 									success: function(response) {
 										console.log('its working');
@@ -522,19 +525,7 @@
 											alert('Error: ' + response.message);
 										}
 									}
-								});$.ajax({
-									type: 'post',
-									url: '../order_place/',
-									data: data,
-									success: function(response) {
-										console.log('its working');
-										if (response.success) {
-											window.location.href = '../view_order/';
-										} else {
-											alert('Error: ' + response.message);
-										}
-									}
-								});								
+								});							
 							}
 						};
 						var rzp1 = new Razorpay(options);

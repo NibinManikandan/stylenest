@@ -1,0 +1,77 @@
+{% extends "admin_panel/adm_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<main id="main" class="main" style="background-color: #3b5d50;">
+    <div class="d-flex justify-content-between">
+        <div class="pagetitle">
+            <h1>Coupons</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Admin</li>
+                    <li class="breadcrumb-item active">Banners</li>
+                </ol>
+            </nav>
+        </div>
+        <!-- End Page Title -->
+
+        <a href="{% url 'add_banners' %}" class="btn btn-dark btn-rounded h-50">Add Banner</a>
+    </div>
+        <!-- Recent Sales -->
+        <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+
+                <div class="card-body">
+                    <table class="table datatable table-striped table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Banner Image</th>
+                                <th>Banner Title</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in banner %}
+                            <tr>
+                                <td class='id'>{{i.id}}</td>
+                                <td> <span class="image">{{i.image}}</span> </td>
+                                <td> <span class="title">{{i.header}}</span> </td>
+                                {% if i.is_listed %}
+                                <td>
+                                    <a href="../banner_controlling/{{i.id}}"><button class="badge bg-danger">Unlist</button></a>
+                                </td>
+                                {%else%}
+                                <td>
+                                    <a href="../banner_controlling/{{i.id}}"><button class="badge bg-success">List</button></a>
+                                </td>
+                                {%endif%}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+        </div><!-- End Recent Sales -->
+
+    </main>
+
+<script>
+    $(document).ready(function () {
+        var dataTable = $('.datatable').DataTable();     
+        // Search functionality
+        $('#searchBtn').on('click', function () {
+            var searchValue = $('#searchInput').val().toLowerCase();
+            dataTable.search(searchValue).draw();
+        });
+
+       
+    });
+</script>
+
+
+{% endblock %}
+

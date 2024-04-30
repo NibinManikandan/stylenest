@@ -29,10 +29,12 @@ def wallet(request):
 # function for add amount to wallet
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_amount(request):
+    print('wallet amount add')
     amount = int(request.POST.get('amount')) * 100
     data = {'amount':amount, 'currency':'INR'}
     payment = client.order.create(data=data)
     request.session['amount'] = amount / 100
+    print(amount)
 
     return JsonResponse(
         {

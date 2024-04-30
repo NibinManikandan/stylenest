@@ -42,9 +42,9 @@
               {% csrf_token %}
 
               <div class="input-group w-75 couponcode-wrap">
-                <input type="text" class="form-control me-2" id="c_amount" placeholder="Amount in INR" aria-label="amount" aria-describedby="button-addon2">
+                <input type="text" class="form-control me-2" id="amount" name='amount' placeholder="Amount in INR" aria-label="amount" aria-describedby="button-addon2">
                 <div class="input-group-append">
-                <button class="btn btn-black btn-sm add-to-wallet-btn" type="button" id="button-addon2" style="border-radius: 10px;">Add</button>
+                <button class="btn btn-black btn-sm add-to-wallet-btn" style="border-radius: 10px;">Add Amount</button>
                 </div>
               </div>
               
@@ -117,60 +117,51 @@
           
           $.ajax({
             type: "POST",
-            url: "add_amount", 
-            data: { amount: amount,
-              csrfmiddlewaretoken: csrfToken, 
-             },
+            url: "/add_amount/",
+            data: {
+                amount: amount,
+                csrfmiddlewaretoken: csrfToken,
+            },
             success: function (data) {
-          
-              console.log("Amount added successfully:", data);
-            
-              var options = {
-                "key": "rzp_test_364uDI7fwiadCE", 
-                "amount": data.amount, 
-                "currency": "INR",
-                "name": "Acme Corp",
-                "description": "Test Transaction",
-                "image": "https://example.com/your_logo",
-                "order_id": data.payment_id, 
-                "handler": function (response){
-                    window.location.reload();
-                  
-                },
-                "prefill": {
-                    "name": "Gaurav Kumar",
-                    "email": "gaurav.kumar@example.com",
-                    "contact": "9000090000"
-                },
-                "notes": {
-                    "address": "Razorpay Corporate Office"
-                },
-                "theme": {
-                    "color": "#3399cc"
-                }
-            };
-            var rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', function (response){
-              Swal.fire({
-                icon: 'error',
-                title: 'Money Not Added',
-                text: 'There was an issue adding money to your account. Please try again later.',
-              });
-            });
-            rzp1.open();
+                console.log("Amount added successfully:", data);
+                var options = {
+                    "key": "rzp_test_94QwzUo1UZWOiT",
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": "Acme Corp",
+                    "description": "Test Transaction",
+                    "image": "https://example.com/your_logo",
+                    "order_id": data.payment_id,
+                    "handler": function (responseb) {
+                        console.log(responseb);
+                        // Handle successful payment response
+                    },
+                    "prefill": {
+                        "name": "Gaurav Kumar",
+                        "email": "gaurav.kumar@example.com",
+                        "contact": "9878463524"
+                    },
+                    "notes": {
+                        "address": "Razorpay Corporate Office"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
             },
             error: function (xhr, status, error) {
-          
-              Swal.fire({
-                icon: 'error',
-                title: 'Money Not Added',
-                text: 'There was an issue adding money to your account. Please try again later.',
-              });
-        
+                console.error("Error adding amount:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Money Not Added',
+                    text: 'There was an issue adding money to your account. Please try again later.',
+                });
             },
-          });
+        });
+        
         } else {
-          
           alert("Invalid amount entered");
         }
       });
