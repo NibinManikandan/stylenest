@@ -14,8 +14,6 @@ from pathlib import Path
 import os
 from telnetlib import AUTHENTICATION
 from . import settings
-import django_heroku
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -163,6 +161,3 @@ EMAIL_USE_SSL = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# activating Django_heroku
-django_heroku.settings(locals())
