@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Page Not Found</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #F0F8FF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            color: #333;
+        }
+
+        .error-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 6rem;
+            color: red;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        a {
+            text-decoration: none;
+            background-color: orangered;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: green;
+        }
+
+        .illustration {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <img src="{% static '/images/error.jpg' %}" alt="Cute illustration" class="illustration">
+        <h1>404</h1>
+        <p>Oh no! We can't seem to find the page you're looking for.</p>
+        <a href="{% url 'home' %}">Go Back to Home</a>
+    </div>
+</body>
+</html>

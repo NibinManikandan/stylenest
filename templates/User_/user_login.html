@@ -41,7 +41,7 @@
                                 <a href="{% url 'password_reset' %}" class="signup-image-link">Forget your Password?</a>
                             </div>
                             <div class="form-group form-button">
-                                <input type="submit" name="signin" id="signin" class="form-submit" value="Log in"/>
+                                <input type="submit" name="signin" id="signin" class="form-submit" value="Login"/>
                             </div>
                             {% if messages %}
                             <div class='error-message mt-3'style="color: red;">
@@ -49,14 +49,6 @@
                             </div>
                             {% endif %}
                         </form>
-                        <div class="social-login">
-                            <span class="social-label">Or login with</span>
-                            <ul class="socials">
-                                <li><a href="#"><i class="display-flex-center zmdi zmdi-facebook"></i></a></li>
-                                <li><a href="#"><i class="display-flex-center zmdi zmdi-twitter"></i></a></li>
-                                <li><a href="#"><i class="display-flex-center zmdi zmdi-google"></i></a></li>
-                            </ul>
-                        </div>
                         <div>
                             <p style="text-align:center;">New to StyleNest?</p>
                             <a href="{% url 'signup' %}" class="signup-image-link">Sign Up</a>

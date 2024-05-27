@@ -110,7 +110,6 @@ def user_Signup(request):
         if CustomUser.objects.filter(phone=phone).exists():
             return redirect('signup')
         
-
         # Check if passwords match
         if paswrd != confirm_password:
             return redirect('signup')

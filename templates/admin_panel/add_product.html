@@ -6,16 +6,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <main id="main" class="main">
-    <div class="pagetitle">
-        <h1>Add Products</h1>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">Admin</li>
-                <li class="breadcrumb-item">Products</li>
-                <li class="breadcrumb-item active">Add Product</li>
-            </ol>
-        </nav>
-    </div><!-- End Page Title -->
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Add a new Product to the database</h5>
@@ -52,7 +42,7 @@
                         </select>
                     </div>
                 </div>
-
+    
                 <div class="row mb-3">
                     <label for="id_stock" class="col-sm-2 col-form-label">Stock</label>
                     <div class="col-sm-10">
@@ -60,16 +50,12 @@
                         <div class="text-danger error-message" id="stock-error"></div>
                     </div>
                 </div>
-
+    
                 <div class="row mb-3">
                     <label for="id_images" class="col-sm-2 col-form-label">Images</label>
                     <div class="col-sm-10">
                         <input type="file" name="images" id="id_images" class="form-control" multiple required onchange="handleImageUpload(this.files)">
-                        {% if messages %}
-                        <div class="error-message" id="images-error">
-                            {% if messages %} {% for message in messages %} {% if message.tags == 'error' %} {{message}} {% endif %} {% endfor %} {% endif %}
-                        </div>
-                        {% endif %}
+                        <div class="error-message" id="images-error"></div>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -83,6 +69,8 @@
         </div>
     </div>
 </main>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     function handleImageUpload(files) {
         let imagesError = document.getElementById("images-error");
@@ -94,32 +82,74 @@
     }
 
     document.getElementById("add-product-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        let form = this;
         let name = document.getElementById("id_name").value;
         let description = document.getElementById("id_description").value;
+        let price = document.getElementById("id_price").value;
         let images = document.getElementById("id_images").files;
 
         let nameError = document.getElementById("name-error");
         let descriptionError = document.getElementById("description-error");
+        let priceError = document.getElementById("price-error");
         let imagesError = document.getElementById("images-error");
 
         nameError.textContent = "";
         descriptionError.textContent = "";
+        priceError.textContent = "";
         imagesError.textContent = "";
 
         if (name.trim() === "") {
             nameError.textContent = "Product name is required";
-            event.preventDefault();
+            return;
         }
 
         if (description.trim() === "") {
             descriptionError.textContent = "Description is required";
-            event.preventDefault();
+            return;
+        }
+
+        if (price.trim() === "") {
+            priceError.textContent = "Price is required";
+            return;
         }
 
         if (images.length === 0) {
             imagesError.textContent = "Please select at least one image";
-            event.preventDefault();
+            return;
         }
+
+        let formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                // Show success message
+                swal({
+                    title: "Success!",
+                    text: "Product added successfully",
+                    icon: "success",
+                    button: "OK",
+                }).then(() => {
+                    // Redirect to a page or do something else
+                    window.location.href = "{% url 'adm_products' %}";
+                });
+            } else {
+                // Show error message
+                swal("Error!", data.message, "error");
+            }
+        })
+        .catch(error => {
+            swal("Error!", "An error occurred", "error");
+        });
     });
 </script>
 <!-- Add these lines in the <head> section of your HTML template -->

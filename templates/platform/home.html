@@ -7,7 +7,9 @@
 			<div class="carousel-inner">
 				{% for i in banners %}
 					<div class="carousel-item {% if forloop.counter == 1  %}active{% endif %}">
-						<img src="media/{{ i.image }}" class="d-block w-100" alt="banner">
+						<a href="{% url 'shop' %}">
+							<img src="media/{{ i.image }}" class="d-block w-100" alt="banner">
+						</a>
 					</div>
 				{% endfor %}
 			</div>
@@ -32,7 +34,7 @@
 				</div>
 			</div>
 		{% endif %}
-		<!-- End Hero Section -->
+		<!-- End Banner Section -->
 
 		<!-- Start Product Section -->
 		<div class="product-section">
@@ -49,10 +51,10 @@
 
 					<!-- Start Column 2 -->
 					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-						<a class="product-item" href="{% url 'cart_page' %}">
+						<a class="product-item" href="{% url 'shop' %}">
 							<img src="{% static "/images/swing a1.jpg" %}" class="img-fluid product-thumbnail">
 							<h3 class="product-title">Nordic Chair</h3>
-							<strong class="product-price">5550.00</strong>
+							<strong class="product-price">&#8377; 5550.00</strong>
 
 							<span class="icon-cross">
 								<img src="{% static '/images/cross.svg' %}" class="img-fluid">
@@ -63,10 +65,10 @@
 
 					<!-- Start Column 3 -->
 					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-						<a class="product-item" href="cart.html">
+						<a class="product-item" href="{% url 'shop' %}">
 							<img src="{% static '/images/chair d1.jpg' %}" class="img-fluid product-thumbnail">
 							<h3 class="product-title">Kruzo Aero Chair</h3>
-							<strong class="product-price">2229.00</strong>
+							<strong class="product-price">&#8377; 2229.00</strong>
 
 							<span class="icon-cross">
 								<img src="{% static '/images/cross.svg' %}" class="img-fluid">
@@ -77,10 +79,10 @@
 
 					<!-- Start Column 4 -->
 					<div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-						<a class="product-item" href="cart.html">
+						<a class="product-item" href="{% url 'shop' %}">
 							<img src="{% static '/images/sofa a2.jpg' %}" class="img-fluid product-thumbnail">
 							<h3 class="product-title">Ergonomic Chair</h3>
-							<strong class="product-price">4143.00</strong>
+							<strong class="product-price">&#8377; 4143.00</strong>
 
 							<span class="icon-cross">
 								<img src="{% static '/images/cross.svg' %}" class="img-fluid">
@@ -298,3 +300,4 @@
 		</script>
 
 {%endblock%}
+

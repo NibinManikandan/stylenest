@@ -6,6 +6,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
 from django.db import transaction
 from django.views.decorators.cache import never_cache
+import coupon
 from coupon.models import Coupons, CouponUsage
 from wallet.models import Wallet
 from .models import *
@@ -70,6 +71,7 @@ def search(request):
 def view_order(request):
     flag=request.session.get('flag')
     order_id = request.session.get('order_id')
+
     if flag == 0:
         ord_details = Order.objects.get(order_id=order_id)
         current_order = Order_item.objects.filter(order=ord_details)

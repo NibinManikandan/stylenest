@@ -75,6 +75,11 @@
                     <div class="col-12">
                       <button class="btn btn-primary w-100" type="submit">Login</button>
                     </div>
+                    {% if messages %}
+                    <div class='error-message mt-3'style="color: red; text-align: center;">
+                        {% if messages %} {% for message in messages %} {% if message.tags == 'error' %} {{message}} {% endif %} {% endfor %} {% endif %}
+                    </div>
+                    {% endif %}
                   </form>
                 </div>
               </div>

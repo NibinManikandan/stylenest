@@ -1,10 +1,12 @@
-from cgi import print_directory
 import code
+from ctypes.wintypes import PINT
 from datetime import timedelta
+from email import message
 from genericpath import exists
 from itertools import product
 from lib2to3.fixes.fix_input import context
 from math import prod
+import re
 from urllib import response
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import JsonResponse,HttpResponse
@@ -25,6 +27,46 @@ from django.views.decorators.cache import never_cache
 
 
 
+# function for add items into cart 
+def add_to_cart(request):
+    if request.method == 'POST':
+        if 'user' in request.session:
+            email = request.session['user']
+            user = get_object_or_404(CustomUser, email=email)
+            product_id = request.POST.get('id')
+            product = get_object_or_404(Product, id=product_id)
+
+            offer_price = product.discounted_price()
+
+            if offer_price < product.Pro_price and offer_price != 0:
+                price = offer_price
+            else:
+                price = product.Pro_price
+            
+            # Check if the product is in stock
+            if product.stock > 0:
+                # Check if the product is already in the user's cart
+                if Cart.objects.filter(user=user, product=product).exists():
+                    return JsonResponse({'success': False, 'status': "Product already in cart"})
+                else:
+                    Cart.objects.create(
+                        user=user,
+                        product=product,
+                        categorye = product.category,
+                        created_at=timezone.now(),
+                        cart_price=price
+                    )
+                    cart_count_ajax = Cart.objects.filter(user=user).count()
+                    return JsonResponse({'status': "Product added successfully", 'success': True, 'cart_count_ajax': cart_count_ajax})
+            else:
+                return JsonResponse({'success': False, 'status': "Product is out of stock"})
+        else:
+            return redirect('Userlogin')
+    else:
+        return render(request, 'platform/home.html')
+
+
+
 # rendering cart page with cart details
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def cart_page(request):
@@ -38,37 +80,6 @@ def cart_page(request):
     else:
         return redirect('Userlogin')
 
-
-
-# function for add items into cart 
-def add_to_cart(request):
-    if request.method == 'POST':
-        if 'user' in request.session:
-            email = request.session['user']
-            user = get_object_or_404(CustomUser, email=email)
-            product_id = request.POST.get('id')
-            product = get_object_or_404(Product, id=product_id)
-            
-            # Check if the product is in stock
-            if product.stock > 0:
-                # Check if the product is already in the user's cart
-                if Cart.objects.filter(user=user, product=product).exists():
-                    return JsonResponse({'success': False, 'status': "Product already in cart"})
-                else:
-                    Cart.objects.create(
-                        user=user, 
-                        product=product,
-                        created_at=timezone.now(), 
-                        cart_price=product.Pro_price
-                    )
-                    cart_count_ajax = Cart.objects.filter(user=user).count()
-                    return JsonResponse({'status': "Product added successfully", 'success': True, 'cart_count_ajax': cart_count_ajax})
-            else:
-                return JsonResponse({'success': False, 'status': "Product is out of stock"})
-        else:
-            return redirect('Userlogin')
-    else:
-        return render(request, 'platform/home.html')
 
 
 # fucntion for remove item from the cart
@@ -148,10 +159,27 @@ def checkout(request):
         addresses = Address.objects.filter(user=user, is_listed=True).all()   
         obj = Cart.objects.filter(user=user).order_by('id')
         obj = obj.filter(product__is_listed=True)
-        coupons = Coupons.objects.all().order_by('id')
         sub_total = sum(obj.values_list('cart_price', flat=True))
         cart_items_queryset = Cart.objects.filter(user=user).all()
         cart_items = [item for item in cart_items_queryset]
+        current_date = timezone.now().date()
+        active_coupons = Coupons.objects.filter(expiry_date__gte=current_date, is_active=True)
+
+        valid_coupons = []
+        for coupon in active_coupons:
+            if coupon.used_count < coupon.usage_limit:
+                valid_coupons.append({
+                    'name': coupon.name,
+                    'code': coupon.code,
+                    'discount_value': coupon.discount_value,
+                    'min_purchase': coupon.min_purchase,
+                    'expiry_date': coupon.expiry_date,
+                    'usage_limit': coupon.usage_limit,
+                    'used_count': coupon.used_count,
+                    'is_active': coupon.is_active,
+                    'created_at': coupon.created_at,
+                    'updated_at': coupon.updated_at
+                })
         delivery_charge = 0
 
         if sub_total < 1000 and sub_total > 0:
@@ -164,7 +192,7 @@ def checkout(request):
             'addresses': addresses, 
             'sub_total': sub_total,
             'obj':obj,
-            'coupons':coupons,
+            'valid_coupons':valid_coupons,
             'delivery_charge':delivery_charge,
             'cart_items':cart_items
         }
@@ -188,14 +216,16 @@ def ship_to_another(request):
         postal = request.POST.get('postal_zip')
         c_phone = request.POST.get('c_phone')
 
-        if not f_name.isalpha() or len(f_name) < 3:
+        f_name_stripped = f_name.strip()
+        if not f_name_stripped.isalpha() or len(f_name) < 3:
             return redirect('checkout')
         
-        if not l_name.isalpha() or len(l_name) < 3:
+        l_name_stripped = l_name.strip()
+        if not l_name_stripped.isalpha() or len(l_name) < 3:
             return redirect('checkout')
         
         c_address_stripped = c_address.strip()
-        if not c_address_stripped or len(c_address_stripped) < 6:
+        if not c_address_stripped or len(c_address) < 6:
             return redirect('checkout')
         
         city_stripped = city.strip()
@@ -206,20 +236,18 @@ def ship_to_another(request):
         if not landMark_stripped or len(landMark) < 3:
             return redirect('checkout')
         
-        if not country.isalpha() or len(country) < 3:
-            return redirect('checkout')
-        
         state_stripped = state.strip()
         if not state_stripped or len(state) < 3:
             return redirect('checkout')
         
-        if not postal.isdigit() or len(postal) != 6:
+        pin_stripped = postal.strip()
+        if not pin_stripped.isdigit() or len(postal) != 6:
             return redirect('checkout')
         
-        if not c_phone.isdigit() or len(c_phone) != 10:
+        phone_stripped = c_phone.strip()
+        if not phone_stripped.isdigit() or len(c_phone) != 10:
             return redirect('checkout')
 
-        
         address_1 = Address.objects.create(
             user = user,
             country = country,
@@ -239,9 +267,8 @@ def ship_to_another(request):
     else:
         return render(request, 'platform/checkout.html')
     
-
-
-# fucntion for place order
+# Function for placing an order
+# Function for placing an order
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def place_order(request):
     if request.user:
@@ -325,7 +352,7 @@ def place_order(request):
             return JsonResponse({"success":False, "message":"Orders exceeding 1000 rupees cannot be placed using cash on delivery."})
             
     return JsonResponse({"error": "User not authenticated"}, status = 400)
-    
+
 
 
 # function for place order using razorpay
@@ -347,7 +374,7 @@ def order_razorpay(request):
         for item in cart_items:
             if item.cart_quantity > item.product.stock:
                 return JsonResponse({"success": False, "message":"Some items are Out of Stock"})
-            total += ((item.cart_quantity) * (item.product.Pro_price))
+            total += ((item.cart_quantity) * (item.cart_price))
         
         if coupon:
             if coupon.min_purchase <= total:
@@ -421,15 +448,20 @@ def payment_confirm(request):
 
 
 
-def payment_confirm_order(request):
+def repayment(request):
     order_id = request.POST.get('order_id')
     items=Order_item.objects.filter(id=order_id).first()
-    items.status='Order confirmed'
-    items.payment_status='Paid'
-    items.save()
-    request.session['order_id'] = order_id
-    request.session['flag'] = 1
-    return JsonResponse({'success':True,"message":"Payment is Successfull"})
+    if items.ord_product.stock != 0:
+        items.status='Order confirmed'
+        items.payment_status='Paid'
+        items.save()
+        request.session['order_id'] = order_id
+        request.session['flag'] = 1
+        return JsonResponse({'success':True,"message":"Payment is Successfull"})
+    else:
+        return JsonResponse({'success':False,"message":"We're sorry, but this product is currently unavailable."})
+
+
 
 # function for place order wallet
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -523,7 +555,7 @@ def place_order_wallet(request):
 
 
 
-# function for apply coupons
+# function to apply coupon 
 def apply_coupons(request):
     if request.method == 'POST':
         if request.user:
@@ -571,11 +603,11 @@ def apply_coupons(request):
                 return JsonResponse({"error":"Invalid Coupon"}, status = 400)
             
         return JsonResponse({"error":"Inavalid request"}, status = 400)
-        
+    
 
 
 
-# function for Remove coupon
+# function to remove coupon 
 def remove_coupon(request):
     if request.user:
         email = request.user
@@ -595,5 +627,29 @@ def remove_coupon(request):
 
         response_data = {"success": "removed", "total": total}
         return JsonResponse(response_data)
+    
 
 
+
+# function to show available coupon
+def coupon_filtering(request):
+    current_date = timezone.now().date()
+    active_coupons = Coupons.objects.filter(expiry_date__gte=current_date, is_active=True)
+
+    valid_coupons = []
+    for coupon in active_coupons:
+        if coupon.used_count < coupon.usage_limit:
+            valid_coupons.append({
+                'name': coupon.name,
+                'code': coupon.code,
+                'discount_value': coupon.discount_value,
+                'min_purchase': coupon.min_purchase,
+                'expiry_date': coupon.expiry_date,
+                'usage_limit': coupon.usage_limit,
+                'used_count': coupon.used_count,
+                'is_active': coupon.is_active,
+                'created_at': coupon.created_at,
+                'updated_at': coupon.updated_at
+            })
+
+    return render(request, 'platform/checkout.html',{'valid_coupons': valid_coupons})

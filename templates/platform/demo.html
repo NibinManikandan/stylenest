@@ -1,0 +1,248 @@
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAddressModal">Edit Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" action="{% url 'manage_address' %}">
+            {% csrf_token %}
+            <div class="form-group row">
+              <div class="col-md-6">
+                <label for="fname" class="text-black">First Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="fname" name="fname" value="{{ addrs.first_name }}">
+              </div>
+              <div class="col-md-6">
+                <label for="lname" class="text-black">Last Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="lname" name="lname">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-12">
+                <label for="c_address" class="text-black">Address <span class="text-danger">*</span></label>
+                <textarea class="form-control" name="c_address" id="c_address" rows="2" placeholder="Street address"></textarea>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-12">
+                <label for="c_city" class="text-black">City <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="c_city" name="city" placeholder="City">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-12">
+                <label for="c_landmark" class="text-black">Landmark <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="c_landmark" name="landmark" placeholder="Landmark">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-6">
+                <label for="country" class="text-black">Country <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="country" name="country">
+              </div>
+              <div class="col-md-6">
+                <label for="state" class="text-black">State <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="state" name="state">
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-6">
+                <label for="postal_zip" class="text-black">Postal / Zip <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="postal_zip" name="postal_zip">
+              </div>
+              <div class="col-md-6">
+                <label for="c_phone" class="text-black">Phone <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="c_phone" name="c_phone" placeholder="Alternative Phone Number">
+              </div>
+            </div>
+            <hr>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+  
+
+	{% comment %} function applyCoupon() {
+		var couponCode = $('#couponCode').val();
+		console.log(couponCode);
+
+		$.ajax({
+			url: '../apply_coupons/',
+			type: 'POST',
+			data: {
+				couponCode: couponCode,
+				csrfmiddlewaretoken: getCSRFToken()
+			},
+			success: function (data) {
+				console.log(data);
+
+				if ('error' in data) {
+					$('#couponError').text(data.error);
+				} else {
+					$('.coupon-discount').text('₹ ' + data.discount_amount);
+					$('.final-total').text('₹ ' + data.total);
+
+					
+					$('#couponCode').val(couponCode); 
+
+					$('#couponError').text('');
+					Swal.fire({
+						icon: 'success',
+						title: "Coupon Applied Successfully",
+						confirmButtonText: 'OK',
+					});
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.error('Error:', errorThrown);
+				var errorResponse = JSON.parse(jqXHR.responseText);
+				var errorMessage = errorResponse.error;
+				Swal.fire({
+					icon: 'error',
+					title: "Error",
+					text: errorMessage,
+					confirmButtonText: 'OK',
+				});
+			}
+		});
+	}
+
+	function removeCoupon() {
+		var couponCode = $('#couponCode').val();
+		console.log("clicked");
+
+		$.ajax({
+			url: '../remove_coupon/',
+			type: 'POST',
+			data: {
+				couponCode: couponCode,
+				csrfmiddlewaretoken: getCSRFToken()
+			},
+			success: function (data) {
+				console.log(data);
+
+				if ('error' in data) {
+					$('#couponError').text(data.error);
+					
+				}else {
+					$('.coupon-discount').text('₹ '+ 0);
+					$('.final-total').text('₹ '+data.total);
+
+					// Clear the value of the coupon code input field
+					$('#couponCode').val(''); // Remove the coupon code
+
+					$('#couponError').text('');
+					Swal.fire({
+						icon: 'success',
+						title: "Coupon Removed Successfully",
+						confirmButtonText: 'OK',
+					});
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.error('Error:', errorThrown);
+				var errorResponse = JSON.parse(jqXHR.responseText);
+				var errorMessage = errorResponse.error;
+				Swal.fire({
+					icon: 'error',
+					title: "Error",
+					text: errorMessage,
+					confirmButtonText: 'OK',
+				});
+			}
+		});
+	} {% endcomment %}
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+# function for apply coupons
+# def apply_coupons(request):
+#     if request.method == 'POST':
+#         if request.user:
+#             email = request.user
+#             user = CustomUser.objects.get(email=email)
+#             coupon_code = request.POST.get('couponCode')
+#             coupon_check = Coupons.objects.filter(code=coupon_code, is_active = True).first()
+#             if coupon_check:
+#                 if coupon_check.used_count < coupon_check.usage_limit:
+#                     cart_total = sum(
+#                         Cart.objects.filter(user=user).values_list("cart_price", flat=True)
+#                     )
+
+#                     if cart_total >= coupon_check.min_purchase:
+#                         if coupon_check.expiry_date < datetime.now().date():
+#                             return JsonResponse({"error": f"Coupon Expired"}, status = 400)
+                        
+#                         total = cart_total - coupon_check.discount_value
+
+#                         response_data = {
+#                             "success":"added",
+#                             "total":total,
+#                             "coupon_code":coupon_code,
+#                             "discount_amount":coupon_check.discount_value,
+#                         }
+
+#                         CouponUsage.objects.create(user=user, coupon=coupon_check)
+
+#                         return JsonResponse(response_data)
+                    
+#                     else:
+#                         return JsonResponse({"error": f"Minimum purchase amount of {round(coupon_check.min_purchase)} required"}, status = 400)
+                    
+#                 else:
+#                     return JsonResponse({"error": "Sorry! This code has reached its usage limit."}, status = 400)
+                
+#             else:
+#                 return JsonResponse({"error":"Invalid Coupon"}, status = 400)
+            
+#         return JsonResponse({"error":"Inavalid request"}, status = 400)
+        
+
+
+
+# # function for Remove coupon
+# def remove_coupon(request):
+#     if request.user:
+#         email = request.user
+#         user = CustomUser.objects.get(email=email)
+
+#         coupon_code = request.POST.get("couponCode")
+#         coupon_check = Coupons.objects.filter(code=coupon_code, is_active=True).first()
+#         if coupon_check:
+#             usage_check = CouponUsage.objects.filter(user=user, coupon=coupon_check).first()
+#             if usage_check:
+#                 coupon_check.used_count -= 1
+#                 coupon_check.save()
+#                 usage_check.delete()
+
+#         # Update the cart total
+#         total = sum(Cart.objects.filter(user=user).values_list("cart_price", flat=True))
+
+#         response_data = {"success": "removed", "total": total}
+#         return JsonResponse(response_data)

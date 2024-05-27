@@ -7,87 +7,93 @@
 </div>
 
 <div class="untree_co-section product-section before-footer-section">
-  <div class="btn-group dropend" style = "bottom: 70px; padding-left: 40px;">
+  <div class="btn-group dropend" style="bottom: 70px; margin-left: 110px">
     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-    Sorted By
+      Sorted By
     </button>
     <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="">All</a></li>
-        <li><a class="dropdown-item" href="../../filtter?sort=low_to_high">Price low to high</a></li>
-        <li><a class="dropdown-item" href="../../filtter?sort=high_to_low">prce high to low</a></li>
+        <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'default')">All</a></li>
+        <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'low_to_high')">Price low to high</a></li>
+        <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'high_to_low')">Price high to low</a></li>
     </ul>
-</div>
+  </div>
 
-<!-- Split dropend button -->
-<div class="btn-group dropend" style = "bottom: 70px; padding-left: 10px;">
-    <button type="button" class="btn btn-secondary">
-    Filtter
-    </button>
-    <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-    <span class="visually-hidden">Toggle Dropend</span>
+  <!-- Split dropend button -->
+  <div class="btn-group dropend" style="bottom: 70px; padding-left: 10px;">
+    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Filter
     </button>
     <ul class="dropdown-menu">
         <li><a class="dropdown-item" href="../../filtter?categoryy=0">All Products</a></li>
         {% for category in categories %}
         <li><a class="dropdown-item" href="../../filtter?categoryy={{category.id}}">{{category.C_name}}</a></li>
         {% endfor %}
-    </ul>
-</div>
+    </ul>   
+  </div>
 
 <div class="container">
-      <div class="row">
-        
-        {% for product in products %}
-        <div class="col-12 col-md-3 col-lg-3 mb-3">
-            <a class="product-item" href="../prod_details/{{product.id}}">
-                <img src="{{ product.images.all.0.Pro_image.url }}" class="img-fluid product-thumbnail" alt="{{ product.Pro_name }}">
-                <h3 class="product-title">{{ product.Pro_name }}</h3>
-                <h6><p style="color: red;">{% if product.stock == 0 %}Out of Stock {% elif product.stock <= 5 %}Limitted stocks are available{% endif %}</p></h6>
-                <h6 style="color: green;">
-                    {% if product.Pro_offer > 0 or product.category.Cate_offer < product.Pro_offer %}
-                        &#8595;{{ product.Pro_offer }} % off
-                    {% elif product.category.Cate_offer > product.Pro_offer %}
-                        &#8595;{{ product.category.Cate_offer }}% off
-                    {% endif %}
-                </h6>
-                <strong class="product-price">&#8377; {{ product.Pro_price }}</strong>
-            </a>
-        </div> 
-        {% endfor %}
-        
-      </div>
-</div>
-
-    <div aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
-            {% if products.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">Previous</span>
-                </li>
-            {% endif %}
-            
-            {% for num in products.paginator.page_range %}
-                <li class="page-item {% if products.number == num %}active{% endif %}">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                </li>
-            {% endfor %}
-            
-            {% if products.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">Next</span>
-                </li>
-            {% endif %}
-        </ul>
+  <div class="row">
+    {% for product in products %}
+    <div class="col-12 col-md-3 col-lg-3 mb-3">
+        <a class="product-item" href="../prod_details/{{ product.id }}">
+            <img src="{{ product.images.all.0.Pro_image.url }}" class="img-fluid product-thumbnail" alt="{{ product.Pro_name }}">
+            <h3 class="product-title">{{ product.Pro_name }}</h3>
+            <h6>
+              <p style="color: red;">{% if product.stock == 0 %}Out of Stock {% elif product.stock <= 5 %}Limited stocks are available{% endif %}</p>
+            </h6>
+            <h6 style="color: green;">
+                {% if product.Pro_offer > 0 or product.category.Cate_offer < product.Pro_offer %}
+                    &#8595;{{ product.Pro_offer }} % off
+                {% elif product.category.Cate_offer > product.Pro_offer %}
+                    &#8595;{{ product.category.Cate_offer }}% off
+                {% endif %}
+            </h6>
+            <strong class="product-price">&#8377; {{ product.Pro_price }}</strong>
+        </a>
     </div>
-
+    {% endfor %}
+  </div>
 </div>
 
-{%endblock%}
+<div aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+      {% if products.has_previous %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Previous</span>
+          </li>
+      {% endif %}
+      
+      {% for num in products.paginator.page_range %}
+          <li class="page-item {% if products.number == num %}active{% endif %}">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+      {% endfor %}
+      
+      {% if products.has_next %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Next</span>
+          </li>
+      {% endif %}
+  </ul>
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+5hb7O6lI5H/t6RVCe2xzLR+svAv9SJBRQ+w5XQ" crossorigin="anonymous"></script>
+
+<script>
+    function updateFilter(key, value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+        window.location.href = url.toString();
+    }
+</script>
+
+{% endblock %}

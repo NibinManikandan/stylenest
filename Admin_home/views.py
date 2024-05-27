@@ -1,6 +1,6 @@
 from ast import Expression, If
 from datetime import datetime, timedelta
-import html
+from decimal import Decimal
 from io import BytesIO
 from multiprocessing import context
 from re import template
@@ -16,6 +16,7 @@ from Admin_home.models import Banner, Category, Product, Product_Image
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
+from Cart.models import Cart
 from order_manage.models import Order_item, Order
 from userAuth.models import CustomUser
 from django.contrib import messages
@@ -231,22 +232,21 @@ def add_products(request):
         category_id = request.POST.get('category')
         Pro_price = request.POST.get('price')
         stock = request.POST.get('stock')
-        # checkthe product already exist with the same name
+        # check the product already exists with the same name
         try:
             existing_product = Product.objects.get(Pro_name__iexact=Pro_name)
-            messages.error(request, 'Product Already exists with the same name.')
-            return redirect('add_product')
-        except ObjectDoesNotExist:
+            return JsonResponse({"success": False, "message": "Product already exists with the same name."})
+        except Product.DoesNotExist:
             pass
 
         category = Category.objects.get(id=category_id)
 
         product = Product(
-            Pro_name = Pro_name,
-            Pro_description = Pro_description,
-            category = category,
-            Pro_price = Pro_price,
-            stock = stock
+            Pro_name=Pro_name,
+            Pro_description=Pro_description,
+            category=category,
+            Pro_price=Pro_price,
+            stock=stock
         )
         
         product.save()
@@ -255,8 +255,7 @@ def add_products(request):
         for img in Pro_images:
             Product_Image(product=product, Pro_image=img).save()
 
-        messages.success(request, "Product added Succesfully.")
-        return redirect('adm_products')
+        return JsonResponse({"success": True, "message": "Product added successfully."})
 
     return render(request, 'admin_panel/add_product.html', context)
 
@@ -270,12 +269,14 @@ def Edit_product(request, id):
     prod = Product.objects.get(id=id) 
     pro_img = Product_Image.objects.all()
     context = {'Cat': Category_list, 'Prod': prod,}
-    
+    cart = Cart.objects.filter(product=prod).all()
+    print(cart)
+
     if request.method =='POST':
         prod.Pro_name = request.POST.get('name')
         prod.Pro_Discription = request.POST.get('description')
         images  = request.FILES.getlist('images')   
-        prod.Pro_price = request.POST.get('price')
+        prod.Pro_price = Decimal(request.POST.get('price'))  # Convert to Decimal
         prod.category_id = request.POST.get('category')
         prod.stock = request.POST.get('stock')
         prod.save()
@@ -288,6 +289,16 @@ def Edit_product(request, id):
             for img in images:
                 Product_Image(product=prod, Pro_image=img).save()
 
+        for cart_single in cart:
+            discount_price = prod.discounted_price()
+            if discount_price < prod.Pro_price and discount_price != 0:
+                cart_single.cart_price = discount_price
+                cart_single.categorye = prod.category
+                cart_single.save()
+            else:
+                cart_single.cart_price = prod.Pro_price
+                cart_single.categorye = prod.category
+                cart_single.save()
         return redirect('adm_products')
     
     return render(request, 'admin_panel/edit_product.html', context)
@@ -307,51 +318,48 @@ def adm_orders(request):
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 @user_passes_test(lambda u: u.is_superuser, login_url='admin_login')
 def order_status_change(request, id):
-    order = Order_item.objects.get(id=id)
+    order_item = Order_item.objects.get(id=id)
 
-    if request.method == 'POST':
+    if request.method == 'POST':    
         status = request.POST.get('status_change')
 
         if status == "Cancelled" or status == "Returned":
-            if order.order.pyment_mode != 'COD':
-                order.status = status
-                order.ord_product.stock += order.ord_quantity
+            if order_item.order.pyment_mode != 'COD':
+                order_item.status = status
+                order_item.ord_product.stock += order_item.ord_quantity
 
-                wallet = Wallet.objects.filter(order.order.user).order_by('-id')
+                wallet = Wallet.objects.filter(user=order_item.order.user).order_by('-id')
                 if wallet:
                     balance = wallet.first().balance
                 else:
                     balance = 0
 
-                new_balance = balance + order.total_price()
+                new_balance = balance + order_item.total_price()
 
                 Wallet.objects.create(
-                    user = order.order.user,
-                    amount = order.total_price,
-                    balance = new_balance,
-                    transaction_type = 'Credit',
-                    transaction_details = f"Recieved money through Order {status} By Seller"
+                    user=order_item.order.user,
+                    amount=order_item.total_price(),
+                    balance=new_balance,
+                    transaction_type='Credit',
+                    transaction_details=f"Received money through Order {status} By Seller"
                 )
-                order.status = status
-                order.ord_product.stock += order.ord_quantity
-                status_change_time = timezone.now()
-                order.save()
-                order.ord_product.save()
+                order_item.status = status
+                order_item.ord_product.stock += order_item.ord_quantity
+                order_item.save()
+                order_item.ord_product.save()
                 return redirect("adm_orders")
             
             else:
-                order.status = status
-                status_change_time = timezone.now()
-                order.save()
+                order_item.status = status
+                order_item.save()
                 return redirect("adm_orders")
         
         else:
-            order.status = status
-            status_change_time = timezone.now()
-            order.save()
+            order_item.status = status
+            order_item.save()
             return redirect("adm_orders")
         
-    return render(request, 'admin_panel/order_info.html', {'obj':order})
+    return render(request, 'admin_panel/order_info.html', {'obj': order_item})
 
 
 
@@ -381,6 +389,7 @@ def addProductOffer(request):
     if request.method == 'POST':
         prod = request.POST.get('product')
         discounted_price = request.POST.get('discount')
+        print(prod)
 
         offerProduct = Product.objects.get(id=prod)
         offerProduct.Pro_offer = discounted_price

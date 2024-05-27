@@ -336,14 +336,19 @@ select.form-control {
                         <div class="product-item">
                             <a class="product-thumb" href="{% url 'track_order' order.id %}"><img src="{{order.ord_product.images.first.Pro_image.url}}" alt="Product"></a>
                             <div class="product-info">
-                                <h4 class="product-title"><a href="../prod_details/{{order.ord_product.id}}">{{order.ord_product.Pro_name}}</a></h4>
+                                <h4 class="product-title"><a href="{% url 'track_order' order.id %}">{{order.ord_product.Pro_name}}</a><br>
+                                    {% if order.ord_product.stock != 0 and order.ord_product.stock > 5 %} <p style="color: green;">In stock</p> 
+                                    {% elif order.ord_product.stock < 5 %} <p style="color: red;">Limitted stock</p> 
+                                    {% elif order.ord_product.stock == 0 %} <p style="color: red;">Out of stock</p> 
+                                    {% endif %}
+                                </h4>
                             </div>
                         </div>
                     </td>
                     <td class="text-center">
                         <h6>{{order.ord_quantity}}</h6>
                     </td>
-                    <td class="text-center text-lg text-medium">&#8377; {{order.price}}</td>
+                    <td class="text-center text-lg text-medium"><p style="color: green;">&#8377; {{order.price}}</p></td>
 
                     <td class="text-center text-lg text-medium"><span class="badge {% if order.status == "Cancelled" %}text-danger 
                         {% elif order.status == "Delivered" %} text-success {% elif order.status == "Out for delivery" %} text-success 
@@ -500,11 +505,6 @@ select.form-control {
     }
     function paying(orderId,orderPrice,quantity) {
         var csrftoken = getCSRFToken();
-        console.log(orderId)
-        console.log(orderPrice)
-        console.log('entering into the payment');
-        console.log('working');
-        console.log(Number(orderPrice * 100))
         var options = {
             "key": "rzp_test_94QwzUo1UZWOiT", 
             "amount": Number(orderPrice * 100)*Number(quantity), 
@@ -522,7 +522,7 @@ select.form-control {
                 console.log('entered');
                 $.ajax({
                     type: 'post',
-                    url: '../payment_confirm_order/',
+                    url: '../repayment/',
                     data: data,
                     success: function(response) {
                         console.log('its working');

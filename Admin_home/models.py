@@ -2,6 +2,8 @@ from email import header
 from email.policy import default
 from django.db import models
 from django.utils import timezone
+from decimal import Decimal
+from django.core.validators import FileExtensionValidator
 
 # Create your models here.
 
@@ -19,30 +21,25 @@ class Category(models.Model):
         return f'{self.C_name}'
 
 class Product(models.Model):
-    Pro_name = models.CharField(max_length = 100, unique=True)
-    Pro_description = models.TextField(blank = True)
-    Pro_price = models.DecimalField(max_digits = 10, decimal_places = 2)
-    category = models.ForeignKey(Category, null = True, on_delete = models.CASCADE)
-    is_listed = models.BooleanField(default=True) 
-    stock = models.PositiveIntegerField(blank = True, null = True)
+    Pro_name = models.CharField(max_length=100, unique=True)
+    Pro_description = models.TextField(blank=True)
+    Pro_price = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
+    is_listed = models.BooleanField(default=True)
+    stock = models.PositiveIntegerField(blank=True, null=True)
     Pro_offer = models.IntegerField(default=0)
-    
-    
-
 
     def discount(self):
         discount_percentage = 0
-
         if self.Pro_offer > self.category.Cate_offer:
             discount_percentage = self.Pro_offer
         else:
             discount_percentage = self.category.Cate_offer
         return discount_percentage
-    
 
     def discounted_price(self):
         if self.discount() > 0:
-            return  ((self.Pro_price/100 )* self.discount())
+            return self.Pro_price - ((self.Pro_price / Decimal('100')) * Decimal(str(self.discount())))
         else:
             return self.Pro_price
 
@@ -53,7 +50,7 @@ class Product(models.Model):
 
 class Product_Image(models.Model):
     product = models.ForeignKey(Product, on_delete = models.CASCADE, related_name = 'images')
-    Pro_image = models.ImageField(upload_to='Product_images/')
+    Pro_image = models.ImageField(upload_to='Product_images/',validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])])
 
 
     def __str__(self):

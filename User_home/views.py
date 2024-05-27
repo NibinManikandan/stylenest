@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from Admin_home.models import *
+from decimal import Decimal
 from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator
@@ -20,7 +21,7 @@ def Home(request):
 
 # product page
 def Shop(request):
-    products = Product.objects.filter(is_listed=True)
+    products = Product.objects.filter(is_listed=True).all()
     page_number = request.GET.get('page', 1)
     
     paginator = Paginator(products, 12)
@@ -43,10 +44,12 @@ def Product_Details(request, id):
     product = Product.objects.get(id=id)
     cate = Category.objects.filter(is_listed = True)
     image_list = Product_Image.objects.filter(product=product)
-    offer_price = product.Pro_price-product.discounted_price()
+
+    offer_price = product.discounted_price()
+
     context={
-        'products':product,
-        'images':image_list, 
+        'product':product,
+        'images':image_list,
         'cate':cate,
         'offer_price':offer_price,
         }
@@ -68,29 +71,57 @@ def search_products(request):
 
 
 # filtter function
+# def filtter(request):
+#     cat = request.GET.get('categoryy', '0')
+#     sort = request.GET.get('sort')
+
+#     if cat != '0':
+#         products = Product.objects.filter(is_listed = True, category__id = cat).order_by('-id')
+
+#     elif sort == 'low_to_high':
+#         products = Product.objects.filter(is_listed = True).order_by('Pro_price')
+
+#     elif sort == 'high_to_low':
+#         products = Product.objects.filter(is_listed = True).order_by('-Pro_price')
+
+#     else:
+#         products = Product.objects.filter(is_listed = True).order_by('-id')
+
+#     categories = Category.objects.all()
+
+#     context = {
+#         'products':products,
+#         'categories':categories,
+#         'cat':cat,
+#         'sort':sort
+#     }
+
+#     return render(request, 'platform/shop.html', context)
+
+
 def filtter(request):
     cat = request.GET.get('categoryy', '0')
     sort = request.GET.get('sort')
 
+    products = Product.objects.filter(is_listed=True)
+
     if cat != '0':
-        products = Product.objects.filter(is_listed = True, category__id = cat).order_by('-id')
+        products = products.filter(category__id=cat)
 
-    elif sort == 'low_to_high':
-        products = Product.objects.filter(is_listed = True).order_by('Pro_price')
-
+    if sort == 'low_to_high':
+        products = products.order_by('Pro_price')
     elif sort == 'high_to_low':
-        products = Product.objects.filter(is_listed = True).order_by('-Pro_price')
-
+        products = products.order_by('-Pro_price')
     else:
-        products = Product.objects.filter(is_listed = True).order_by('-id')
+        products = products.order_by('-id')
 
     categories = Category.objects.all()
 
     context = {
-        'products':products,
-        'categories':categories,
-        'cat':cat,
-        'sort':sort
+        'products': products,
+        'categories': categories,
+        'cat': cat,
+        'sort': sort
     }
 
     return render(request, 'platform/shop.html', context)

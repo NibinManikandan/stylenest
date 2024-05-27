@@ -1,9 +1,11 @@
 {% extends 'platform/common.html' %}
 {% load static %}
-{% block title %}Wallet{% endblock title %}
-{% block css %}<link href="{% static 'home/css/about.css' %}" rel="stylesheet" />
+{% block title %}
+Wallet
+{% endblock title %}
+{% block css %}
 
-
+<link href="{% static 'home/css/about.css' %}" rel="stylesheet" />
 <style>
     .wallet-container {
       margin-top: 50px;
@@ -40,11 +42,10 @@
           <div >
               <label>Add Amount to Wallet : </label>
               {% csrf_token %}
-
               <div class="input-group w-75 couponcode-wrap">
                 <input type="text" class="form-control me-2" id="amount" name='amount' placeholder="Amount in INR" aria-label="amount" aria-describedby="button-addon2">
                 <div class="input-group-append">
-                <button class="btn btn-black btn-sm add-to-wallet-btn" style="border-radius: 10px;">Add Amount</button>
+                  <button class="btn btn-black btn-sm add-to-wallet-btn" onclick="razor()" style="border-radius: 10px;">Add Amount</button>
                 </div>
               </div>
               
@@ -91,81 +92,83 @@
   </div>
 </div>
 
-  
-  {% endblock content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  function razor() {
+    var amount = $("input[name='amount']").val(); // Changed input type to 'name' attribute
+    var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
 
-  {% block scripts %}
-  <!-- Your existing code here -->
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    if (!amount || isNaN(amount) || amount < 1) {
+      alert("Please enter a valid amount.");
+      return;
+    }
 
-  <script>
-    
-    $(document).ready(function () {
-      $(".add-to-wallet-btn").click(function () {
-        var amount = $("input[type='number']").val();
-
-        var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
-
-        if (
-          amount &&
-          !isNaN(amount) &&
-          parseFloat(amount) > 0 &&
-          /^[0-9]+$/.test(amount) &&
-          parseFloat(amount) <= 100000
-        ) {
-          
-          $.ajax({
-            type: "POST",
-            url: "/add_amount/",
-            data: {
-                amount: amount,
-                csrfmiddlewaretoken: csrfToken,
-            },
-            success: function (data) {
-                console.log("Amount added successfully:", data);
-                var options = {
-                    "key": "rzp_test_94QwzUo1UZWOiT",
-                    "amount": data.amount,
-                    "currency": "INR",
-                    "name": "Acme Corp",
-                    "description": "Test Transaction",
-                    "image": "https://example.com/your_logo",
-                    "order_id": data.payment_id,
-                    "handler": function (responseb) {
-                        console.log(responseb);
-                        // Handle successful payment response
-                    },
-                    "prefill": {
-                        "name": "Gaurav Kumar",
-                        "email": "gaurav.kumar@example.com",
-                        "contact": "9878463524"
-                    },
-                    "notes": {
-                        "address": "Razorpay Corporate Office"
-                    },
-                    "theme": {
-                        "color": "#3399cc"
-                    }
-                };
-                var rzp1 = new Razorpay(options);
-                rzp1.open();
-            },
-            error: function (xhr, status, error) {
-                console.error("Error adding amount:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Money Not Added',
-                    text: 'There was an issue adding money to your account. Please try again later.',
-                });
-            },
-        });
-        
-        } else {
-          alert("Invalid amount entered");
+    $.ajax({
+      type: "POST",
+      url: '../add_amount/',
+      data: {
+        amount: amount,
+        csrfmiddlewaretoken: csrfToken
+      },
+      success: function(data) {
+        if (!data.success) {
+          alert(data.message);
+          return;
         }
-      });
-    });
-  </script>
 
-  {% endblock scripts %}
+        var options = {
+          "key": "rzp_test_F4i5wCsFw7GaJK",
+          "amount": data.amount, // Amount is already in paise
+          "currency": "INR",
+          "name": "styleNest",
+          "description": "Test Transaction",
+          "image": "https://example.com/your_logo",
+          "handler": function (response) {
+            $.ajax({
+              type: "POST",
+              url: '../update_wallet/',
+              data: {
+                csrfmiddlewaretoken: csrfToken
+              },
+              success: function(response) {
+                console.log(response);
+                Swal.fire({
+                  position: "center",
+                  icon: "success",
+                  title: "Payment successful!",
+                  showConfirmButton: false,
+                  timer: 1500
+                }).then(function() {
+                    window.location.reload();
+                  });
+              },
+              error: function(error) {
+                console.log(error);
+                Swal.fire({
+                  position: "center",
+                  icon: "failed",
+                  title: "Payment failed!",
+                  showConfirmButton: false,
+                  timer: 1500
+                }).then(function() {
+                  window.location.reload();
+                });
+              },
+            });
+          },
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+      },
+      error: function(error) {
+        console.log(error);
+        alert("Failed to create Razorpay order!");
+      }
+    });
+  }
+</script>
+
+{% endblock content %}
+
+  

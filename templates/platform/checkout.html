@@ -3,6 +3,12 @@
 
 {% block content %}
 	
+<style>
+	.error-message {
+	  color: red;
+	}
+  </style>
+
 <div class="untree_co-section">
 	<div class="intro-excerpt">
 		<h1 style="text-align: center;">Checkout</h1>
@@ -23,9 +29,9 @@
 		</div>
 			{% endif %}
 		<div class="row">
-		<div class="col-md-6 mb-5 mb-md-0">
+		  <div class="col-md-6 mb-5 mb-md-0">
 			<h2 class="h3 mb-3 text-black">Shipping Details</h2>
-			<div class="p-3 p-lg-5 border bg-white" style="min-height: 500px;">
+			  <div class="p-3 p-lg-5 border bg-white" style="min-height: 500px;">
 				<div class="form-group row col-12">
 
 					{% csrf_token %}
@@ -67,63 +73,72 @@
 
 				<div class="collapse" id="ship_different_address">
 					<div class="py-2">
-					<form action="{% url "ship_to_another" %}" method="POST">
+					<form action="{% url "ship_to_another" %}" method="POST" id="shipToAnother">
 						{% csrf_token %}
 						<div class="form-group row">
-						<div class="col-md-6">
-						  <label for="c_diff_fname" class="text-black">First Name <span class="text-danger">*</span></label>
-						  <input type="text" class="form-control" id="c_diff_fname" name="fname" placeholder="First name">
-						</div>
-		
-						<div class="col-md-6">
-						  <label for="c_diff_lname" class="text-black">Last Name <span class="text-danger">*</span></label>
-						  <input type="text" class="form-control" id="c_diff_lname" name="lname" placeholder="Last name">
-						</div>
-						</div>
-			  
-						<div class="form-group row">
-						  <div class="col-md-12">
-						  <label for="c_address" class="text-black">Address <span class="text-danger">*</span></label>
-						  <textarea class="form-control" type="text" name="c_address" id="exampleFormControlTextarea1" rows="2" placeholder="Street address"></textarea>
-						  </div>
-						</div>
-				  
-						<div class="form-group row">
-						  <div class="col-md-12">
-						  <label for="c_companyname" class="text-black">City <span class="text-danger">*</span></label>
-						  <input type="text" class="form-control" id="c_city" name="city" placeholder="City">
-						  </div>
-						</div>
-						
-						<div class="form-group row">
-						  <div class="col-md-12">
-						  <label for="c_companyname" class="text-black">Landmark <span class="text-danger">*</span></label>
-						  <input type="text" class="form-control" id="c_landmark" name="landmark" placeholder="Landmark">
-						  </div>
-						</div>
-		
-						<div class="form-group row">
-						  <div class="col-md-6">
-							<label for="c_diff_fname" class="text-black">Country <span class="text-danger">*</span></label>
-							<input type="text" class="form-control" id="c_diff_fname" name="country" placeholder="Country">
-						  </div>
-			  
-						<div class="form-group row">
-						<div class="col-md-6">
-						  <label for="c_diff_state_country" class="text-black">State <span class="text-danger">*</span></label>
-						  <input type="text" class="form-control" id="c_diff_state" name="state" placeholder="State">
-						</div>
-						
-						<div class="col-md-6">
-						  <label for="c_diff_postal_zip" class="text-black">Posta / Zip <span class="text-danger">*</span></label>
-						  <input type="text" class="form-control" id="c_diff_postal_zip" name="postal_zip" placeholder="Posta / Zip">
-						</div>
+							<div class="col-md-6">
+								<label for="c_diff_fname" class="text-black">First Name <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="fname" name="fname" placeholder="First name">
+								<div class="error-message"></div>
+							</div>
+			
+							<div class="col-md-6">
+								<label for="c_diff_lname" class="text-black">Last Name <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="lname" name="lname" placeholder="Last name">
+								<div class="error-message"></div>
+							</div>
 						</div>
 			  
-						<div class="col-md-6">
-						  <label for="c_diff_phone" class="text-black">Phone <span class="text-danger">*</span></label>
-						  <input type="text" class="form-control" id="c_diff_phone" name="c_phone" placeholder="Alter native Phone Number">
+						<div class="form-group row">
+							<div class="col-md-12">
+								<label for="c_address" class="text-black">Address <span class="text-danger">*</span></label>
+								<textarea class="form-control" type="text" name="c_address" id="c_address" rows="2" placeholder="Street address"></textarea>
+								<div class="error-message"></div>
+							</div>
 						</div>
+			
+						<div class="form-group row">
+							<div class="col-md-12">
+								<label for="c_companyname" class="text-black">City <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="city" name="city" placeholder="City">
+								<div class="error-message"></div>
+							</div>
+						</div>
+			
+						<div class="form-group row">
+							<div class="col-md-12">
+								<label for="c_companyname" class="text-black">Landmark <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="landmark" name="landmark" placeholder="Landmark">
+								<div class="error-message"></div>
+							</div>
+						</div>
+			
+						<div class="form-group row">
+							<div class="col-md-6">
+								<label for="c_diff_fname" class="text-black">Country <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="country" name="country" placeholder="Country">
+								<div class="error-message"></div>
+							</div>
+			
+							<div class="col-md-6">
+								<label for="c_diff_state_country" class="text-black">State <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="state" name="state" placeholder="State">
+								<div class="error-message"></div>
+							</div>
+						</div>
+			
+						<div class="form-group row">
+							<div class="col-md-6">
+								<label for="c_diff_postal_zip" class="text-black">Postal / Zip <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="postal_zip" name="postal_zip" placeholder="Postal / Zip">
+								<div class="error-message"></div>
+							</div>
+			
+							<div class="col-md-6">
+								<label for="c_diff_phone" class="text-black">Phone <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="c_phone" name="c_phone" placeholder="Alternative Phone Number">
+								<div class="error-message"></div>
+							</div>
 						</div>
 						<hr />
 						<button type="submit" class="btn btn-primary">Add New</button>
@@ -132,11 +147,12 @@
 				</div>
 			    </div>
 			</div>
-			</div>
+		  </div>
 		</div>
 		<!--end section-->
 
 		<!--coupon section-->
+
 		<div class="col-md-6">
 			{% csrf_token %}
 			<div class="row mb-5">
@@ -166,23 +182,25 @@
 				<!--coupons modal-->
 				<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog">
-					  <div class="modal-content">
+					  <div class="modal-content" style="width: 38rem;">
 						<div class="modal-header">
 						  <h5 class="modal-title" id="exampleModalLabel">Availabe Coupons</h5>
 						  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
 							<ul>
-								{% for coupon in coupons %}
-								<div class="container">
-									<div class="label">
-										{{coupon.name}}
+								{% for coupon in valid_coupons %}
+								<div class="card" style="width: 32rem;">
+									<div class="card-body">
+									  <h5 class="card-title">{{coupon.name}}</h5>
+									  <h6 class="card-title">Shop now and save!</h6>
+									  <p class="card-text">Spend at least {{coupon.min_purchase}} and instantly receive a ₹ {{coupon.discount_value}}% discount on your entire order. This amazing deal is valid until {{coupon.expiry_date}}. Don't wait – grab your savings today!</p>
+										<div class="copy-text">
+											<input type="text" class="text" value="{{coupon.code}}" readonly style="border-radius: 5px;"/>
+											<button style="border-radius: 5px;" onclick="copyCouponCode(this)"><i class="fa fa-clone"></i></button>
+										</div>
 									</div>
-									<div class="copy-text">
-										<input type="text" class="text" value="{{coupon.code}}" readonly style="border-radius: 5px;"/>
-										<button style="border-radius: 5px;" onclick="copyCouponCode(this)"><i class="fa fa-clone"></i></button>
-									</div>
-								</div>
+								  </div>
 								{% endfor %}
 							</ul>
 						</div>
@@ -191,10 +209,11 @@
 			  </div>
 			  <!--end modal-->
 
-				</div>
 			</div>
 			</div>
-			<!--coupon end-->
+			</div>
+
+		<!--coupon end-->
 
 			<!--order Section-->
 			<div class="row mb-5">
@@ -219,14 +238,14 @@
 					</tr>
 
 					<tr>
-						<td class="text-black font-weight-bold"><strong>Coupon Offer</strong></td>
-						<td class="text-black coupon-discount">&#8377; 0</td>
-					</tr>
-
-					<tr>
 						<td class="text-black font-weight-bold"><strong>Delivery Charge</strong></td>
 						<td class="text-black"><strong>{% if sub_total < 1000 %} &#8377;  {{delivery_charge}} {% else %}<p style="color: green;">free delivery</p>{% endif %}</strong></td>
 					</tr>
+
+					{% comment %} <tr>
+						<td class="text-black font-weight-bold"><strong>Coupon offer</strong></td>
+						<td class="text-black"><strong>{% if coupon_check %} <p style="color: green;">&#8377; {{discount_amount}}</p> {% else %}<p>&#8377; 0</p>{% endif %}</strong></td>
+					</tr> {% endcomment %}
 
 					<tr>
 						<td class="text-black font-weight-bold"><strong>Order Total</strong></td>
@@ -293,7 +312,7 @@
 
 
 <!--coupon applay-->
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 
 	function getCSRFToken() {
@@ -306,109 +325,258 @@
 		}
 		return '';
 	}
+
+
+	<script>
+		function copyCouponCode(button) {
+			let input = button.parentElement.querySelector(".text");
+			input.select();
+			document.execCommand("copy");
+			showCopyMessage();
+		}
+		
+		function showCopyMessage() {
+			let copyMessage = document.querySelector(".copy-message");
+			copyMessage.classList.add("active");
+			setTimeout(function () {
+				copyMessage.classList.remove("active");
+			}, 2000);
+		}
+	</script>
 	
-
-	function applyCoupon() {
-		var couponCode = $('#couponCode').val();
-		console.log(couponCode);
-
-		$.ajax({
-			url: '../apply_coupons/',
-			type: 'POST',
-			data: {
-				couponCode: couponCode,
-				csrfmiddlewaretoken: getCSRFToken()
-			},
-			success: function (data) {
-				console.log(data);
-
-				if ('error' in data) {
-					$('#couponError').text(data.error);
-				} else {
-					$('.coupon-discount').text('₹ ' + data.discount_amount);
-					$('.final-total').text('₹ ' + data.total);
-
-					
-					$('#couponCode').val(couponCode); 
-
-					$('#couponError').text('');
+	
+	<!--coupon applay-->
+	
+	<script>
+	
+		function getCSRFToken() {
+			var cookies = document.cookie.split(';');
+			for (var i = 0; i < cookies.length; i++) {
+				var cookie = cookies[i].trim();
+				if (cookie.startsWith('csrftoken=')) {
+					return cookie.substring('csrftoken='.length, cookie.length);
+				}
+			}
+			return '';
+		}
+		
+	
+		function applyCoupon() {
+			var couponCode = $('#couponCode').val();
+			console.log(couponCode);
+	
+			$.ajax({
+				url: '../apply_coupons/',
+				type: 'POST',
+				data: {
+					couponCode: couponCode,
+					csrfmiddlewaretoken: getCSRFToken()
+				},
+				success: function (data) {
+					console.log(data);
+	
+					if ('error' in data) {
+						$('#couponError').text(data.error);
+					} else {
+						$('.coupon-discount').text('₹ ' + data.discount_amount);
+						$('.final-total').text('₹ ' + data.total);
+	
+						
+						$('#couponCode').val(couponCode); 
+	
+						$('#couponError').text('');
+						Swal.fire({
+							icon: 'success',
+							title: "Coupon Applied Successfully",
+							confirmButtonText: 'OK',
+						});
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.error('Error:', errorThrown);
+					var errorResponse = JSON.parse(jqXHR.responseText);
+					var errorMessage = errorResponse.error;
 					Swal.fire({
-						icon: 'success',
-						title: "Coupon Applied Successfully",
+						icon: 'error',
+						title: "Error",
+						text: errorMessage,
 						confirmButtonText: 'OK',
 					});
 				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.error('Error:', errorThrown);
-				var errorResponse = JSON.parse(jqXHR.responseText);
-				var errorMessage = errorResponse.error;
-				Swal.fire({
-					icon: 'error',
-					title: "Error",
-					text: errorMessage,
-					confirmButtonText: 'OK',
-				});
-			}
-		});
-	}
-
-	function removeCoupon() {
-		var couponCode = $('#couponCode').val();
-		console.log("clicked");
-
-		$.ajax({
-			url: '../remove_coupon/',
-			type: 'POST',
-			data: {
-				couponCode: couponCode,
-				csrfmiddlewaretoken: getCSRFToken()
-			},
-			success: function (data) {
-				console.log(data);
-
-				if ('error' in data) {
-					$('#couponError').text(data.error);
-					
-				}else {
-					$('.coupon-discount').text('₹ '+ 0);
-					$('.final-total').text('₹ '+data.total);
-
-					// Clear the value of the coupon code input field
-					$('#couponCode').val(''); // Remove the coupon code
-
-					$('#couponError').text('');
+			});
+		}
+	
+		function removeCoupon() {
+			var couponCode = $('#couponCode').val();
+			console.log("clicked");
+	
+			$.ajax({
+				url: '../remove_coupon/',
+				type: 'POST',
+				data: {
+					couponCode: couponCode,
+					csrfmiddlewaretoken: getCSRFToken()
+				},
+				success: function (data) {
+					console.log(data);
+	
+					if ('error' in data) {
+						$('#couponError').text(data.error);
+						
+					}else {
+						$('.coupon-discount').text('₹ '+ 0);
+						$('.final-total').text('₹ '+data.total);
+	
+						// Clear the value of the coupon code input field
+						$('#couponCode').val(''); // Remove the coupon code
+	
+						$('#couponError').text('');
+						Swal.fire({
+							icon: 'success',
+							title: "Coupon Removed Successfully",
+							confirmButtonText: 'OK',
+						});
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.error('Error:', errorThrown);
+					var errorResponse = JSON.parse(jqXHR.responseText);
+					var errorMessage = errorResponse.error;
 					Swal.fire({
-						icon: 'success',
-						title: "Coupon Removed Successfully",
+						icon: 'error',
+						title: "Error",
+						text: errorMessage,
 						confirmButtonText: 'OK',
 					});
 				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.error('Error:', errorThrown);
-				var errorResponse = JSON.parse(jqXHR.responseText);
-				var errorMessage = errorResponse.error;
-				Swal.fire({
-					icon: 'error',
-					title: "Error",
-					text: errorMessage,
-					confirmButtonText: 'OK',
-				});
-			}
-		});
-	}
+			});
+		}
+	
+	</script>
 
+<!--ship to another validation-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#shipToAnother').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var fname = $('#fname').val().trim();
+            var lname = $('#lname').val().trim();
+            var c_address = $('#c_address').val().trim();
+            var city = $('#city').val().trim();
+            var landmark = $('#landmark').val().trim();
+            var country = $('#country').val().trim();
+            var state = $('#state').val().trim();
+            var postal_zip = $('#postal_zip').val().trim();
+            var c_phone = $('#c_phone').val().trim();
+            var isValid = true;
+
+            if (fname.length < 4) {
+                $('#fname').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#fname').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (lname.length < 4) {
+                $('#lname').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#lname').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (c_address.length < 4) {
+                $('#c_address').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#c_address').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (city.length < 4) {
+                $('#city').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#city').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (landmark.length < 4) {
+                $('#landmark').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#landmark').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (country.length < 4) {
+                $('#country').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#country').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (state.length < 4) {
+                $('#state').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#state').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (!$.isNumeric(postal_zip) || postal_zip.length !== 6) {
+                $('#postal_zip').siblings('.error-message').addClass('error').text('Enter a valid Postal / Zip code (6 digits)');
+                isValid = false;
+            } else {
+                $('#postal_zip').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (!$.isNumeric(c_phone) || c_phone.length !== 10) {
+                $('#c_phone').siblings('.error-message').addClass('error').text('Enter a valid Phone number (10 digits)');
+                isValid = false;
+            } else {
+                $('#c_phone').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function (response) {
+                    Swal.fire({
+                        position: "top-center",
+                        icon: "success",
+                        title: 'Address added successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(function() {
+                        window.location.reload();
+                    });
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr);
+                    alert('Error occurred while submitting the form. Please try again.');
+                }
+            });
+        });
+
+        $('.form-control').focus(function () {
+            $(this).siblings('.error-message').removeClass('error').text('');
+        });
+    });
 </script>
-
 
 <!--place the order-->
 
 <script>
     function place_order() {
 		var couponCode = $('#couponCode').val();
+console.log(couponCode);
+
 		var selectedAddress = $("input[name='select_address']:checked").val();
 		var selectedPayment = $("input[name='payment']:checked").val();
+		console.log(selectedPayment)
 		var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
 
 		if (!selectedAddress) {
@@ -460,7 +628,6 @@
 					url: '../place_order_wallet/',
 					data: data,
 					success: function(response) {
-						console.log('success');
 						if (response.success) {
 							console.log('done');
 							window.location.href='../view_order/'
@@ -475,7 +642,6 @@
 					}
 				});
 			}else if (selectedPayment === 'razorepay') {
-				console.log('entering into the payment')
 				var data = {
 					
 					selected_address:selectedAddress,
@@ -489,9 +655,8 @@
 					data: data,
 					success:function (response){
 						var order_id=response.order_id
-						console.log('working')
 						var options = {
-							"key": "rzp_test_94QwzUo1UZWOiT", 
+							"key": "rzp_test_F4i5wCsFw7GaJK", 
 							"amount": response.amount, 
 							"currency": "INR",
 							"name": "StyleNest", 
@@ -500,7 +665,6 @@
 							"callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
 							
 							"handler": function (responseb){
-								console.log(response);
 								// alert(responseb.razorpay_order_id);
 								//alert(responseb.razorpay_payment_id);
 								// alert(responseb.razorpay_signature);
@@ -512,13 +676,11 @@
 									total_amount: responseb.amount,	
 									payment_id : responseb.razorpay_payment_id,
 								};
-								console.log('entered')
 								$.ajax({
 									type: 'post',
 									url: '../payment_confirm/',
 									data: data,
 									success: function(response) {
-										console.log('its working');
 										if (response.success) {
 											window.location.href = '../view_order/';
 										} else {

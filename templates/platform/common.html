@@ -26,9 +26,10 @@
     <link href="{% static 'css/tiny-slider.css' %}" rel="stylesheet" />
     <link
       rel="stylesheet"
-      href="{% static 'css/style_1.css' %}"
+      href={% static 'css/style_1.css' %}
       type="text/css"
     />
+    
     <title>StyleNest</title>
     
   </head>
@@ -42,82 +43,66 @@
     </style>
 
     <!-- Start Header/Navigation -->
-    <nav
-      class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
-      arial-label="Furni navigation bar"
-    >
-      
-    <div class="ms-3" style="width: 40%;">
-      <div class="d-flex align-items-center">
-          <a href="{% url 'home' %}" class="navbar-brand" href="home.html">StyleNest</a>
-          <div class="container-fluid">
-              <form class="d-flex" action="../../search_products" method="get">
-                  <div class="input-group">
-                      <input class="form-control form-control-sm me-2" name="search" type="search" placeholder="Search" aria-label="Search" style="height: 35px; border-radius: 10px;">
-                      <button class="btn btn-outline-success btn-sm" type="submit" style="height: 35px; line-height: 0; border-radius: 10px;">Search</button>
-                  </div>
-              </form>
-          </div>
-      </div>
-  </div>
-
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarsFurni"
-          aria-controls="navbarsFurni"
-          aria-expanded="false"
-          aria-label="Toggle navigation">
+    <nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+      <div class="container-fluid">
+        <a href="{% url 'home' %}" class="navbar-brand">StyleNest</a>
+    
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div class="collapse navbar-collapse" id="navbarsFurni" style="width: 40%;">
-          <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-            
+    
+        <div class="collapse navbar-collapse" id="navbarsFurni">
+          <form class="d-flex ms-auto" action="../../search_products" method="get">
+            <div class="input-group">
+              <input class="form-control form-control-sm me-2" name="search" type="search" placeholder="Search" aria-label="Search" style="height: 20px; font-size: 0.8rem; border-radius: 10px;">
+              <i class="fas fa-search" style="font-size: 1.5rem; cursor: pointer; color: black;" onclick="this.closest('form').submit();"></i>
+            </div>
+          </form>
+    
+          <ul class="custom-navbar-nav navbar-nav">
             <li><a class="nav-link" href="{% url 'home' %}">Home</a></li>
             <li><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
             <li><a class="nav-link" href="{% url "about_us" %}">About us</a></li>
             <li><a class="nav-link" href="{% url "contact" %}">Contact us</a></li>
           </ul>
-
-          <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5  me-5">
+    
+          <ul class="custom-navbar-cta navbar-nav">
             <li>
-                {% if user.is_authenticated %}
-                <div class="btn-group">
-                  <button type="button" class="btn btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user"></i>
-                    {{user.first_name}}
-                  </button>
-
-                    <ul class="dropdown-menu" aria-labelledby="userDropdown">                      
-                      <li><a class="dropdown-item" href="{% url 'cart_page' %}"><i class="fas fa-cart-shopping"></i> Cart</a></li>
-                      <li><a class="dropdown-item" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
-                      <li><a class="dropdown-item" href="{% url 'orders' %}"><i class="fas fa-box-open"></i> Order Details</a></li>
-                      <li><a class="dropdown-item" href="{% url 'wallet' %}"><i class="fas fa-wallet"></i> Wallet</a></li>
-                      <li><a class="dropdown-item" href="{% url 'my_details' %}"><i class="fas fa-user"></i> Profile Info</a></li>
-                      <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                    </ul>
-                </div>
-                
-                {% else %}
-                <div class="btn-group dropstart">
-                  <a class="nav-link dropdown-toggle" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static '/images/user.svg' %}"/>
-                  </a>
-                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="{% url 'cart_page' %}"><i class="fas fa-cart-shopping"></i> Cart</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-heart"></i> Wishlist</a></li>
-                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-box-open"></i> My Order</a></li>
-                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-wallet"></i> Wallet</a></li>
-                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-user"></i> My Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-right-to-bracket"></i> Login</a></li>
-                    </ul>
-                </div>
-                {% endif %}
+              {% if user.is_authenticated %}
+              <div class="btn-group">
+                <button type="button" class="btn btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-user"></i>
+                  {{user.first_name}}
+                </button>
+    
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'cart_page' %}"><i class="fas fa-cart-shopping"></i> Cart</a></li>
+                  <li><a class="dropdown-item" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+                  <li><a class="dropdown-item" href="{% url 'orders' %}"><i class="fas fa-box-open"></i> Order Details</a></li>
+                  <li><a class="dropdown-item" href="{% url 'wallet' %}"><i class="fas fa-wallet"></i> Wallet</a></li>
+                  <li><a class="dropdown-item" href="{% url 'my_details' %}"><i class="fas fa-user"></i> Profile Info</a></li>
+                  <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+              </div>
+    
+              {% else %}
+              <div class="btn-group dropstart">
+                <a class="nav-link dropdown-toggle" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="{% static '/images/user.svg' %}"/>
+                </a>
+    
+                <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                  <li><a class="dropdown-item" href="{% url 'cart_page' %}"><i class="fas fa-cart-shopping"></i> Cart</a></li>
+                  <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+                  <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-box-open"></i> My Order</a></li>
+                  <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-wallet"></i> Wallet</a></li>
+                  <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                  <li><a class="dropdown-item" href="{% url 'Userlogin' %}"><i class="fas fa-right-to-bracket"></i> Login</a></li>
+                </ul>
+              </div>
+              {% endif %}
             </li>
-        </ul>
-        
+          </ul>
         </div>
       </div>
     </nav>
@@ -130,10 +115,6 @@
     <!-- Start Footer Section -->
     <footer class="footer-section">
       <div class="container relative">
-        <div class="sofa-img" style="margin-top: 30px;">
-          <img src="{% static '/images/sofa.png' %}" alt="Image" class="img-fluid" />
-      </div>
-
         <div class="row">
           <div class="col-lg-8">
             <div class="subscription-form">
