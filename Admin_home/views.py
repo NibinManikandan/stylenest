@@ -1,16 +1,8 @@
-from ast import Expression, If
 from datetime import datetime, timedelta
 from decimal import Decimal
 from io import BytesIO
-from multiprocessing import context
-from re import template
-from tkinter import font
-from urllib import response
-from django.db.models import Q  
 from django.utils import timezone
-from tkinter.tix import Tree
-from django.db.models import Sum, F, Count, ExpressionWrapper, DecimalField
-from unicodedata import category
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from Admin_home.models import Banner, Category, Product, Product_Image
 from django.views.decorators.cache import cache_control
@@ -22,8 +14,6 @@ from userAuth.models import CustomUser
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from wallet.models import Wallet
-from django.db.models.functions import TruncMonth, TruncYear
-import csv
 from django.views import View
 from django.template.loader import get_template
 from xhtml2pdf import pisa
