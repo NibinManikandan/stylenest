@@ -270,7 +270,6 @@ def Edit_product(request, id):
     pro_img = Product_Image.objects.all()
     context = {'Cat': Category_list, 'Prod': prod,}
     cart = Cart.objects.filter(product=prod).all()
-    print(cart)
 
     if request.method =='POST':
         prod.Pro_name = request.POST.get('name')
@@ -389,8 +388,6 @@ def addProductOffer(request):
     if request.method == 'POST':
         prod = request.POST.get('product')
         discounted_price = request.POST.get('discount')
-        print(prod)
-
         offerProduct = Product.objects.get(id=prod)
         offerProduct.Pro_offer = discounted_price
         offerProduct.save()
@@ -554,7 +551,6 @@ class DownloadPDF2(View):
 class DownloadPDF1(View):
     def get(self, request, *args, **kwargs):
 
-        
         data = {'sales': Order.objects.filter(order_date__date__gte=request.session.get('from'),order_date__date__lte=request.session.get('to')).order_by('-order_date').all(),'from':request.session.get('from'),'to':request.session.get('to')}
         pdf = render_to_pdf('admin_panel/report.html', data)
 
@@ -566,7 +562,6 @@ class DownloadPDF1(View):
         response['Content-Disposition'] = content
 
         return response
-
 
 
 

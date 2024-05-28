@@ -71,7 +71,6 @@ def change_password(request):
                         user.save()
                         logout(request)
                         
-                        print('password changed')
 
                         return JsonResponse({'success': True, 'message': 'Password changed successfully.'})
                     else:
