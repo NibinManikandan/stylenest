@@ -2,89 +2,96 @@
 {% load static %}	
 {% block content %}
 
-<div class="intro-excerpt" style="margin-top: 40px;">
-  <h1 style='text-align: center;" aria-hidden="true"></i>'>Shop</h1>
-</div>
-
-<div class="untree_co-section product-section before-footer-section">
-  <div class="btn-group dropend" style="bottom: 70px; margin-left: 110px">
-    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      Sorted By
-    </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'default')">All</a></li>
-        <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'low_to_high')">Price low to high</a></li>
-        <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'high_to_low')">Price high to low</a></li>
-    </ul>
+<div class="intro-excerpt mt-3">
+    <h1 class="text-center p-3">Shop</h1>
   </div>
-
-  <!-- Split dropend button -->
-  <div class="btn-group dropend" style="bottom: 70px; padding-left: 10px;">
-    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        Filter
-    </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="../../filtter?categoryy=0">All Products</a></li>
-        {% for category in categories %}
-        <li><a class="dropdown-item" href="../../filtter?categoryy={{category.id}}">{{category.C_name}}</a></li>
-        {% endfor %}
-    </ul>   
-  </div>
-
-<div class="container">
-  <div class="row">
-    {% for product in products %}
-    <div class="col-12 col-md-3 col-lg-3 mb-3">
-        <a class="product-item" href="../prod_details/{{ product.id }}">
-            <img src="{{ product.images.all.0.Pro_image.url }}" class="img-fluid product-thumbnail" alt="{{ product.Pro_name }}">
-            <h3 class="product-title">{{ product.Pro_name }}</h3>
-            <h6>
-              <p style="color: red;">{% if product.stock == 0 %}Out of Stock {% elif product.stock <= 5 %}Limited stocks are available{% endif %}</p>
-            </h6>
-            <h6 style="color: green;">
-                {% if product.Pro_offer > 0 or product.category.Cate_offer < product.Pro_offer %}
-                    &#8595;{{ product.Pro_offer }} % off
-                {% elif product.category.Cate_offer > product.Pro_offer %}
-                    &#8595;{{ product.category.Cate_offer }}% off
-                {% endif %}
-            </h6>
-            <strong class="product-price">&#8377; {{ product.Pro_price }}</strong>
-        </a>
+  
+  <div class="untree_co-section product-section before-footer-section" style="padding-top: 0!important;">
+    <div class="d-flex justify-content-center mb-5">
+      <div class="btn-group dropend me-2">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Sorted By
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'default')">All</a></li>
+          <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'low_to_high')">Price low to high</a></li>
+          <li><a class="dropdown-item" href="#" onclick="updateFilter('sort', 'high_to_low')">Price high to low</a></li>
+        </ul>
+      </div>
+  
+      <div class="btn-group dropend">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Filter
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="../../filtter?categoryy=0">All Products</a></li>
+          {% for category in categories %}
+          <li><a class="dropdown-item" href="../../filtter?categoryy={{category.id}}">{{category.C_name}}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
-    {% endfor %}
-  </div>
-</div>
-
-<div aria-label="Page navigation example">
-  <ul class="pagination justify-content-center">
-      {% if products.has_previous %}
+  
+    <div class="container">
+      <div class="row">
+        {% for product in products %}
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <a class="product-item" href="../prod_details/{{ product.id }}">
+            <img src="{{ product.images.all.0.Pro_image.url }}" class="img-fluid product-thumbnail product-image" alt="{{ product.Pro_name }}">
+            <h5 class="product-title product-name">{{ product.Pro_name }}</h5>
+            <h6>
+              <p class="product-stock" style="color: red;">
+                {% if product.stock == 0 %}
+                  Out of Stock 
+                {% elif product.stock <= 5 %}
+                  Limited stocks are available
+                {% endif %}
+              </p>
+            </h6>
+            <h6 class="product-offer" style="color: green;">
+              {% if product.Pro_offer > 0 or product.category.Cate_offer < product.Pro_offer %}
+                &#8595;{{ product.Pro_offer }} % off
+              {% elif product.category.Cate_offer > product.Pro_offer %}
+                &#8595;{{ product.category.Cate_offer }}% off
+              {% endif %}
+            </h6>
+            <strong class="product-price" style="font-size: 14px;">&#8377; {{ product.Pro_price }}</strong>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  
+    <div aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        {% if products.has_previous %}
           <li class="page-item">
-              <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+            <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
           </li>
-      {% else %}
+        {% else %}
           <li class="page-item disabled">
-              <span class="page-link">Previous</span>
+            <span class="page-link">Previous</span>
           </li>
-      {% endif %}
-      
-      {% for num in products.paginator.page_range %}
+        {% endif %}
+        
+        {% for num in products.paginator.page_range %}
           <li class="page-item {% if products.number == num %}active{% endif %}">
-              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            <a class="page-link" href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.categoryy %}&categoryy={{ request.GET.categoryy }}{% endif %}">{{ num }}</a>
           </li>
-      {% endfor %}
-      
-      {% if products.has_next %}
+        {% endfor %}
+        
+        {% if products.has_next %}
           <li class="page-item">
-              <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+            <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
           </li>
-      {% else %}
+        {% else %}
           <li class="page-item disabled">
-              <span class="page-link">Next</span>
+            <span class="page-link">Next</span>
           </li>
-      {% endif %}
-  </ul>
-</div>
-</div>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+5hb7O6lI5H/t6RVCe2xzLR+svAv9SJBRQ+w5XQ" crossorigin="anonymous"></script>
 
@@ -95,5 +102,37 @@
         window.location.href = url.toString();
     }
 </script>
+
+<style>
+    /* Adjust the product image and text sizes for desktop view */
+    @media (min-width: 768px) {
+      .product-image {
+        height: 250px;
+      }
+      .product-title {
+        font-size: 18px;
+      }
+      .product-stock,
+      .product-offer,
+      .product-price {
+        font-size: 16px;
+      }
+    }
+  
+    /* Adjust the product image and text sizes for mobile view */
+    @media (max-width: 767.98px) {
+      .product-image {
+        height: 150px;
+      }
+      .product-title {
+        font-size: 14px;
+      }
+      .product-stock,
+      .product-offer,
+      .product-price {
+        font-size: 12px;
+      }
+    }
+  </style>
 
 {% endblock %}

@@ -70,34 +70,6 @@ def search_products(request):
 
 
 
-# filtter function
-# def filtter(request):
-#     cat = request.GET.get('categoryy', '0')
-#     sort = request.GET.get('sort')
-
-#     if cat != '0':
-#         products = Product.objects.filter(is_listed = True, category__id = cat).order_by('-id')
-
-#     elif sort == 'low_to_high':
-#         products = Product.objects.filter(is_listed = True).order_by('Pro_price')
-
-#     elif sort == 'high_to_low':
-#         products = Product.objects.filter(is_listed = True).order_by('-Pro_price')
-
-#     else:
-#         products = Product.objects.filter(is_listed = True).order_by('-id')
-
-#     categories = Category.objects.all()
-
-#     context = {
-#         'products':products,
-#         'categories':categories,
-#         'cat':cat,
-#         'sort':sort
-#     }
-
-#     return render(request, 'platform/shop.html', context)
-
 
 def filtter(request):
     cat = request.GET.get('categoryy', '0')

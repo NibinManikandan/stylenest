@@ -1,23 +1,11 @@
-import code
-from ctypes.wintypes import PINT
 from datetime import timedelta
-from email import message
-from genericpath import exists
-from itertools import product
-from lib2to3.fixes.fix_input import context
-from math import prod
-import re
-from urllib import response
 from django.shortcuts import render,redirect,get_object_or_404
-from django.http import JsonResponse,HttpResponse
-from django.conf import settings
+from django.http import JsonResponse
 from coupon.models import CouponUsage, Coupons
 from wallet.models import Wallet
 from .models import Cart
 from userAuth.models import *
 from Admin_home.models import *
-from django.contrib import messages
-from decimal import Decimal
 from django.utils import timezone
 from datetime import timedelta, datetime
 from Userprofile.models import *
@@ -61,7 +49,7 @@ def add_to_cart(request):
             else:
                 return JsonResponse({'success': False, 'status': "Product is out of stock"})
         else:
-            return redirect('Userlogin')
+            return JsonResponse({'success': False, 'status': "Please login to continue."})
     else:
         return render(request, 'platform/home.html')
 

@@ -102,9 +102,14 @@ def user_Signup(request):
         # Check if phone number is valid (e.g., contains only digits and has a length of 10)
         if not phone.isdigit() or len(phone) != 10:
             return redirect('signup')
+        
+        if CustomUser.objects.filter(phone=phone).exists():
+            messages.info(request, 'This E-mail is alreday exist.')
+            return redirect('signup')
 
         # Check if email is already registered
         if CustomUser.objects.filter(email=email).exists():
+            messages.info(request, 'This E-mail is alreday exist.')
             return redirect('signup')
         
         if CustomUser.objects.filter(phone=phone).exists():

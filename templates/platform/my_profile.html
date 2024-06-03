@@ -461,64 +461,75 @@
   
   <!--change password validation-->
   <script>
-    function changePassword() {
-      console.log('entered')
-      var old_pass = document.getElementById('old_pass').value;
-      var new_pass = document.getElementById('new_pass').value;
-      var cnf_new_pass = document.getElementById('cnf_new_pass').value;
-      
-      var passwordPattern = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
-  
-      if (!passwordPattern.test(new_pass)) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Password',
-          text: 'Password Doesn\'t match',
-        });
-        return;
-      }
-  
-      var data = {
-        'old_pass': old_pass,
-        'new_pass': new_pass,
-        'cnf_new_pass': cnf_new_pass,
-        'csrfmiddlewaretoken': '{{ csrf_token }}'
-      };
-  
-      $.ajax({
-        type: 'POST',
-        url: '../change_password/',
-        data: data,
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: response.message,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/Userlogin/';
-                    }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'false',
-                    title: 'Failed to change password',
-                    text: response.message,
-                });
-            }
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Failed to change password',
-                text: 'Something went wrong. Please try again later.',
-            });
-        }
-    });
-    }
-  </script>
+    $(document).ready(function () {
+        $('#editDetailsForm').on('submit', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var firstName = $('#firstName').val().trim();
+            var lastName = $('#lastName').val().trim();
+            var phone = $('#phone').val().trim();
 
+            var isValid = true;
+
+            if (firstName.length < 4) {
+                $('#firstName').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#firstName').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (lastName.length < 4) {
+                $('#lastName').siblings('.error-message').addClass('error').text('Minimum 4 characters required');
+                isValid = false;
+            } else {
+                $('#lastName').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (!$.isNumeric(phone) || phone.length !== 10) {
+                $('#phone').siblings('.error-message').addClass('error').text('Enter a valid Phone number (10 digits)');
+                isValid = false;
+            } else {
+                $('#phone').siblings('.error-message').removeClass('error').text('');
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function (response) {
+                    Swal.fire({
+                        position: "top-center",
+                        icon: "success",
+                        title: 'Profile details updated successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(function() {
+                        window.location.reload();
+                    });
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr);
+                    if (xhr.status === 400) {
+                        var errors = xhr.responseJSON;
+                        $.each(errors, function (key, value) {
+                            $('#' + key).siblings('.error-message').addClass('error').text(value[0]);
+                        });
+                    } else {
+                        alert('Error occurred while submitting the form. Please try again.');
+                    }
+                }
+            });
+        });
+
+        $('.form-control').focus(function () {
+            $(this).siblings('.error-message').removeClass('error').text('');
+        });
+    });
+</script>
   <!--add address validation-->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script>

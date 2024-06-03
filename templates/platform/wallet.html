@@ -8,88 +8,101 @@ Wallet
 <link href="{% static 'home/css/about.css' %}" rel="stylesheet" />
 <style>
     .wallet-container {
-      margin-top: 50px;
-      margin-bottom: 20px;
+        margin-top: 50px;
+        margin-bottom: 20px;
+    }
+    .balance-section p, .balance-section h1 {
+        margin: 0;
+    }
+    .balance-section .form-group {
+        margin-bottom: 0;
+    }
+    @media (max-width: 576px) {
+        .balance-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .balance-section .form-group {
+            margin-top: 15px;
+            width: 100%;
+        }
+        .balance-section .input-group {
+            width: 100%;
+        }
     }
 </style>
 
 {% endblock css %}
 
-
 {% block content %}
-  
-  <section id="center" class="center_o pt-4 pb-4 bg-light" style="margin: 20px;">
+
+<section id="center" class="center_o pt-4 pb-4 bg-light" style="margin: 20px;">
     <div class="container-xl">
-      <div class="row center_o1 text-center">
-       <div class="col-md-12">
-         <h1>My Wallet</h1>
-       </div>
-      </div>
+        <div class="row center_o1 text-center">
+            <div class="col-md-12">
+                <h1>My Wallet</h1>
+            </div>
+        </div>
     </div>
-  </section>
-  
-  
+</section>
+
 <div class="container" style="margin-top: 20px;">
-  <div class="container wallet-container ">
-    <div class="row justify-content-center">
-      <!-- Balance Section -->
-      <div class="col-10 mb-5">
-        <div class="balance-section d-flex justify-content-between align-items-center">
-          <div >
-              <p>Wallet Balance</p>
-              <h1>&#8377;{{balance}}</h1>
-          </div>
-          <div >
-              <label>Add Amount to Wallet : </label>
-              {% csrf_token %}
-              <div class="input-group w-75 couponcode-wrap">
-                <input type="text" class="form-control me-2" id="amount" name='amount' placeholder="Amount in INR" aria-label="amount" aria-describedby="button-addon2">
-                <div class="input-group-append">
-                  <button class="btn btn-black btn-sm add-to-wallet-btn" onclick="razor()" style="border-radius: 10px;">Add Amount</button>
+    <div class="container wallet-container">
+        <div class="row justify-content-center">
+            <!-- Balance Section -->
+            <div class="col-12 mb-5">
+                <div class="balance-section d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="flex-grow-1 mb-3 mb-md-0">
+                        <p>Wallet Balance</p>
+                        <h1>&#8377;{{balance}}</h1>
+                    </div>
+                    <div class="flex-grow-1 mb-3 mb-md-0">
+                        <label>Add Amount to Wallet:</label>
+                        <form class="form-group">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" class="form-control me-2" id="amount" name='amount' placeholder="Amount in INR" aria-label="amount" aria-describedby="button-addon2">
+                                <button class="btn btn-black btn-sm add-to-wallet-btn" type="button" onclick="razor()" style="border-radius: 10px;">Add Amount</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-              </div>
-              
-          </div>
-          <!-- Add more balance-related information or actions here -->
+            </div>
+
+            <!-- History List Section -->
+            <div class="col-lg-12">
+                <div class="history-list mb-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Payment History</h4>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Payment Details</th>
+                                        <th>Payment Type</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in wallett %}
+                                    <tr>
+                                        <td>{{item.date.date}}</td>
+                                        <td>{{item.date.time}}</td>
+                                        <td>{{item.transaction_details}}</td>
+                                        <td class="fw-bold {% if item.transaction_type == 'Credit' %}text-success{% else %}text-danger{% endif %}">{{item.transaction_type}}</td>
+                                        <td>&#8377; {{item.amount}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-  
-      <!-- History List Section -->
-      
-      <div class="col-lg-12 ">
-          
-          <center>
-        <div class="history-list col-10 mb-5">
-          <table class="table">
-            <h4>Payment History</h4>
-              <thead>
-                
-                <tr>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Payment Details</th>
-                  <th>Payment Type</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in wallett %}
-                <tr>
-                  <td>{{item.date.date}}</td>
-                  <td>{{item.date.time}}</td>
-                  <td>{{item.transaction_details}}</td>
-                  <td class= "fw-bold {% if item.transaction_type == 'Credit' %}text-success{% else %}text-danger{% endif %}">{{item.transaction_type}}</td>
-                  <td>&#8377; {{item.amount}}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-        </div>
-      </center>
-      
-      </div>
-    </div>  
-  </div>
+    </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

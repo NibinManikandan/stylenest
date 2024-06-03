@@ -181,32 +181,35 @@
 
 				<!--coupons modal-->
 				<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-					  <div class="modal-content" style="width: 38rem;">
-						<div class="modal-header">
-						  <h5 class="modal-title" id="exampleModalLabel">Availabe Coupons</h5>
-						  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<ul>
-								{% for coupon in valid_coupons %}
-								<div class="card" style="width: 32rem;">
-									<div class="card-body">
-									  <h5 class="card-title">{{coupon.name}}</h5>
-									  <h6 class="card-title">Shop now and save!</h6>
-									  <p class="card-text">Spend at least {{coupon.min_purchase}} and instantly receive a ₹ {{coupon.discount_value}}% discount on your entire order. This amazing deal is valid until {{coupon.expiry_date}}. Don't wait – grab your savings today!</p>
-										<div class="copy-text">
-											<input type="text" class="text" value="{{coupon.code}}" readonly style="border-radius: 5px;"/>
-											<button style="border-radius: 5px;" onclick="copyCouponCode(this)"><i class="fa fa-clone"></i></button>
+					<div class="modal-dialog modal-dialog-centered modal-lg">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLabel">Available Coupons</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div class="row">
+									{% for coupon in valid_coupons %}
+									<div class="col-12 mb-3">
+										<div class="card h-100">
+											<div class="card-body">
+												<h5 class="card-title">{{ coupon.name }}</h5>
+												<h6 class="card-title">Shop now and save!</h6>
+												<p class="card-text">Spend at least ₹{{ coupon.min_purchase }} and instantly receive a {{ coupon.discount_value }}% discount on your entire order. This amazing deal is valid until {{ coupon.expiry_date }}. Don't wait – grab your savings today!</p>
+												<div class="copy-text d-flex">
+													<input type="text" class="form-control me-2" value="{{ coupon.code }}" readonly />
+													<button class="btn btn-secondary" onclick="copyCouponCode(this)"><i class="fa fa-clone"></i></button>
+												</div>
+											</div>
 										</div>
 									</div>
-								  </div>
-								{% endfor %}
-							</ul>
+									{% endfor %}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-			  </div>
+				
 			  <!--end modal-->
 
 			</div>
@@ -241,11 +244,6 @@
 						<td class="text-black font-weight-bold"><strong>Delivery Charge</strong></td>
 						<td class="text-black"><strong>{% if sub_total < 1000 %} &#8377;  {{delivery_charge}} {% else %}<p style="color: green;">free delivery</p>{% endif %}</strong></td>
 					</tr>
-
-					{% comment %} <tr>
-						<td class="text-black font-weight-bold"><strong>Coupon offer</strong></td>
-						<td class="text-black"><strong>{% if coupon_check %} <p style="color: green;">&#8377; {{discount_amount}}</p> {% else %}<p>&#8377; 0</p>{% endif %}</strong></td>
-					</tr> {% endcomment %}
 
 					<tr>
 						<td class="text-black font-weight-bold"><strong>Order Total</strong></td>

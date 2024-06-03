@@ -33,20 +33,31 @@ def my_details(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_details(request):
     if request.user.is_authenticated:
-        user = CustomUser.objects.filter(email = request.user).first()
+        user = CustomUser.objects.filter(email=request.user.email).first()
         if request.method == "POST":
             fname = request.POST.get('firstname')
             lname = request.POST.get('lastname')
             phone_num = request.POST.get('phone')
+
+            errors = {}
+
+            if len(fname) < 4:
+                errors['firstName'] = ["Minimum 4 characters required"]
+            if len(lname) < 4:
+                errors['lastName'] = ["Minimum 4 characters required"]
+            if not phone_num.isdigit() or len(phone_num) != 10:
+                errors['phone'] = ["Enter a valid Phone number (10 digits)"]
+
+            if errors:
+                return JsonResponse(errors, status=400)
 
             user.first_name = fname
             user.last_name = lname
             user.phone = phone_num
             user.save()
 
-            return redirect('my_details')
+            return JsonResponse({'success': True})
 
-    # Render the edit details form template
     return render(request, 'platform/my_profile.html')
 
 
