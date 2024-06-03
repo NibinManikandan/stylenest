@@ -371,7 +371,8 @@ def order_razorpay(request):
         if total < 1000 and total > 0:
             delivery_charge = 50
             total +=  delivery_charge
-
+        
+        
         if cart_items.exists():
             total_quantity = sum(item.cart_quantity for item in cart_items)
             order = Order(
@@ -422,20 +423,20 @@ def order_razorpay(request):
             return JsonResponse(data)
         else:
             return JsonResponse({'success': False, 'message':'Your catr is empty'})
+        
+       
+
 
         
 def payment_confirm(request):
-    if Order.total_amount < 20000:
-        order_id = request.POST.get('order_id')
-        product=Order.objects.filter(order_id=order_id).first()
-        order_items=Order_item.objects.filter(order=product).all()
-        for items in order_items:
-            items.status='Order confirmed'
-            items.payment_status='Paid'
-            items.save()
-        return JsonResponse({'success':True,"message":"Product ordered Successfully"})
-    else:
-        return redirect('checkout')
+    order_id = request.POST.get('order_id')
+    product=Order.objects.filter(order_id=order_id).first()
+    order_items=Order_item.objects.filter(order=product).all()
+    for items in order_items:
+        items.status='Order confirmed'
+        items.payment_status='Paid'
+        items.save()
+    return JsonResponse({'success':True,"message":"Product ordered Successfully"})
 
 
 def repayment(request):

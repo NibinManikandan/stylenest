@@ -93,8 +93,8 @@ DATABASES = {
         'NAME': 'stylenest',
         'USER': 'postgres',
         'PASSWORD': '1999',
-        # 'HOST': 'postgres_container',
-        'HOST': 'localhost',
+        'HOST': 'postgres_container',
+        # 'HOST': 'localhost',
         'PORT': '5432'
     }
 }
