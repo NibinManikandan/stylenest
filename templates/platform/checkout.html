@@ -291,26 +291,27 @@
 
 <!--coupon modal-->
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script>
-	function copyCouponCode(button) {
-		let input = button.parentElement.querySelector(".text");
-		input.select();
-		document.execCommand("copy");
-		showCopyMessage();
-	}
-	
-	function showCopyMessage() {
-		let copyMessage = document.querySelector(".copy-message");
-		copyMessage.classList.add("active");
-		setTimeout(function () {
-			copyMessage.classList.remove("active");
-		}, 2000);
-	}
+    function copyCouponCode(button) {
+        let input = button.parentElement.querySelector("input");
+        input.select();
+        document.execCommand("copy");
+        showCopyMessage();
+    }
+    
+    function showCopyMessage() {
+        let copyMessage = document.querySelector(".copy-message");
+        copyMessage.classList.add("active");
+        setTimeout(function () {
+            copyMessage.classList.remove("active");
+        }, 2000);
+    }
 </script>
 
 
 <!--coupon applay-->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 
 	function getCSRFToken() {
@@ -325,22 +326,20 @@
 	}
 
 
-	<script>
-		function copyCouponCode(button) {
-			let input = button.parentElement.querySelector(".text");
-			input.select();
-			document.execCommand("copy");
-			showCopyMessage();
-		}
-		
-		function showCopyMessage() {
-			let copyMessage = document.querySelector(".copy-message");
-			copyMessage.classList.add("active");
-			setTimeout(function () {
-				copyMessage.classList.remove("active");
-			}, 2000);
-		}
-	</script>
+	function copyCouponCode(button) {
+		let input = button.parentElement.querySelector(".form-control");
+		input.select();
+		document.execCommand("copy");
+		showCopyMessage();
+	}
+	
+	function showCopyMessage() {
+		let copyMessage = document.querySelector(".copy-message");
+		copyMessage.classList.add("active");
+		setTimeout(function () {
+			copyMessage.classList.remove("active");
+		}, 2000);
+	}
 	
 	
 	<!--coupon applay-->
