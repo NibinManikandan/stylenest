@@ -425,15 +425,17 @@ def order_razorpay(request):
 
         
 def payment_confirm(request):
-    order_id = request.POST.get('order_id')
-    product=Order.objects.filter(order_id=order_id).first()
-    order_items=Order_item.objects.filter(order=product).all()
-    for items in order_items:
-        items.status='Order confirmed'
-        items.payment_status='Paid'
-        items.save()
-    return JsonResponse({'success':True,"message":"Product ordered Successfully"})
-
+    if Order.total_amount < 20000:
+        order_id = request.POST.get('order_id')
+        product=Order.objects.filter(order_id=order_id).first()
+        order_items=Order_item.objects.filter(order=product).all()
+        for items in order_items:
+            items.status='Order confirmed'
+            items.payment_status='Paid'
+            items.save()
+        return JsonResponse({'success':True,"message":"Product ordered Successfully"})
+    else:
+        return redirect('checkout')
 
 
 def repayment(request):
@@ -537,7 +539,7 @@ def place_order_wallet(request):
                 
                 return JsonResponse({"success": "Order placed successfully"})
             else:
-                return JsonResponse({"success": False, "message": "Insufficient balance in wallet"})
+                return JsonResponse({"success": False, "message": "Insufficient balance in wallet"}, status=400)
             
     return JsonResponse({"error": "User not authenticated"}, status=400)
 
